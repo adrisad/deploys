@@ -30,6 +30,9 @@ function scan() {
   const entries = fs.readdirSync(MAQUETAS_DIR, { withFileTypes: true });
 
   for (const entry of entries) {
+    if (entry.isFile() && /^ejemplo\.html?$/i.test(entry.name)) {
+      continue; // maqueta de ejemplo, no se lista
+    }
     if (entry.isFile() && /\.html?$/i.test(entry.name)) {
       items.push({
         id: stripExt(entry.name),
