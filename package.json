@@ -1,0 +1,10 @@
+{
+  "name": "galeria-maquetas",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Galeria de maquetas HTML lista para desplegar en Vercel",
+  "scripts": {
+    "build": "node generate-list.js",
+    "dev": "node generate-list.js && npx serve ."
+  }
+}

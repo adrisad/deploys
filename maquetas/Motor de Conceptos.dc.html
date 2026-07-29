@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+
+<helmet>
+  <style>
+    body{margin:0;background:#0b0d12;}
+    ::selection{background:#3b82f6;color:#fff;}
+    select{appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6'><path d='M0 0l5 6 5-6z' fill='%239199a8'/></svg>");background-repeat:no-repeat;background-position:right 14px center;}
+    @keyframes om-spin{to{transform:rotate(360deg);}}
+  </style>
+</helmet>
+<div style="min-height:100vh;background:#0b0d12;color:#f5f6f8;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;padding:48px;box-sizing:border-box;">
+
+  <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:24px;margin-bottom:24px;flex-wrap:wrap;">
+    <div style="width:100%;">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;">
+        <div style="font-size:32px;font-weight:800;letter-spacing:-0.02em;">Motor de Conceptos</div>
+        <button onClick="{{ onOpenNew }}" style="display:flex;align-items:center;gap:8px;background:#3b82f6;color:#fff;border:none;padding:10px 18px;border-radius:9px;font-size:14.5px;font-weight:600;cursor:pointer;white-space:nowrap;" style-hover="background:#2f6fe0;">+ Nuevo Concepto</button>
+      </div>
+      <div style="font-size:15px;color:#9199a8;margin-top:8px;max-width:660px;line-height:1.5;">Parametrización universal de fórmulas, tasas y campos de captura del motor de cálculo fiscal y contable (public.motor_conceptos).</div>
+    </div>
+  </div>
+
+  <div style="background:#14161c;border:1px solid #262a33;border-radius:14px;padding:24px;margin-bottom:20px;display:flex;gap:20px;align-items:flex-end;flex-wrap:wrap;">
+    <div style="flex:2;min-width:260px;">
+      <div style="font-size:11px;font-weight:700;letter-spacing:.06em;color:#9199a8;margin-bottom:8px;">BUSCAR (CÓDIGO O GLOSA)</div>
+      <input value="{{ search }}" onChange="{{ onSearchChange }}" placeholder="Ej: HON_BRUT, Honorarios..." style="width:100%;box-sizing:border-box;background:#0b0d12;border:1px solid #2a2d35;border-radius:9px;padding:12px 14px;color:#f5f6f8;font-size:14px;">
+    </div>
+    <div style="min-width:190px;">
+      <div style="font-size:11px;font-weight:700;letter-spacing:.06em;color:#9199a8;margin-bottom:8px;">SUBMÓDULO ERP</div>
+      <select value="{{ filterSubmodulo }}" onChange="{{ onFilterSubmoduloChange }}" style="width:100%;box-sizing:border-box;background:#0b0d12;border:1px solid #2a2d35;border-radius:9px;padding:12px 30px 12px 14px;color:#f5f6f8;font-size:14px;">
+        <option value="">Todos</option>
+        <sc-for list="{{ submodulosOptions }}" as="s" hint-placeholder-count="4">
+          <option value="{{ s }}">{{ s }}</option>
+        </sc-for>
+      </select>
+    </div>
+    <div style="min-width:150px;">
+      <div style="font-size:11px;font-weight:700;letter-spacing:.06em;color:#9199a8;margin-bottom:8px;">ESTADO</div>
+      <select value="{{ filterEstado }}" onChange="{{ onFilterEstadoChange }}" style="width:100%;box-sizing:border-box;background:#0b0d12;border:1px solid #2a2d35;border-radius:9px;padding:12px 30px 12px 14px;color:#f5f6f8;font-size:14px;">
+        <option value="todos">Todos</option>
+        <option value="Activo">Activo</option>
+        <option value="Inactivo">Inactivo</option>
+      </select>
+    </div>
+    <button onClick="{{ onClearFilters }}" style="background:#1b1d24;border:1px solid #2a2d35;color:#9199a8;padding:12px 18px;border-radius:9px;cursor:pointer;font-size:14px;">Limpiar</button>
+    <div style="color:#9199a8;font-size:14px;white-space:nowrap;padding-bottom:2px;">{{ registrosLabel }}</div>
+  </div>
+
+  <div style="background:#14161c;border:1px solid #262a33;border-radius:14px;overflow:hidden;">
+    <div style="display:grid;grid-template-columns:110px 1.3fr 100px 1.7fr 120px 110px 130px;padding:16px 24px;font-size:11px;font-weight:700;letter-spacing:.06em;color:#9199a8;border-bottom:1px solid #262a33;">
+      <div>CÓDIGO</div><div>GLOSA / NOMBRE</div><div>TIPO</div><div>CONFIGURACIÓN (JSONB)</div><div>SUBMÓDULO</div><div>ESTADO</div><div>ACCIONES</div>
+    </div>
+    <sc-for list="{{ filteredConcepts }}" as="c" hint-placeholder-count="5">
+      <div style="display:grid;grid-template-columns:110px 1.3fr 100px 1.7fr 120px 110px 130px;padding:18px 24px;align-items:center;border-bottom:1px solid #1d2028;">
+        <div style="color:#5b9dff;font-weight:600;font-size:13px;">{{ c.codigo }}</div>
+        <div style="font-size:14.5px;">{{ c.nombre }}</div>
+        <div><span style="font-size:11px;font-weight:700;padding:4px 8px;border-radius:6px;background:{{ c.tipoBg }};color:{{ c.tipoColor }};">{{ c.tipo }}</span></div>
+        <div style="font-size:12.5px;color:#9199a8;font-family:ui-monospace,monospace;">{{ c.resumen }}</div>
+        <div style="font-size:13px;color:#9199a8;">{{ c.submodulo }}</div>
+        <div>
+          <span style="display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:600;padding:5px 10px;border-radius:20px;background:{{ c.estadoBg }};color:{{ c.estadoColor }};">
+            <span style="width:6px;height:6px;border-radius:50%;background:{{ c.estadoColor }};"></span>{{ c.estado }}
+          </span>
+        </div>
+        <div style="display:flex;gap:14px;font-size:16px;">
+          <span onClick="{{ c.onView }}" title="Ver" style="cursor:pointer;">👁️</span>
+          <span onClick="{{ c.onEdit }}" title="Editar" style="cursor:pointer;">✏️</span>
+          <span onClick="{{ c.onDelete }}" title="Eliminar" style="cursor:pointer;">🗑️</span>
+        </div>
+      </div>
+    </sc-for>
+    <sc-if value="{{ noResults }}">
+      <div style="padding:48px;text-align:center;color:#6b7280;font-size:14px;">No se encontraron conceptos con los filtros aplicados.</div>
+    </sc-if>
+  </div>
+
+  <sc-if value="{{ showModal }}">
+    <div style="position:fixed;inset:0;background:rgba(0,0,0,.65);display:flex;align-items:center;justify-content:center;z-index:50;padding:24px;">
+
+      <sc-if value="{{ isDeleteModal }}">
+        <div style="background:#14161c;border:1px solid #262a33;border-radius:16px;padding:32px;max-width:480px;width:100%;">
+          <div style="font-size:19px;font-weight:700;margin-bottom:16px;">⚠️ Confirmación de Baja Lógica de Regla Macro</div>
+
+          <sc-if value="{{ deletePhaseConfirm }}">
+            <div style="color:#9199a8;font-size:14.5px;line-height:1.6;margin-bottom:20px;">
+              ¿Está seguro que desea eliminar la regla macro <strong style="color:#f5f6f8;">[ {{ deleteConceptCodigo }} ]</strong>? El sistema ejecutará una comprobación de dependencias contables en tiempo real.
+            </div>
+            <div style="display:flex;justify-content:flex-end;gap:12px;">
+              <button onClick="{{ onCloseModal }}" style="background:transparent;border:1px solid #2a2d35;color:#9199a8;padding:11px 20px;border-radius:9px;cursor:pointer;">Cancelar</button>
+              <button onClick="{{ onConfirmBaja }}" style="background:#ef4444;color:#fff;border:none;padding:11px 20px;border-radius:9px;cursor:pointer;font-weight:600;">✓ Confirmar Baja</button>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ deletePhaseChecking }}">
+            <div style="display:flex;align-items:center;gap:12px;color:#9199a8;font-size:14px;padding:8px 0 24px;">
+              <span style="width:16px;height:16px;border-radius:50%;border:2px solid #2a2d35;border-top-color:#3b82f6;animation:om-spin 0.8s linear infinite;"></span>
+              Procesando validación de dependencias contables…
+            </div>
+            <div style="display:flex;justify-content:flex-end;">
+              <button disabled="{{ true }}" style="background:#2a2d35;color:#6b7280;border:none;padding:11px 20px;border-radius:9px;font-weight:600;">Validando…</button>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ deleteBlocked }}">
+            <div style="background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);border-radius:10px;padding:16px;color:#fca5a5;font-size:14px;line-height:1.6;margin-bottom:20px;">
+              No es posible eliminar <strong>{{ deleteConceptCodigo }}</strong>. Está en uso activo dentro del ecosistema contable:
+              <div style="margin-top:8px;color:#fecaca;">{{ deleteUsosText }}</div>
+            </div>
+            <div style="display:flex;justify-content:flex-end;">
+              <button onClick="{{ onCloseModal }}" style="background:#3b82f6;color:#fff;border:none;padding:11px 22px;border-radius:9px;cursor:pointer;font-weight:600;">Entendido</button>
+            </div>
+          </sc-if>
+          <sc-if value="{{ deleteNotBlocked }}">
+            <div style="color:#9199a8;font-size:14.5px;line-height:1.6;margin-bottom:24px;">
+              El concepto <strong style="color:#f5f6f8;">{{ deleteConceptCodigo }} — {{ deleteConceptNombre }}</strong> no tiene dependencias activas. Se marcará como <strong style="color:#f5f6f8;">Inactivo</strong> (deshabilitación lógica); el registro histórico se conserva.
+            </div>
+            <div style="display:flex;justify-content:flex-end;gap:12px;">
+              <button onClick="{{ onCloseModal }}" style="background:transparent;border:1px solid #2a2d35;color:#9199a8;padding:11px 20px;border-radius:9px;cursor:pointer;">Cancelar</button>
+              <button onClick="{{ onConfirmDisable }}" style="background:#ef4444;color:#fff;border:none;padding:11px 20px;border-radius:9px;cursor:pointer;font-weight:600;">Deshabilitar</button>
+            </div>
+          </sc-if>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isFormModal }}">
+        <div style="background:#14161c;border:1px solid #262a33;border-radius:16px;padding:32px;max-width:640px;width:100%;max-height:88vh;overflow:auto;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;">
+            <div style="font-size:19px;font-weight:700;">{{ modalTitle }}</div>
+            <span onClick="{{ onCloseModal }}" style="cursor:pointer;color:#9199a8;font-size:20px;">✕</span>
+          </div>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
+            <div>
+              <div style="font-size:11px;font-weight:700;letter-spacing:.06em;color:#9199a8;margin-bottom:8px;">CÓDIGO ÚNICO</div>
+              <input value="{{ formCodigo }}" onChange="{{ onCodigoChange }}" disabled="{{ codigoDisabled }}" placeholder="Ej: HON_BRUT" style="width:100%;box-sizing:border-box;background:{{ codigoBg }};border:1px solid #2a2d35;border-radius:9px;padding:11px 13px;color:#f5f6f8;font-size:14px;">
+            </div>
+            <div>
+              <div style="font-size:11px;font-weight:700;letter-spacing:.06em;color:#9199a8;margin-bottom:8px;">GLOSA / NOMBRE</div>
+              <input value="{{ formNombre }}" onChange="{{ onNombreChange }}" disabled="{{ isViewMode }}" placeholder="Ej: Captura de Importe Bruto" style="width:100%;box-sizing:border-box;background:#0b0d12;border:1px solid #2a2d35;border-radius:9px;padding:11px 13px;color:#f5f6f8;font-size:14px;">
+            </div>
+          </div>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;">
+            <div>
+              <div style="font-size:11px;font-weight:700;letter-spacing:.06em;color:#9199a8;margin-bottom:8px;">SUBMÓDULO ERP</div>
+              <select value="{{ formSubmodulo }}" onChange="{{ onSubmoduloChange }}" disabled="{{ isViewMode }}" style="width:100%;box-sizing:border-box;background:#0b0d12;border:1px solid #2a2d35;border-radius:9px;padding:11px 30px 11px 13px;color:#f5f6f8;font-size:14px;">
+                <sc-for list="{{ submodulosOptions }}" as="s" hint-placeholder-count="4">
+                  <option value="{{ s }}">{{ s }}</option>
+                </sc-for>
+              </select>
+            </div>
+            <div>
+              <div style="font-size:11px;font-weight:700;letter-spacing:.06em;color:#9199a8;margin-bottom:8px;">ESTADO OPERATIVO</div>
+              <button onClick="{{ onToggleEstado }}" disabled="{{ isViewMode }}" style="display:flex;align-items:center;gap:10px;width:100%;box-sizing:border-box;background:#0b0d12;border:1px solid #2a2d35;border-radius:9px;padding:11px 13px;cursor:pointer;">
+                <span style="width:36px;height:20px;border-radius:12px;background:{{ estadoToggleTrack }};position:relative;flex:none;">
+                  <span style="position:absolute;top:2px;left:{{ estadoToggleLeft }};width:16px;height:16px;border-radius:50%;background:#fff;transition:left .15s;"></span>
+                </span>
+                <span style="font-size:14px;font-weight:600;color:{{ estadoToggleTextColor }};">{{ formEstado }}</span>
+              </button>
+            </div>
+          </div>
+
+          <div style="margin-bottom:10px;font-size:11px;font-weight:700;letter-spacing:.06em;color:#9199a8;">TIPO DE CONCEPTO</div>
+          <div style="display:flex;gap:10px;margin-bottom:24px;">
+            <button onClick="{{ onSetTipoCampo }}" disabled="{{ tipoLocked }}" style="flex:1;padding:12px;border-radius:9px;cursor:pointer;font-weight:600;font-size:13.5px;background:{{ tipoCampoBg }};color:{{ tipoCampoColor }};border:1px solid {{ tipoCampoBorder }};">CAMPO</button>
+            <button onClick="{{ onSetTipoMonto }}" disabled="{{ tipoLocked }}" style="flex:1;padding:12px;border-radius:9px;cursor:pointer;font-weight:600;font-size:13.5px;background:{{ tipoMontoBg }};color:{{ tipoMontoColor }};border:1px solid {{ tipoMontoBorder }};">MONTO</button>
+            <button onClick="{{ onSetTipoFormula }}" disabled="{{ tipoLocked }}" style="flex:1;padding:12px;border-radius:9px;cursor:pointer;font-weight:600;font-size:13.5px;background:{{ tipoFormulaBg }};color:{{ tipoFormulaColor }};border:1px solid {{ tipoFormulaBorder }};">FÓRMULA</button>
+          </div>
+
+          <div style="background:#0b0d12;border:1px solid #1d2028;border-radius:12px;padding:20px;margin-bottom:24px;">
+            <sc-if value="{{ isTipoCampo }}">
+              <div style="font-size:11px;font-weight:700;color:#9199a8;margin-bottom:10px;letter-spacing:.06em;">CAMPO DESTINO (public.campos_destino)</div>
+              <select value="{{ formCampoDestinoId }}" onChange="{{ onCampoDestinoChange }}" disabled="{{ isViewMode }}" style="width:100%;box-sizing:border-box;background:#14161c;border:1px solid #2a2d35;border-radius:9px;padding:11px 30px 11px 13px;color:#f5f6f8;font-size:14px;margin-bottom:14px;">
+                <sc-for list="{{ campoDestinoOptions }}" as="cd" hint-placeholder-count="5">
+                  <option value="{{ cd.id }}">{{ cd.var }}</option>
+                </sc-for>
+              </select>
+              <div style="font-size:13px;color:#7dd3fc;font-family:ui-monospace,monospace;">{{ campoPreview }}</div>
+            </sc-if>
+            <sc-if value="{{ isTipoMonto }}">
+              <div style="font-size:11px;font-weight:700;color:#9199a8;margin-bottom:10px;letter-spacing:.06em;">NATURALEZA DEL VALOR</div>
+              <div style="display:flex;gap:10px;margin-bottom:16px;">
+                <button onClick="{{ onSetSubtipoPorcentaje }}" disabled="{{ isViewMode }}" style="flex:1;padding:10px;border-radius:8px;cursor:pointer;font-size:13.5px;font-weight:600;background:{{ subtipoPctBg }};color:{{ subtipoPctColor }};border:1px solid {{ subtipoPctBorder }};">Porcentaje</button>
+                <button onClick="{{ onSetSubtipoAbsoluto }}" disabled="{{ isViewMode }}" style="flex:1;padding:10px;border-radius:8px;cursor:pointer;font-size:13.5px;font-weight:600;background:{{ subtipoAbsBg }};color:{{ subtipoAbsColor }};border:1px solid {{ subtipoAbsBorder }};">Absoluto</button>
+              </div>
+              <div style="font-size:12px;color:#9199a8;margin-bottom:6px;">{{ montoValorLabel }}</div>
+              <input value="{{ formMontoValor }}" onChange="{{ onMontoValorChange }}" disabled="{{ isViewMode }}" placeholder="0.00" style="width:100%;box-sizing:border-box;background:#14161c;border:1px solid #2a2d35;border-radius:9px;padding:11px 13px;color:#f5f6f8;font-size:14px;margin-bottom:12px;">
+              <div style="font-size:13px;color:#7dd3fc;font-family:ui-monospace,monospace;">{{ montoPreview }}</div>
+            </sc-if>
+            <sc-if value="{{ isTipoFormula }}">
+              <div style="font-size:11px;font-weight:700;color:#9199a8;margin-bottom:10px;letter-spacing:.06em;">🧮 CALCULADORA VISUAL — PANEL DE LA EXPRESIÓN ANALIZADA</div>
+              <div style="background:#000;border:1px solid #2a2d35;border-radius:8px;padding:14px;font-family:ui-monospace,monospace;font-size:14px;color:#4ade80;min-height:22px;margin-bottom:16px;">{{ formulaDisplay }}</div>
+
+              <div style="display:grid;grid-template-columns:1.3fr 1fr;gap:20px;margin-bottom:20px;">
+                <div>
+                  <div style="font-size:11px;color:#6b7280;margin-bottom:8px;">OPERADORES</div>
+                  <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px;">
+                    <sc-for list="{{ operatorPalette }}" as="op" hint-placeholder-count="6">
+                      <button onClick="{{ op.onClick }}" disabled="{{ isViewMode }}" style="background:#1d1f26;color:#f5f6f8;border:1px solid #2a2d35;border-radius:7px;width:38px;height:38px;font-size:15px;cursor:pointer;">{{ op.label }}</button>
+                    </sc-for>
+                  </div>
+                  <div style="display:flex;flex-wrap:wrap;gap:8px;">
+                    <button onClick="{{ onClearTokens }}" disabled="{{ isViewMode }}" style="background:transparent;color:#9199a8;border:1px solid #2a2d35;border-radius:7px;padding:9px 14px;font-size:12.5px;cursor:pointer;">🗑 Limpiar Tablero</button>
+                    <button onClick="{{ onValidateSyntax }}" style="background:transparent;color:#9199a8;border:1px solid #2a2d35;border-radius:7px;padding:9px 14px;font-size:12.5px;cursor:pointer;">✓ Validar Sintaxis</button>
+                  </div>
+                  <sc-if value="{{ hasValidationMsg }}">
+                    <div style="margin-top:12px;font-size:12.5px;padding:9px 12px;border-radius:8px;background:{{ validationBg }};color:{{ validationColor }};">{{ validationMsg }}</div>
+                  </sc-if>
+                </div>
+                <div>
+                  <div style="font-size:11px;color:#6b7280;margin-bottom:8px;">+ INSERTAR VARIABLE — DISPONIBLES EN {{ formSubmodulo }}</div>
+                  <div style="display:flex;flex-direction:column;gap:8px;">
+                    <sc-for list="{{ tokenPalette }}" as="t" hint-placeholder-count="3">
+                      <button onClick="{{ t.onClick }}" disabled="{{ isViewMode }}" style="text-align:left;background:#1b2735;color:#7dd3fc;border:1px solid #234;border-radius:7px;padding:9px 12px;font-size:12.5px;font-family:ui-monospace,monospace;cursor:pointer;">→ {{ t.label }} <span style="color:#6b93aa;">({{ t.typeLabel }})</span></button>
+                    </sc-for>
+                  </div>
+                </div>
+              </div>
+
+              <div style="font-size:12px;color:#9199a8;margin-bottom:6px;">Almacenar Resultado en</div>
+              <select value="{{ formFormulaResultadoId }}" onChange="{{ onFormulaResultadoChange }}" disabled="{{ isViewMode }}" style="width:100%;box-sizing:border-box;background:#14161c;border:1px solid #2a2d35;border-radius:9px;padding:11px 30px 11px 13px;color:#f5f6f8;font-size:14px;margin-bottom:8px;">
+                <sc-for list="{{ campoDestinoOptions }}" as="cd" hint-placeholder-count="5">
+                  <option value="{{ cd.id }}">{{ cd.var }}</option>
+                </sc-for>
+              </select>
+              <div style="font-size:11.5px;color:#6b7280;">El token {{ formulaResultadoToken }} equivale a la variable amigable seleccionada.</div>
+            </sc-if>
+          </div>
+
+          <div style="display:flex;justify-content:flex-end;gap:12px;">
+            <button onClick="{{ onCloseModal }}" style="background:transparent;border:1px solid #2a2d35;color:#9199a8;padding:11px 22px;border-radius:9px;cursor:pointer;">{{ closeButtonLabel }}</button>
+            <sc-if value="{{ showSaveButton }}">
+              <button onClick="{{ onSaveConcept }}" disabled="{{ saveDisabled }}" style="background:#3b82f6;color:#fff;border:none;padding:11px 24px;border-radius:9px;cursor:pointer;font-weight:600;opacity:{{ saveOpacity }};">Guardar</button>
+            </sc-if>
+          </div>
+        </div>
+      </sc-if>
+
+    </div>
+  </sc-if>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+
+const SUBMODULOS = ['COMPRAS', 'VENTAS', 'TESORERIA', 'PLANILLAS'];
+
+const CAMPOS_DESTINO = [
+  { id: 101, var: 'HON_BASE_BRUTA', tabla: 'cabecera_libro_compras', col: 'monto_base_imponible_pais' },
+  { id: 102, var: 'HON_IMP_RETENCION', tabla: 'cabecera_libro_compras', col: 'monto_retencion_igv_pais' },
+  { id: 103, var: 'VTA_BASE_BRUTA', tabla: 'cabecera_libro_ventas', col: 'monto_base_imponible_pais' },
+  { id: 104, var: 'TES_MONTO_COMISION', tabla: 'cabecera_movimientos_tesoreria', col: 'monto_comision_pais' },
+  { id: 105, var: 'PLA_BASE_SUELDO', tabla: 'cabecera_planillas', col: 'monto_sueldo_base_pais' },
+];
+
+const SEED = [
+  { id: 50, codigo: 'HON_BRUT', nombre: 'Captura de Importe Bruto', tipo: 'CAMPO', submodulo: 'COMPRAS', estado: 'Activo', campoDestinoId: 101, enUso: true, usos: ['Dinámica Contable #2001 (Honorarios Local)'] },
+  { id: 51, codigo: 'HON_TASA', nombre: 'Tasa de Retención 4ta Categoría', tipo: 'MONTO', submodulo: 'COMPRAS', estado: 'Activo', montoSubtipo: 'PORCENTAJE', montoValor: '8.00', enUso: true, usos: ['Referenciado por la fórmula HON_RET'] },
+  { id: 52, codigo: 'HON_RET', nombre: 'Cálculo de Retención Cuarta', tipo: 'FORMULA', submodulo: 'COMPRAS', estado: 'Activo', formulaTokens: [{ type: 'var', value: 'HON_BRUT' }, { type: 'op', value: '*' }, { type: 'var', value: 'HON_TASA' }], formulaResultadoId: 102, enUso: true, usos: ['Dinámica Contable #2002 (Honorarios Local)'] },
+  { id: 53, codigo: 'VTA_BRUT', nombre: 'Captura de Venta Bruta', tipo: 'CAMPO', submodulo: 'VENTAS', estado: 'Activo', campoDestinoId: 103, enUso: false, usos: [] },
+  { id: 54, codigo: 'VTA_IGV', nombre: 'Tasa IGV Ventas', tipo: 'MONTO', submodulo: 'VENTAS', estado: 'Activo', montoSubtipo: 'PORCENTAJE', montoValor: '18.00', enUso: false, usos: [] },
+  { id: 55, codigo: 'TES_COM_FIJA', nombre: 'Comisión Bancaria Fija', tipo: 'MONTO', submodulo: 'TESORERIA', estado: 'Inactivo', montoSubtipo: 'ABSOLUTO', montoValor: '15.00', enUso: false, usos: [] },
+  { id: 56, codigo: 'PLA_SUELDO', nombre: 'Captura de Sueldo Base', tipo: 'CAMPO', submodulo: 'PLANILLAS', estado: 'Activo', campoDestinoId: 105, enUso: false, usos: [] },
+  { id: 57, codigo: 'VTA_TOTAL', nombre: 'Total Venta con Comisión', tipo: 'FORMULA', submodulo: 'VENTAS', estado: 'Inactivo', formulaTokens: [{ type: 'var', value: 'VTA_BRUT' }, { type: 'op', value: '+' }, { type: 'var', value: 'TES_COM_FIJA' }], formulaResultadoId: 104, enUso: false, usos: [] },
+];
+
+class Component extends DCLogic {
+  emptyForm() {
+    return { codigo: '', nombre: '', submodulo: 'COMPRAS', estado: 'Activo', tipo: 'CAMPO', campoDestinoId: 101, montoSubtipo: 'PORCENTAJE', montoValor: '', formulaTokens: [], formulaResultadoId: 101 };
+  }
+
+  state = {
+    concepts: SEED,
+    search: '',
+    filterSubmodulo: '',
+    filterEstado: 'todos',
+    modal: null,
+    form: this.emptyForm(),
+    validationMsg: '',
+    validationOk: false,
+  };
+
+  findCampo(id) { return CAMPOS_DESTINO.find(c => String(c.id) === String(id)); }
+  findConcept(id) { return this.state.concepts.find(c => c.id === id); }
+
+  resumenFor(c) {
+    if (c.tipo === 'CAMPO') {
+      const cd = this.findCampo(c.campoDestinoId);
+      return 'Mapea a: ' + c.submodulo + ' ➔ ' + (cd ? cd.var : '—');
+    }
+    if (c.tipo === 'MONTO') {
+      return c.montoSubtipo === 'PORCENTAJE'
+        ? 'Tipo: Porcentaje | Valor: ' + c.montoValor + ' %'
+        : 'Tipo: Absoluto | Valor: S/ ' + c.montoValor;
+    }
+    const expr = (c.formulaTokens || []).map(t => t.type === 'var' ? '{' + t.value + '}' : t.value).join(' ');
+    const cd = this.findCampo(c.formulaResultadoId);
+    return 'Operación: ' + expr + ' ➔ ' + (cd ? cd.var : '—');
+  }
+
+  tipoColors(tipo) {
+    if (tipo === 'CAMPO') return { bg: 'rgba(59,130,246,.15)', color: '#93c5fd' };
+    if (tipo === 'MONTO') return { bg: 'rgba(168,85,247,.15)', color: '#d8b4fe' };
+    return { bg: 'rgba(34,197,94,.15)', color: '#86efac' };
+  }
+
+  loadForm(c) {
+    return {
+      codigo: c.codigo, nombre: c.nombre, submodulo: c.submodulo, estado: c.estado, tipo: c.tipo,
+      campoDestinoId: c.campoDestinoId ?? 101,
+      montoSubtipo: c.montoSubtipo ?? 'PORCENTAJE', montoValor: c.montoValor ?? '',
+      formulaTokens: c.formulaTokens ? c.formulaTokens.slice() : [],
+      formulaResultadoId: c.formulaResultadoId ?? 101,
+    };
+  }
+
+  openNew() { this.setState({ modal: { type: 'new', id: null }, form: this.emptyForm() }); }
+  openView(c) { this.setState({ modal: { type: 'view', id: c.id }, form: this.loadForm(c) }); }
+  openEdit(c) { this.setState({ modal: { type: 'edit', id: c.id }, form: this.loadForm(c) }); }
+  openDelete(c) { this.setState({ modal: { type: 'delete', id: c.id, phase: 'confirm' } }); }
+  closeModal() { this.setState({ modal: null }); }
+
+  confirmBaja() {
+    this.setState(s => ({ modal: { ...s.modal, phase: 'checking' } }));
+    setTimeout(() => {
+      this.setState(s => (s.modal && s.modal.type === 'delete' ? { modal: { ...s.modal, phase: 'result' } } : {}));
+    }, 900);
+  }
+
+  setField(key, val) { this.setState(s => ({ form: { ...s.form, [key]: val } })); }
+  setTipo(t) { if (this.state.modal && this.state.modal.type === 'edit') return; this.setField('tipo', t); }
+  addToken(tok) { this.setState(s => ({ form: { ...s.form, formulaTokens: [...s.form.formulaTokens, tok] } })); }
+  removeLastToken() { this.setState(s => ({ form: { ...s.form, formulaTokens: s.form.formulaTokens.slice(0, -1) } })); }
+  clearTokens() { this.setField('formulaTokens', []); this.setState({ validationMsg: '' }); }
+
+  validateSyntax() {
+    const tokens = this.state.form.formulaTokens;
+    if (!tokens.length) { this.setState({ validationMsg: 'La expresión está vacía.', validationOk: false }); return; }
+    let depth = 0, prevWasOperand = false, ok = true;
+    for (const t of tokens) {
+      if (t.value === '(') { depth++; prevWasOperand = false; }
+      else if (t.value === ')') { depth--; if (depth < 0) { ok = false; break; } prevWasOperand = true; }
+      else if (t.type === 'op') { if (!prevWasOperand) { ok = false; break; } prevWasOperand = false; }
+      else { prevWasOperand = true; }
+    }
+    if (depth !== 0) ok = false;
+    if (!prevWasOperand) ok = false;
+    this.setState({ validationMsg: ok ? 'Sintaxis válida — expresión balanceada.' : 'Sintaxis inválida — revise operadores o paréntesis.', validationOk: ok });
+  }
+
+  saveConcept() {
+    const f = this.state.form;
+    if (!f.codigo.trim() || !f.nombre.trim()) return;
+    const modal = this.state.modal;
+    this.setState(s => {
+      let concepts;
+      if (modal.type === 'new') {
+        const nextId = Math.max(0, ...s.concepts.map(c => c.id)) + 1;
+        concepts = [...s.concepts, { id: nextId, ...f, enUso: false, usos: [] }];
+      } else {
+        concepts = s.concepts.map(c => c.id === modal.id ? { ...c, ...f, enUso: c.enUso, usos: c.usos } : c);
+      }
+      return { concepts, modal: null };
+    });
+  }
+
+  confirmDisable() {
+    const id = this.state.modal.id;
+    this.setState(s => ({ concepts: s.concepts.map(c => c.id === id ? { ...c, estado: 'Inactivo' } : c), modal: null }));
+  }
+
+  renderVals() {
+    const s = this.state;
+    const search = s.search.trim().toLowerCase();
+    const filtered = s.concepts.filter(c => {
+      const matchSearch = !search || c.codigo.toLowerCase().includes(search) || c.nombre.toLowerCase().includes(search);
+      const matchSub = !s.filterSubmodulo || c.submodulo === s.filterSubmodulo;
+      const matchEstado = s.filterEstado === 'todos' || c.estado === s.filterEstado;
+      return matchSearch && matchSub && matchEstado;
+    });
+
+    const filteredConcepts = filtered.map(c => {
+      const tc = this.tipoColors(c.tipo);
+      const activo = c.estado === 'Activo';
+      return {
+        ...c,
+        resumen: this.resumenFor(c),
+        tipoBg: tc.bg, tipoColor: tc.color,
+        estadoBg: activo ? 'rgba(34,197,94,.12)' : 'rgba(148,163,184,.12)',
+        estadoColor: activo ? '#4ade80' : '#94a3b8',
+        onView: () => this.openView(c),
+        onEdit: () => this.openEdit(c),
+        onDelete: () => this.openDelete(c),
+      };
+    });
+
+    const modal = s.modal;
+    const f = s.form;
+    const isDeleteModal = !!modal && modal.type === 'delete';
+    const isFormModal = !!modal && (modal.type === 'new' || modal.type === 'edit' || modal.type === 'view');
+    const isViewMode = !!modal && modal.type === 'view';
+    const isEditMode = !!modal && modal.type === 'edit';
+    const isNewMode = !!modal && modal.type === 'new';
+
+    let deleteBlocked = false, deleteConceptCodigo = '', deleteConceptNombre = '', deleteUsosText = '';
+    const deletePhaseConfirm = isDeleteModal && modal.phase === 'confirm';
+    const deletePhaseChecking = isDeleteModal && modal.phase === 'checking';
+    const deletePhaseResult = isDeleteModal && modal.phase === 'result';
+    if (isDeleteModal) {
+      const dc = this.findConcept(modal.id);
+      if (dc) {
+        deleteBlocked = deletePhaseResult && !!dc.enUso;
+        deleteConceptCodigo = dc.codigo;
+        deleteConceptNombre = dc.nombre;
+        deleteUsosText = (dc.usos || []).join(' · ');
+      }
+    }
+
+    const tipoBtnStyle = (active, activeColor) => active
+      ? { bg: activeColor.bg, color: activeColor.color, border: activeColor.border }
+      : { bg: 'transparent', color: '#9199a8', border: '#2a2d35' };
+
+    const campoActive = tipoBtnStyle(f.tipo === 'CAMPO', { bg: 'rgba(59,130,246,.15)', color: '#93c5fd', border: '#3b82f6' });
+    const montoActive = tipoBtnStyle(f.tipo === 'MONTO', { bg: 'rgba(168,85,247,.15)', color: '#d8b4fe', border: '#a855f7' });
+    const formulaActive = tipoBtnStyle(f.tipo === 'FORMULA', { bg: 'rgba(34,197,94,.15)', color: '#86efac', border: '#22c55e' });
+
+    const pctActive = tipoBtnStyle(f.montoSubtipo === 'PORCENTAJE', { bg: 'rgba(59,130,246,.15)', color: '#93c5fd', border: '#3b82f6' });
+    const absActive = tipoBtnStyle(f.montoSubtipo === 'ABSOLUTO', { bg: 'rgba(59,130,246,.15)', color: '#93c5fd', border: '#3b82f6' });
+
+    const cdCampo = this.findCampo(f.campoDestinoId);
+    const campoPreview = cdCampo ? ('Mapea a: ' + f.submodulo + ' ➔ ' + cdCampo.tabla + '.' + cdCampo.col) : 'Seleccione un campo destino…';
+
+    const valNum = parseFloat(f.montoValor);
+    let montoPreview = 'Ingrese un valor…';
+    if (!isNaN(valNum)) {
+      montoPreview = f.montoSubtipo === 'PORCENTAJE'
+        ? 'Factor de operación: ' + (valNum / 100).toFixed(4) + ' (' + valNum.toFixed(2) + '%)'
+        : 'Factor de operación: ' + valNum.toFixed(2) + ' (valor absoluto)';
+    }
+
+    const formulaDisplay = f.formulaTokens.length
+      ? f.formulaTokens.map(t => t.type === 'var' ? '{' + t.value + '}' : t.value).join(' ')
+      : 'Toque variables y operadores para construir la fórmula…';
+
+    const tokenSource = s.concepts.filter(c => c.tipo !== 'FORMULA' && c.submodulo === f.submodulo && c.id !== modal?.id);
+    const tokenTypeLabel = c => c.tipo === 'CAMPO' ? 'Campo' : (c.montoSubtipo === 'PORCENTAJE' ? 'Tasa / Decimal' : 'Monto Fijo');
+    const tokenPalette = tokenSource.map(c => ({ label: c.codigo, typeLabel: tokenTypeLabel(c), onClick: () => this.addToken({ type: 'var', value: c.codigo }) }));
+    const operatorPalette = ['+', '-', '*', '/', '(', ')'].map(op => ({ label: op, onClick: () => this.addToken({ type: 'op', value: op }) }));
+    const resultCampo = this.findCampo(f.formulaResultadoId);
+
+    return {
+      search: s.search, filterSubmodulo: s.filterSubmodulo, filterEstado: s.filterEstado,
+      submodulosOptions: SUBMODULOS,
+      registrosLabel: filteredConcepts.length + ' registro' + (filteredConcepts.length === 1 ? '' : 's'),
+      noResults: filteredConcepts.length === 0,
+      filteredConcepts,
+      onSearchChange: e => this.setState({ search: e.target.value }),
+      onFilterSubmoduloChange: e => this.setState({ filterSubmodulo: e.target.value }),
+      onFilterEstadoChange: e => this.setState({ filterEstado: e.target.value }),
+      onClearFilters: () => this.setState({ search: '', filterSubmodulo: '', filterEstado: 'todos' }),
+      onOpenNew: () => this.openNew(),
+
+      showModal: !!modal, isDeleteModal, isFormModal, isViewMode,
+      deletePhaseConfirm, deletePhaseChecking,
+      deleteBlocked, deleteNotBlocked: deletePhaseResult && !deleteBlocked,
+      deleteConceptCodigo, deleteConceptNombre, deleteUsosText,
+      onCloseModal: () => this.closeModal(),
+      onConfirmBaja: () => this.confirmBaja(),
+      onConfirmDisable: () => this.confirmDisable(),
+
+      modalTitle: isNewMode ? 'Nuevo Concepto' : isEditMode ? 'Editar Concepto' : 'Ver Concepto',
+      closeButtonLabel: isViewMode ? 'Cerrar' : 'Cancelar',
+      showSaveButton: !isViewMode,
+      saveDisabled: !f.codigo.trim() || !f.nombre.trim(),
+      saveOpacity: (!f.codigo.trim() || !f.nombre.trim()) ? 0.5 : 1,
+
+      formCodigo: f.codigo, formNombre: f.nombre, formSubmodulo: f.submodulo, formEstado: f.estado,
+      codigoDisabled: isViewMode || isEditMode,
+      codigoBg: (isViewMode || isEditMode) ? '#0f1115' : '#0b0d12',
+      onCodigoChange: e => this.setField('codigo', e.target.value.toUpperCase()),
+      onNombreChange: e => this.setField('nombre', e.target.value),
+      onSubmoduloChange: e => this.setField('submodulo', e.target.value),
+      onEstadoChange: e => this.setField('estado', e.target.value),
+
+      tipoLocked: isViewMode || isEditMode,
+      isTipoCampo: f.tipo === 'CAMPO', isTipoMonto: f.tipo === 'MONTO', isTipoFormula: f.tipo === 'FORMULA',
+      tipoCampoBg: campoActive.bg, tipoCampoColor: campoActive.color, tipoCampoBorder: campoActive.border,
+      tipoMontoBg: montoActive.bg, tipoMontoColor: montoActive.color, tipoMontoBorder: montoActive.border,
+      tipoFormulaBg: formulaActive.bg, tipoFormulaColor: formulaActive.color, tipoFormulaBorder: formulaActive.border,
+      onSetTipoCampo: () => this.setTipo('CAMPO'),
+      onSetTipoMonto: () => this.setTipo('MONTO'),
+      onSetTipoFormula: () => this.setTipo('FORMULA'),
+
+      campoDestinoOptions: CAMPOS_DESTINO,
+      formCampoDestinoId: f.campoDestinoId,
+      onCampoDestinoChange: e => this.setField('campoDestinoId', parseInt(e.target.value, 10)),
+      campoPreview,
+
+      subtipoPctBg: pctActive.bg, subtipoPctColor: pctActive.color, subtipoPctBorder: pctActive.border,
+      subtipoAbsBg: absActive.bg, subtipoAbsColor: absActive.color, subtipoAbsBorder: absActive.border,
+      onSetSubtipoPorcentaje: () => this.setField('montoSubtipo', 'PORCENTAJE'),
+      onSetSubtipoAbsoluto: () => this.setField('montoSubtipo', 'ABSOLUTO'),
+      montoValorLabel: f.montoSubtipo === 'PORCENTAJE' ? 'Valor (%)' : 'Valor (Monto Fijo)',
+      formMontoValor: f.montoValor,
+      onMontoValorChange: e => this.setField('montoValor', e.target.value),
+      montoPreview,
+
+      formulaDisplay, tokenPalette, operatorPalette,
+      onRemoveLastToken: () => this.removeLastToken(),
+      onClearTokens: () => this.clearTokens(),
+      formFormulaResultadoId: f.formulaResultadoId,
+      onFormulaResultadoChange: e => this.setField('formulaResultadoId', parseInt(e.target.value, 10)),
+      formulaResultadoToken: resultCampo ? ('{' + resultCampo.var + '}') : '—',
+      onValidateSyntax: () => this.validateSyntax(),
+      hasValidationMsg: !!s.validationMsg,
+      validationMsg: s.validationMsg,
+      validationBg: s.validationOk ? 'rgba(34,197,94,.12)' : 'rgba(239,68,68,.12)',
+      validationColor: s.validationOk ? '#4ade80' : '#fca5a5',
+
+      onToggleEstado: () => this.setField('estado', f.estado === 'Activo' ? 'Inactivo' : 'Activo'),
+      estadoToggleTrack: f.estado === 'Activo' ? '#3b82f6' : '#2a2d35',
+      estadoToggleLeft: f.estado === 'Activo' ? '18px' : '2px',
+      estadoToggleTextColor: f.estado === 'Activo' ? '#4ade80' : '#9199a8',
+
+      onSaveConcept: () => this.saveConcept(),
+    };
+  }
+}
+
+</script>
+</body>
+</html>
