@@ -1,10 +1,15 @@
 {
-  "generatedAt": "2026-07-28T00:00:00.000Z",
+  "generatedAt": "2026-07-31T00:00:00.000Z",
   "items": [
     {
       "id": "HU Actualizacion motor de conceptos",
       "name": "HU Actualizacion motor de conceptos",
       "path": "maquetas/HU Actualizacion motor de conceptos.dc.html"
+    },
+    {
+      "id": "Honorarios/Registro de Honorarios",
+      "name": "Registro De Honorarios",
+      "path": "maquetas/Honorarios/Registro de Honorarios.dc.html"
     }
   ]
 }

@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+
+<helmet>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+  body { margin:0; background:#05070d; }
+  * { box-sizing:border-box; font-family:'Manrope',system-ui,sans-serif; }
+  ::-webkit-scrollbar { width:10px; height:10px; }
+  ::-webkit-scrollbar-thumb { background:#232838; border-radius:6px; }
+  a { color:#6ea1ff; text-decoration:none; }
+  a:hover { color:#8fb4ff; }
+  input[type=date]::-webkit-calendar-picker-indicator { filter:invert(0.6); cursor:pointer; }
+  select option { background:#0b0e15; color:#f5f6f8; }
+</style>
+</helmet>
+
+<div style="display:flex;min-height:100vh;background:#05070d;color:#f5f6f8;">
+
+  
+
+  <div style="flex:1;padding:40px 44px;overflow-y:auto;min-width:0;">
+
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:28px;gap:24px;flex-wrap:wrap;">
+      <div>
+        <div style="font-size:34px;font-weight:800;letter-spacing:-.01em;">Registro Honorarios de Cuarta Categoría</div>
+        <div style="color:#8b95a5;font-size:15px;margin-top:6px;">Operaciones / Libro Compras / Registro Honorarios de Cuarta Categoria.</div>
+      </div>
+      <button onclick="{{ openNuevo }}" style="display:flex;align-items:center;gap:8px;background:#3b7cff;color:#fff;border:none;border-radius:10px;padding:14px 22px;font-weight:700;font-size:15px;cursor:pointer;white-space:nowrap;">
+        📥 Nuevo Registro
+      </button>
+    </div>
+
+    <div style="background:#10131b;border:1px solid #1c212c;border-radius:14px;padding:24px;margin-bottom:24px;">
+      <div style="font-weight:700;font-size:15px;margin-bottom:16px;color:#dfe3ea;">🔍 Búsqueda por Criterios de Selección Avanzados</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:16px;">
+        <div>
+          <div style="font-size:12px;color:#8b95a5;text-transform:uppercase;letter-spacing:.04em;font-weight:700;margin-bottom:6px;">Empresa</div>
+          <div style="background:#161a24;border:1px solid #262b38;color:#7a8496;border-radius:8px;padding:10px 12px;font-size:14px;">🔒 24 - INVERSIONES GLOBALES PERÚ S.A.</div>
+        </div>
+        <div>
+          <div style="font-size:12px;color:#8b95a5;text-transform:uppercase;letter-spacing:.04em;font-weight:700;margin-bottom:6px;">Sucursal Operativa</div>
+          <div style="background:#161a24;border:1px solid #262b38;color:#7a8496;border-radius:8px;padding:10px 12px;font-size:14px;">🔒 19 - SEDE OPERATIVA SUR COSTA</div>
+        </div>
+        <div>
+          <div style="font-size:12px;color:#8b95a5;text-transform:uppercase;letter-spacing:.04em;font-weight:700;margin-bottom:6px;">RUC / Proveedor</div>
+          <input value="{{ filters.ruc }}" oninput="{{ setFilterRuc }}" placeholder="Buscar por RUC o razón social..." style="width:100%;background:#0b0e15;border:1px solid #232838;color:#f5f6f8;border-radius:8px;padding:10px 12px;font-size:14px;">
+        </div>
+        <div>
+          <div style="font-size:12px;color:#8b95a5;text-transform:uppercase;letter-spacing:.04em;font-weight:700;margin-bottom:6px;">Correlativo Auxiliar</div>
+          <input value="{{ filters.correlativo }}" oninput="{{ setFilterCorrelativo }}" placeholder="Ej: HON-202603-0045" style="width:100%;background:#0b0e15;border:1px solid #232838;color:#f5f6f8;border-radius:8px;padding:10px 12px;font-size:14px;">
+        </div>
+        <div>
+          <div style="font-size:12px;color:#8b95a5;text-transform:uppercase;letter-spacing:.04em;font-weight:700;margin-bottom:6px;">Desde</div>
+          <input type="date" value="{{ filters.desde }}" onchange="{{ setFilterDesde }}" style="width:100%;background:#0b0e15;border:1px solid #232838;color:#f5f6f8;border-radius:8px;padding:9px 12px;font-size:14px;">
+        </div>
+        <div>
+          <div style="font-size:12px;color:#8b95a5;text-transform:uppercase;letter-spacing:.04em;font-weight:700;margin-bottom:6px;">Hasta</div>
+          <input type="date" value="{{ filters.hasta }}" onchange="{{ setFilterHasta }}" style="width:100%;background:#0b0e15;border:1px solid #232838;color:#f5f6f8;border-radius:8px;padding:9px 12px;font-size:14px;">
+        </div>
+        <div>
+          <div style="font-size:12px;color:#8b95a5;text-transform:uppercase;letter-spacing:.04em;font-weight:700;margin-bottom:6px;">Estado Documento</div>
+          <select value="{{ filters.estado }}" onchange="{{ setFilterEstado }}" style="width:100%;background:#0b0e15;border:1px solid #232838;color:#f5f6f8;border-radius:8px;padding:10px 12px;font-size:14px;">
+            <sc-for list="{{ estadosOptions }}" as="op" hint-placeholder-count="4">
+              <option value="{{ op }}">{{ op }}</option>
+            </sc-for>
+          </select>
+        </div>
+      </div>
+      <div style="display:flex;gap:12px;margin-top:20px;">
+        
+        <button onclick="{{ limpiarFiltros }}" style="background:#1a1e28;color:#dfe3ea;border:1px solid #262b38;border-radius:10px;padding:11px 20px;font-weight:600;font-size:14px;cursor:pointer;">Limpiar</button>
+      </div>
+    </div>
+
+    <div style="background:#10131b;border:1px solid #1c212c;border-radius:14px;overflow:hidden;">
+      <div style="padding:20px 24px;font-weight:700;font-size:15px;color:#dfe3ea;border-bottom:1px solid #1c212c;">
+        📋 Comprobantes de Cuarta Categoría Registrados (Fase Borrador / Libro Auxiliar)
+      </div>
+      <div style="display:grid;grid-template-columns:1.2fr 1.6fr 1fr 1fr 1fr 1fr 1.1fr;padding:14px 24px;background:#0d1017;font-size:12px;color:#8b95a5;text-transform:uppercase;letter-spacing:.05em;font-weight:700;">
+        <div>Folio Auxiliar</div><div>Proveedor</div><div>Emisión</div><div>Bruto Soles</div><div>Neto Soles</div><div>Estado</div><div style="text-align:right;">Acciones</div>
+      </div>
+      <sc-for list="{{ registrosFiltrados }}" as="reg" hint-placeholder-count="4">
+        <div style="display:grid;grid-template-columns:1.2fr 1.6fr 1fr 1fr 1fr 1fr 1.1fr;padding:18px 24px;border-bottom:1px solid #171b24;align-items:center;font-size:14px;">
+          <div style="font-weight:700;color:{{ reg.folioColor }};text-decoration:{{ reg.folioDecoration }};">{{ reg.folioAuxiliar }}</div>
+          <div style="color:#dfe3ea;">{{ reg.proveedor }}</div>
+          <div style="color:#9aa4b2;">{{ reg.emision }}</div>
+          <div style="color:#dfe3ea;">S/ {{ reg.brutoPaisFmt }}</div>
+          <div style="color:#dfe3ea;">S/ {{ reg.netoPaisFmt }}</div>
+          <div>
+            <span style="background:{{ reg.badgeBg }};color:{{ reg.badgeColor }};padding:5px 12px;border-radius:20px;font-size:12px;font-weight:700;">● {{ reg.estado }}</span>
+          </div>
+          <div style="display:flex;gap:14px;justify-content:flex-end;">
+            <button onclick="{{ reg.onVer }}" title="Ver" style="background:none;border:none;color:#9aa4b2;cursor:pointer;font-size:16px;">👁️</button>
+            <sc-if value="{{ reg.esBorrador }}" hint-placeholder-val="{{ true }}">
+              <button onclick="{{ reg.onEditar }}" title="Editar" style="background:none;border:none;color:#9aa4b2;cursor:pointer;font-size:16px;">✏️</button>
+              <button onclick="{{ reg.onAnular }}" title="Anular" style="background:none;border:none;color:#ef4444;cursor:pointer;font-size:16px;">🗑️</button>
+            </sc-if>
+          </div>
+        </div>
+      </sc-for>
+      <sc-if value="{{ sinResultados }}" hint-placeholder-val="{{ false }}">
+        <div style="padding:40px 24px;text-align:center;color:#7a8496;font-size:14px;">No se encontraron registros con los criterios ingresados.</div>
+      </sc-if>
+    </div>
+  </div>
+
+  <sc-if value="{{ modalOpen }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed;inset:0;background:rgba(0,0,0,0.6);display:flex;align-items:flex-start;justify-content:center;padding:36px 20px;overflow-y:auto;z-index:50;">
+      <div style="background:#0d1017;border:1px solid #232838;border-radius:16px;width:100%;max-width:940px;padding:0;">
+
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:22px 28px;border-bottom:1px solid #1c212c;">
+          <div style="font-weight:800;font-size:18px;">📝 {{ modalTitulo }}</div>
+          <button onclick="{{ closeModal }}" style="background:none;border:none;color:#8b95a5;font-size:20px;cursor:pointer;">✕</button>
+        </div>
+
+        <div style="padding:26px 28px;display:flex;flex-direction:column;gap:22px;">
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+            <div>
+              <div style="font-size:12px;color:#8b95a5;text-transform:uppercase;letter-spacing:.04em;font-weight:700;margin-bottom:6px;">[Seguridad] Empresa</div>
+              <div style="background:#161a24;border:1px solid #262b38;color:#7a8496;border-radius:8px;padding:10px 12px;font-size:14px;">🔒 24 - INVERSIONES GLOBALES PERÚ S.A.</div>
+            </div>
+            <div>
+              <div style="font-size:12px;color:#8b95a5;text-transform:uppercase;letter-spacing:.04em;font-weight:700;margin-bottom:6px;">[Seguridad] Sucursal</div>
+              <div style="background:#161a24;border:1px solid #262b38;color:#7a8496;border-radius:8px;padding:10px 12px;font-size:14px;">🔒 19 - SEDE OPERATIVA SUR COSTA</div>
+            </div>
+          </div>
+
+          <div style="height:1px;background:#1c212c;"></div>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+            <div>
+              <div style="font-size:12px;color:#8b95a5;text-transform:uppercase;letter-spacing:.04em;font-weight:700;margin-bottom:6px;">Tipo de Operación</div>
+              <input list="tiposOpList" value="{{ draft.tipoOperacion }}" oninput="{{ setDraftTipoOperacion }}" disabled="{{ draftTipoOpDisabled }}" placeholder="Ej: 40 - Recibo de Honorarios Local Terceros" style="width:100%;background:{{ draftInputBg }};border:1px solid #232838;color:#f5f6f8;border-radius:8px;padding:10px 12px;font-size:14px;">
+              <datalist id="tiposOpList">
+                <sc-for list="{{ tiposOperacion }}" as="t" hint-placeholder-count="2">
+                  <option value="{{ t }}"></option>
+                </sc-for>
+              </datalist>
+            </div>
+            <div>
+              <div style="font-size:12px;color:#8b95a5;text-transform:uppercase;letter-spacing:.04em;font-weight:700;margin-bottom:6px;">Tipo Documento SUNAT</div>
+              <div style="background:#161a24;border:1px solid #262b38;color:#7a8496;border-radius:8px;padding:10px 12px;font-size:14px;">🔒 02 - RECIBO POR HONORARIOS</div>
+            </div>
+          </div>
+
+          <div>
+            <div style="font-size:12px;color:#8b95a5;text-transform:uppercase;letter-spacing:.04em;font-weight:700;margin-bottom:6px;">Proveedor / Tercero</div>
+            <input list="tercerosList" value="{{ draft.proveedor }}" oninput="{{ setDraftProveedor }}" disabled="{{ draftReadOnly }}" placeholder="RUC o Razón Social..." style="width:100%;background:{{ draftInputBg }};border:1px solid #232838;color:#f5f6f8;border-radius:8px;padding:10px 12px;font-size:14px;">
+            <datalist id="tercerosList">
+              <sc-for list="{{ terceros }}" as="tc" hint-placeholder-count="3">
+                <option value="{{ tc }}"></option>
+              </sc-for>
+            </datalist>
+          </div>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:16px;">
+            <div>
+              <div style="font-size:12px;color:#8b95a5;text-transform:uppercase;letter-spacing:.04em;font-weight:700;margin-bottom:6px;">Serie</div>
+              <input value="{{ draft.serie }}" oninput="{{ setDraftSerie }}" disabled="{{ draftSerieDisabled }}" style="width:100%;background:{{ draftInputBg }};border:1px solid #232838;color:#f5f6f8;border-radius:8px;padding:10px 12px;font-size:14px;">
+            </div>
+            <div>
+              <div style="font-size:12px;color:#8b95a5;text-transform:uppercase;letter-spacing:.04em;font-weight:700;margin-bottom:6px;">Número</div>
+              <input value="{{ draft.numero }}" oninput="{{ setDraftNumero }}" disabled="{{ draftSerieDisabled }}" style="width:100%;background:{{ draftInputBg }};border:1px solid #232838;color:#f5f6f8;border-radius:8px;padding:10px 12px;font-size:14px;">
+            </div>
+            <div>
+              <div style="font-size:12px;color:#8b95a5;text-transform:uppercase;letter-spacing:.04em;font-weight:700;margin-bottom:6px;">Fecha Emisión</div>
+              <input type="date" value="{{ draft.fechaEmision }}" onchange="{{ setDraftFechaEmision }}" disabled="{{ draftReadOnly }}" style="width:100%;background:{{ draftInputBg }};border:1px solid #232838;color:#f5f6f8;border-radius:8px;padding:9px 12px;font-size:14px;">
+            </div>
+            <div>
+              <div style="font-size:12px;color:#8b95a5;text-transform:uppercase;letter-spacing:.04em;font-weight:700;margin-bottom:6px;">Fecha Vencimiento</div>
+              <input type="date" value="{{ draft.fechaVencimiento }}" onchange="{{ setDraftFechaVencimiento }}" disabled="{{ draftReadOnly }}" style="width:100%;background:{{ draftInputBg }};border:1px solid #232838;color:#f5f6f8;border-radius:8px;padding:9px 12px;font-size:14px;">
+            </div>
+          </div>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;">
+            <div>
+              <div style="font-size:12px;color:#8b95a5;text-transform:uppercase;letter-spacing:.04em;font-weight:700;margin-bottom:6px;">Período Contable</div>
+              <div style="background:#161a24;border:1px solid #262b38;color:#7a8496;border-radius:8px;padding:10px 12px;font-size:14px;">{{ draft.periodoLabel }} — {{ draft.periodoEstado }}</div>
+            </div>
+            <div>
+              <div style="font-size:12px;color:#8b95a5;text-transform:uppercase;letter-spacing:.04em;font-weight:700;margin-bottom:6px;">Moneda</div>
+              <div style="background:#161a24;border:1px solid #262b38;color:#7a8496;border-radius:8px;padding:10px 12px;font-size:14px;">🔒 DÓLARES</div>
+            </div>
+            <div>
+              <div style="font-size:12px;color:#8b95a5;text-transform:uppercase;letter-spacing:.04em;font-weight:700;margin-bottom:6px;">T.C. Venta / Compra</div>
+              <div style="background:#161a24;border:1px solid #262b38;color:#7a8496;border-radius:8px;padding:10px 12px;font-size:14px;">🔒 {{ draft.tcVentaFmt }} / {{ draft.tcCompraFmt }}</div>
+            </div>
+          </div>
+
+          <div style="height:1px;background:#1c212c;"></div>
+
+          <div>
+            <div style="font-weight:700;font-size:14px;color:#dfe3ea;margin-bottom:14px;">📋 Grilla Multilínea de Detalles Analíticos (Edición Directa Inline)</div>
+
+            <div style="display:grid;grid-template-columns:0.4fr 2fr 1fr 1.2fr 1fr 1.1fr 1.1fr 0.5fr;gap:10px;padding:0 6px 10px;font-size:11px;color:#8b95a5;text-transform:uppercase;letter-spacing:.04em;font-weight:700;">
+              <div>Item</div><div>Concepto Comercial</div><div>Cantidad</div><div>P. Unitario USD</div><div>Susp.?</div><div>Retención</div><div>Neto</div><div></div>
+            </div>
+
+            <sc-for list="{{ draft.itemsView }}" as="it" hint-placeholder-count="1">
+              <div style="display:grid;grid-template-columns:0.4fr 2fr 1fr 1.2fr 1fr 1.1fr 1.1fr 0.5fr;gap:10px;padding:8px 6px;align-items:center;border-bottom:1px solid #171b24;">
+                <div style="color:#9aa4b2;font-size:13px;">{{ it.indexLabel }}</div>
+                <div>
+                  <select value="{{ it.conceptoId }}" onchange="{{ it.onConcepto }}" disabled="{{ draftReadOnly }}" style="width:100%;background:{{ draftInputBg }};border:1px solid #232838;color:#f5f6f8;border-radius:8px;padding:9px 10px;font-size:13px;">
+                    <sc-for list="{{ conceptos }}" as="c" hint-placeholder-count="3">
+                      <option value="{{ c.id }}">{{ c.label }}</option>
+                    </sc-for>
+                  </select>
+                </div>
+                <div>
+                  <input type="number" step="0.0001" value="{{ it.cantidad }}" oninput="{{ it.onCantidad }}" disabled="{{ draftReadOnly }}" style="width:100%;background:{{ draftInputBg }};border:1px solid #232838;color:#f5f6f8;border-radius:8px;padding:9px 10px;font-size:13px;">
+                </div>
+                <div>
+                  <input type="number" step="0.01" value="{{ it.precioUnitario }}" oninput="{{ it.onPrecio }}" disabled="{{ draftReadOnly }}" style="width:100%;background:{{ draftInputBg }};border:1px solid #232838;color:#f5f6f8;border-radius:8px;padding:9px 10px;font-size:13px;">
+                </div>
+                <div style="display:flex;justify-content:center;">
+                  <input type="checkbox" checked="{{ it.suspension }}" onchange="{{ it.onSuspension }}" disabled="{{ draftReadOnly }}" style="width:18px;height:18px;accent-color:#3b7cff;">
+                </div>
+                <div style="background:#161a24;border:1px solid #262b38;color:#7a8496;border-radius:8px;padding:9px 10px;font-size:13px;">🔒 {{ it.retencionFmt }}</div>
+                <div style="background:#161a24;border:1px solid #262b38;color:#7a8496;border-radius:8px;padding:9px 10px;font-size:13px;">🔒 {{ it.netoFmt }}</div>
+                <div style="display:flex;justify-content:center;">
+                  <sc-if value="{{ draftEditable }}" hint-placeholder-val="{{ true }}">
+                    <button onclick="{{ it.onEliminar }}" style="background:none;border:none;color:#ef4444;cursor:pointer;font-size:15px;">🗑️</button>
+                  </sc-if>
+                </div>
+              </div>
+            </sc-for>
+
+            <sc-if value="{{ draftEditable }}" hint-placeholder-val="{{ true }}">
+              <button onclick="{{ addItem }}" style="margin-top:14px;background:#1a1e28;color:#8fb4ff;border:1px dashed #2a3a5c;border-radius:10px;padding:11px 18px;font-weight:700;font-size:13px;cursor:pointer;">➕ Añadir Fila de Servicio</button>
+            </sc-if>
+          </div>
+
+          <div style="height:1px;background:#1c212c;"></div>
+
+          <div>
+            <div style="font-weight:700;font-size:14px;color:#dfe3ea;margin-bottom:14px;">📊 Consolidado de Impuestos (Calculado por el Motor de Conceptos)</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;">
+              <div style="background:#12151d;border:1px solid #1c212c;border-radius:10px;padding:14px;">
+                <div style="font-size:12px;color:#8b95a5;font-weight:700;margin-bottom:6px;">Total Bruto</div>
+                <div style="font-size:17px;font-weight:800;">$ {{ draft.totalBrutoOrigenFmt }}</div>
+                <div style="font-size:12px;color:#7a8496;margin-top:4px;">Equivale País: S/ {{ draft.totalBrutoPaisFmt }}</div>
+              </div>
+              <div style="background:#12151d;border:1px solid #1c212c;border-radius:10px;padding:14px;">
+                <div style="font-size:12px;color:#8b95a5;font-weight:700;margin-bottom:6px;">🔒 Retención</div>
+                <div style="font-size:17px;font-weight:800;">$ {{ draft.totalRetencionOrigenFmt }}</div>
+                <div style="font-size:12px;color:#7a8496;margin-top:4px;">Equivale País: S/ {{ draft.totalRetencionPaisFmt }}</div>
+              </div>
+              <div style="background:#12151d;border:1px solid #1c212c;border-radius:10px;padding:14px;">
+                <div style="font-size:12px;color:#8b95a5;font-weight:700;margin-bottom:6px;">🔒 Neto a Pagar</div>
+                <div style="font-size:17px;font-weight:800;color:#4ade80;">$ {{ draft.totalNetoOrigenFmt }}</div>
+                <div style="font-size:12px;color:#7a8496;margin-top:4px;">Equivale País: S/ {{ draft.totalNetoPaisFmt }}</div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <div style="display:flex;justify-content:flex-end;gap:12px;padding:20px 28px;border-top:1px solid #1c212c;">
+          <sc-if value="{{ draftEditable }}" hint-placeholder-val="{{ true }}">
+            <button onclick="{{ guardarBorrador }}" style="background:#3b7cff;color:#fff;border:none;border-radius:10px;padding:12px 22px;font-weight:700;font-size:14px;cursor:pointer;">💾 Guardar Borrador</button>
+          </sc-if>
+          <button onclick="{{ closeModal }}" style="background:#1a1e28;color:#dfe3ea;border:1px solid #262b38;border-radius:10px;padding:12px 22px;font-weight:600;font-size:14px;cursor:pointer;">❌ {{ cancelarLabel }}</button>
+        </div>
+
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ confirmOpen }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed;inset:0;background:rgba(0,0,0,0.65);display:flex;align-items:center;justify-content:center;padding:20px;z-index:60;">
+      <div style="background:#0d1017;border:1px solid #2a2130;border-radius:14px;max-width:560px;width:100%;padding:26px 28px;">
+        <div style="font-weight:800;font-size:16px;color:#f0b13d;margin-bottom:18px;">⚠️ Confirmación de Anulación Lógica de Comprobante Borrador</div>
+        <div style="color:#dfe3ea;font-size:14px;line-height:1.6;margin-bottom:16px;">
+          ¿Está seguro que desea dar de baja el Recibo por Honorarios <strong>{{ confirmRegistro.folioAuxiliar }}</strong>?
+          El sistema ejecutará una actualización de estado en cascada:
+        </div>
+        <div style="background:#12151d;border:1px solid #1c212c;border-radius:10px;padding:14px 16px;font-size:13px;color:#9aa4b2;line-height:1.9;margin-bottom:18px;">
+          - Estado en Sublibro → <span style="color:#f87171;font-weight:700;">ANULADO</span> (se preservan importes históricos)<br>
+          - Estado en Cuenta Cte → <span style="color:#f87171;font-weight:700;">ANULADO</span> (se actualiza el hito de la obligación)
+        </div>
+        <div style="display:flex;justify-content:flex-end;gap:12px;">
+          <button onclick="{{ confirmarAnular }}" style="background:#ef4444;color:#fff;border:none;border-radius:10px;padding:11px 20px;font-weight:700;font-size:14px;cursor:pointer;">✓ Confirmar Baja</button>
+          <button onclick="{{ closeConfirm }}" style="background:#1a1e28;color:#dfe3ea;border:1px solid #262b38;border-radius:10px;padding:11px 20px;font-weight:600;font-size:14px;cursor:pointer;">❌ Cancelar</button>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+
+const CONCEPTOS = [
+  { id: 500, label: '500 - Asesoría de Sistemas' },
+  { id: 501, label: '501 - Asesoría Legal' },
+  { id: 502, label: '502 - Auditoría Externa' },
+  { id: 503, label: '503 - Consultoría Financiera' },
+  { id: 504, label: '504 - Diseño Gráfico' },
+];
+const TERCEROS = [
+  '20601234567 - INGENIERO DE SISTEMAS S.A.C.',
+  '20609876543 - ABOGADO LEGAL S.A.',
+  '20612345678 - CONSULTORES ASOCIADOS E.I.R.L.',
+  '20655544332 - DISEÑO CREATIVO S.A.C.',
+  '20699988877 - AUDITORES DEL PERU S.A.',
+];
+const TIPOS_OPERACION = ['40 - Recibo de Honorarios Local Terceros', '41 - Recibo de Honorarios No Domiciliado'];
+const TC_TABLE = [
+  { fecha: '2026-01-01', venta: 3.700, compra: 3.696 },
+  { fecha: '2026-03-01', venta: 3.720, compra: 3.716 },
+  { fecha: '2026-04-01', venta: 3.725, compra: 3.721 },
+  { fecha: '2026-05-01', venta: 3.730, compra: 3.726 },
+  { fecha: '2026-07-01', venta: 3.740, compra: 3.736 },
+  { fecha: '2026-07-15', venta: 3.745, compra: 3.741 },
+];
+const RETENCION_RATE = 0.08;
+
+function fmt(n) {
+  const v = Number(n) || 0;
+  return v.toLocaleString('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+function getTC(fecha) {
+  let best = TC_TABLE[0];
+  for (const row of TC_TABLE) { if (row.fecha <= fecha) best = row; }
+  return best;
+}
+function periodoInfo(fecha) {
+  if (!fecha) return { label: '---', estado: '---' };
+  const ym = fecha.slice(0, 7).replace('-', '');
+  const meses = ['ENERO','FEBRERO','MARZO','ABRIL','MAYO','JUNIO','JULIO','AGOSTO','SEPTIEMBRE','OCTUBRE','NOVIEMBRE','DICIEMBRE'];
+  const mi = parseInt(fecha.slice(5, 7), 10) - 1;
+  return { label: ym + ' - ' + (meses[mi] || '') + ' ' + fecha.slice(0, 4), estado: 'ABIERTO' };
+}
+function calcItem(it, tcVenta) {
+  const cantidad = Number(it.cantidad) || 0;
+  const precio = Number(it.precioUnitario) || 0;
+  const baseOrigen = cantidad * precio;
+  const retencionOrigen = it.suspension ? 0 : baseOrigen * RETENCION_RATE;
+  const netoOrigen = baseOrigen - retencionOrigen;
+  return {
+    baseOrigen, retencionOrigen, netoOrigen,
+    basePais: baseOrigen * tcVenta, retencionPais: retencionOrigen * tcVenta, netoPais: netoOrigen * tcVenta,
+  };
+}
+function makeDraft(base) {
+  return JSON.parse(JSON.stringify(base));
+}
+function emptyItem(id) {
+  return { id, conceptoId: 500, cantidad: 1, precioUnitario: 0, suspension: false };
+}
+function nuevoDraftBase() {
+  const fecha = '2026-07-20';
+  const tc = getTC(fecha);
+  return {
+    tipoOperacion: '', proveedor: '', serie: 'E001', numero: '',
+    fechaEmision: fecha, fechaVencimiento: '2026-08-20',
+    tcVenta: tc.venta, tcCompra: tc.compra,
+    items: [emptyItem(1)],
+  };
+}
+
+class Component extends DCLogic {
+  state = {
+    registros: [
+      { id: 1, folioAuxiliar: 'HON-202603-0045', proveedor: 'INGENIERO S.A.C.', tipoOperacion: TIPOS_OPERACION[0], serie: 'E001', numero: '00000542', fechaEmision: '2026-03-15', fechaVencimiento: '2026-04-15', tcVenta: 3.720, tcCompra: 3.716, estado: 'BORRADOR', items: [{ id: 1, conceptoId: 500, cantidad: 1, precioUnitario: 2000, suspension: true }] },
+      { id: 2, folioAuxiliar: 'HON-202603-0046', proveedor: 'ABOGADO LEGAL S.A.', tipoOperacion: TIPOS_OPERACION[0], serie: 'E002', numero: '00000118', fechaEmision: '2026-03-20', fechaVencimiento: '2026-04-20', tcVenta: 3.720, tcCompra: 3.716, estado: 'BORRADOR', items: [{ id: 1, conceptoId: 501, cantidad: 1, precioUnitario: 1200, suspension: true }] },
+      { id: 3, folioAuxiliar: 'HON-202604-0012', proveedor: 'CONSULTORES ASOCIADOS E.I.R.L.', tipoOperacion: TIPOS_OPERACION[0], serie: 'E001', numero: '00000560', fechaEmision: '2026-04-05', fechaVencimiento: '2026-05-05', tcVenta: 3.725, tcCompra: 3.721, estado: 'CONTABILIZADO', items: [{ id: 1, conceptoId: 503, cantidad: 2, precioUnitario: 1500, suspension: false }] },
+      { id: 4, folioAuxiliar: 'HON-202605-0031', proveedor: 'DISEÑO CREATIVO S.A.C.', tipoOperacion: TIPOS_OPERACION[0], serie: 'E003', numero: '00000047', fechaEmision: '2026-05-18', fechaVencimiento: '2026-06-18', tcVenta: 3.730, tcCompra: 3.726, estado: 'ANULADO', items: [{ id: 1, conceptoId: 504, cantidad: 1, precioUnitario: 900, suspension: true }] },
+      { id: 5, folioAuxiliar: 'HON-202607-0002', proveedor: 'AUDITORES DEL PERU S.A.', tipoOperacion: TIPOS_OPERACION[0], serie: 'E001', numero: '00000581', fechaEmision: '2026-07-10', fechaVencimiento: '2026-08-10', tcVenta: 3.740, tcCompra: 3.736, estado: 'BORRADOR', items: [{ id: 1, conceptoId: 502, cantidad: 1, precioUnitario: 3200, suspension: false }] },
+    ],
+    nextFolioSeq: 47,
+    filters: { ruc: '', correlativo: '', desde: '', hasta: '', estado: 'Todos' },
+    modal: null,
+    confirmId: null,
+  };
+
+  openNuevo = () => this.setState({ modal: { mode: 'nuevo', draft: nuevoDraftBase() } });
+
+  openVer = (reg) => this.setState({ modal: { mode: 'ver', draft: makeDraft(reg) } });
+
+  openEditar = (reg) => this.setState({ modal: { mode: 'editar', draft: makeDraft(reg) } });
+
+  closeModal = () => this.setState({ modal: null });
+
+  setFilter = (key, val) => this.setState(s => ({ filters: { ...s.filters, [key]: val } }));
+
+  limpiarFiltros = () => this.setState({ filters: { ruc: '', correlativo: '', desde: '', hasta: '', estado: 'Todos' } });
+
+  updateDraft = (patch) => this.setState(s => ({ modal: { ...s.modal, draft: { ...s.modal.draft, ...patch } } }));
+
+  updateItem = (idx, patch) => this.setState(s => {
+    const items = s.modal.draft.items.slice();
+    items[idx] = { ...items[idx], ...patch };
+    return { modal: { ...s.modal, draft: { ...s.modal.draft, items } } };
+  });
+
+  addItem = () => this.setState(s => {
+    const items = s.modal.draft.items.concat([emptyItem(Date.now())]);
+    return { modal: { ...s.modal, draft: { ...s.modal.draft, items } } };
+  });
+
+  removeItem = (idx) => this.setState(s => {
+    const items = s.modal.draft.items.filter((_, i) => i !== idx);
+    return { modal: { ...s.modal, draft: { ...s.modal.draft, items } } };
+  });
+
+  onFechaEmisionChange = (val) => {
+    const tc = getTC(val);
+    this.updateDraft({ fechaEmision: val, tcVenta: tc.venta, tcCompra: tc.compra });
+  };
+
+  guardarBorrador = () => this.setState(s => {
+    const d = s.modal.draft;
+    if (s.modal.mode === 'nuevo') {
+      const seq = s.nextFolioSeq;
+      const folioAuxiliar = 'HON-202607-' + String(seq).padStart(4, '0');
+      const nuevo = { id: Date.now(), folioAuxiliar, proveedor: (d.proveedor || 'SIN NOMBRE').split(' - ').slice(1).join(' - ') || d.proveedor, tipoOperacion: d.tipoOperacion, serie: d.serie, numero: d.numero, fechaEmision: d.fechaEmision, fechaVencimiento: d.fechaVencimiento, tcVenta: d.tcVenta, tcCompra: d.tcCompra, estado: 'BORRADOR', items: d.items };
+      return { registros: s.registros.concat([nuevo]), nextFolioSeq: seq + 1, modal: null };
+    } else {
+      const registros = s.registros.map(r => r.id === d.id ? { ...r, proveedor: (d.proveedor || r.proveedor).split(' - ').slice(1).join(' - ') || r.proveedor, fechaEmision: d.fechaEmision, fechaVencimiento: d.fechaVencimiento, tcVenta: d.tcVenta, tcCompra: d.tcCompra, items: d.items } : r);
+      return { registros, modal: null };
+    }
+  });
+
+  openConfirm = (id) => this.setState({ confirmId: id });
+  closeConfirm = () => this.setState({ confirmId: null });
+  confirmarAnular = () => this.setState(s => ({
+    registros: s.registros.map(r => r.id === s.confirmId ? { ...r, estado: 'ANULADO' } : r),
+    confirmId: null,
+  }));
+
+  badgeStyle(estado) {
+    if (estado === 'BORRADOR') return { bg: 'rgba(59,124,255,0.15)', color: '#6ea1ff' };
+    if (estado === 'CONTABILIZADO') return { bg: 'rgba(34,197,94,0.15)', color: '#4ade80' };
+    return { bg: 'rgba(239,68,68,0.15)', color: '#f87171' };
+  }
+
+  renderVals() {
+    const s = this.state;
+
+    const registrosFiltrados = s.registros.filter(r => {
+      const f = s.filters;
+      if (f.estado !== 'Todos' && r.estado !== f.estado) return false;
+      if (f.ruc && !(r.proveedor.toLowerCase().includes(f.ruc.toLowerCase()))) return false;
+      if (f.correlativo && !r.folioAuxiliar.toLowerCase().includes(f.correlativo.toLowerCase())) return false;
+      if (f.desde && r.fechaEmision < f.desde) return false;
+      if (f.hasta && r.fechaEmision > f.hasta) return false;
+      return true;
+    }).map(r => {
+      const totals = r.items.reduce((acc, it) => {
+        const c = calcItem(it, r.tcVenta);
+        acc.bruto += c.basePais; acc.neto += c.netoPais;
+        return acc;
+      }, { bruto: 0, neto: 0 });
+      const b = this.badgeStyle(r.estado);
+      return {
+        ...r,
+        emision: r.fechaEmision,
+        brutoPaisFmt: fmt(totals.bruto),
+        netoPaisFmt: fmt(totals.neto),
+        badgeBg: b.bg, badgeColor: b.color,
+        folioColor: r.estado === 'ANULADO' ? '#7a8496' : '#f5f6f8',
+        folioDecoration: r.estado === 'ANULADO' ? 'line-through' : 'none',
+        esBorrador: r.estado === 'BORRADOR',
+        onVer: () => this.openVer(r),
+        onEditar: () => this.openEditar(r),
+        onAnular: () => this.openConfirm(r.id),
+      };
+    });
+
+    const modal = s.modal;
+    let modalOpen = !!modal;
+    let draftVals = null;
+    let draftReadOnly = true, draftEditable = false, draftTipoOpDisabled = true, draftSerieDisabled = true, modalTitulo = '', cancelarLabel = 'Cerrar', draftInputBg = '#161a24';
+
+    if (modal) {
+      const d = modal.draft;
+      draftEditable = modal.mode !== 'ver';
+      draftReadOnly = modal.mode === 'ver';
+      draftTipoOpDisabled = modal.mode !== 'nuevo';
+      draftSerieDisabled = modal.mode !== 'nuevo';
+      draftInputBg = draftReadOnly ? '#12151d' : '#0b0e15';
+      modalTitulo = modal.mode === 'ver' ? 'Detalle de Recibo por Honorarios' : (modal.mode === 'editar' ? 'Editar Recibo por Honorarios (Estado: BORRADOR)' : 'Registro de Recibo por Honorarios (Fase Borrador)');
+      cancelarLabel = modal.mode === 'ver' ? 'Cerrar' : 'Cancelar';
+
+      const pInfo = periodoInfo(d.fechaEmision);
+      const itemsView = d.items.map((it, idx) => {
+        const calc = calcItem(it, d.tcVenta);
+        return {
+          ...it,
+          indexLabel: String(idx + 1).padStart(2, '0'),
+          retencionFmt: fmt(calc.retencionOrigen),
+          netoFmt: fmt(calc.netoOrigen),
+          onConcepto: (e) => this.updateItem(idx, { conceptoId: Number(e.target.value) }),
+          onCantidad: (e) => this.updateItem(idx, { cantidad: e.target.value }),
+          onPrecio: (e) => this.updateItem(idx, { precioUnitario: e.target.value }),
+          onSuspension: (e) => this.updateItem(idx, { suspension: e.target.checked }),
+          onEliminar: () => this.removeItem(idx),
+        };
+      });
+
+      const totals = d.items.reduce((acc, it) => {
+        const c = calcItem(it, d.tcVenta);
+        acc.bo += c.baseOrigen; acc.ro += c.retencionOrigen; acc.no += c.netoOrigen;
+        acc.bp += c.basePais; acc.rp += c.retencionPais; acc.np += c.netoPais;
+        return acc;
+      }, { bo: 0, ro: 0, no: 0, bp: 0, rp: 0, np: 0 });
+
+      draftVals = {
+        ...d,
+        periodoLabel: pInfo.label, periodoEstado: pInfo.estado,
+        tcVentaFmt: fmt(d.tcVenta), tcCompraFmt: fmt(d.tcCompra),
+        itemsView,
+        totalBrutoOrigenFmt: fmt(totals.bo), totalRetencionOrigenFmt: fmt(totals.ro), totalNetoOrigenFmt: fmt(totals.no),
+        totalBrutoPaisFmt: fmt(totals.bp), totalRetencionPaisFmt: fmt(totals.rp), totalNetoPaisFmt: fmt(totals.np),
+      };
+    }
+
+    return {
+      registrosFiltrados,
+      sinResultados: registrosFiltrados.length === 0,
+      filters: s.filters,
+      setFilterRuc: (e) => this.setFilter('ruc', e.target.value),
+      setFilterCorrelativo: (e) => this.setFilter('correlativo', e.target.value),
+      setFilterDesde: (e) => this.setFilter('desde', e.target.value),
+      setFilterHasta: (e) => this.setFilter('hasta', e.target.value),
+      setFilterEstado: (e) => this.setFilter('estado', e.target.value),
+      estadosOptions: ['Todos', 'BORRADOR', 'CONTABILIZADO', 'ANULADO'],
+      limpiarFiltros: this.limpiarFiltros,
+      openNuevo: this.openNuevo,
+      closeModal: this.closeModal,
+
+      modalOpen, modalTitulo, cancelarLabel,
+      draft: draftVals || {},
+      draftReadOnly, draftEditable, draftTipoOpDisabled, draftSerieDisabled, draftInputBg,
+      tiposOperacion: TIPOS_OPERACION,
+      terceros: TERCEROS,
+      conceptos: CONCEPTOS,
+      setDraftTipoOperacion: (e) => this.updateDraft({ tipoOperacion: e.target.value }),
+      setDraftProveedor: (e) => this.updateDraft({ proveedor: e.target.value }),
+      setDraftSerie: (e) => this.updateDraft({ serie: e.target.value }),
+      setDraftNumero: (e) => this.updateDraft({ numero: e.target.value }),
+      setDraftFechaEmision: (e) => this.onFechaEmisionChange(e.target.value),
+      setDraftFechaVencimiento: (e) => this.updateDraft({ fechaVencimiento: e.target.value }),
+      addItem: this.addItem,
+      guardarBorrador: this.guardarBorrador,
+
+      confirmOpen: !!s.confirmId,
+      confirmRegistro: s.registros.find(r => r.id === s.confirmId) || {},
+      confirmarAnular: this.confirmarAnular,
+      closeConfirm: this.closeConfirm,
+    };
+  }
+}
+
+</script>
+</body>
+</html>

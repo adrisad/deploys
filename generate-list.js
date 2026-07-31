@@ -40,13 +40,27 @@ function scan() {
         path: `maquetas/${entry.name}`,
       });
     } else if (entry.isDirectory()) {
-      const indexPath = path.join(MAQUETAS_DIR, entry.name, "index.html");
+      const dirPath = path.join(MAQUETAS_DIR, entry.name);
+      const indexPath = path.join(dirPath, "index.html");
       if (fs.existsSync(indexPath)) {
         items.push({
           id: entry.name,
           name: humanize(entry.name),
           path: `maquetas/${entry.name}/index.html`,
         });
+      } else {
+        // Carpeta sin index.html: busca un unico .html/.dc.html suelto
+        // (mockups exportados del "design canvas" a su propia carpeta).
+        const htmlFile = fs
+          .readdirSync(dirPath)
+          .find((f) => /\.html?$/i.test(f));
+        if (htmlFile) {
+          items.push({
+            id: `${entry.name}/${stripExt(htmlFile)}`,
+            name: humanize(htmlFile),
+            path: `maquetas/${entry.name}/${htmlFile}`,
+          });
+        }
       }
     }
   }
