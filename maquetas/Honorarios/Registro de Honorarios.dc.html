@@ -136,11 +136,19 @@
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
             <div>
               <div style="font-size:12px;color:#8b95a5;text-transform:uppercase;letter-spacing:.04em;font-weight:700;margin-bottom:6px;">[Seguridad] Empresa</div>
-              <div style="background:#161a24;border:1px solid #262b38;color:#7a8496;border-radius:8px;padding:10px 12px;font-size:14px;">🔒 24 - INVERSIONES GLOBALES PERÚ S.A.</div>
+              <select value="{{ draft.empresaId }}" onchange="{{ setDraftEmpresa }}" disabled="{{ draftTipoOpDisabled }}" style="width:100%;background:{{ draftInputBg }};border:1px solid #232838;color:#f5f6f8;border-radius:8px;padding:10px 12px;font-size:14px;">
+                <sc-for list="{{ empresasPermitidas }}" as="emp" hint-placeholder-count="2">
+                  <option value="{{ emp.id }}">{{ emp.label }}</option>
+                </sc-for>
+              </select>
             </div>
             <div>
               <div style="font-size:12px;color:#8b95a5;text-transform:uppercase;letter-spacing:.04em;font-weight:700;margin-bottom:6px;">[Seguridad] Sucursal</div>
-              <div style="background:#161a24;border:1px solid #262b38;color:#7a8496;border-radius:8px;padding:10px 12px;font-size:14px;">🔒 19 - SEDE OPERATIVA SUR COSTA</div>
+              <select value="{{ draft.sucursalId }}" onchange="{{ setDraftSucursal }}" disabled="{{ draftSucursalDisabled }}" style="width:100%;background:{{ draftSucursalDisabled === true ? '#161a24' : draftInputBg }};border:1px solid #232838;color:{{ draftSucursalDisabled === true ? '#7a8496' : '#f5f6f8' }};border-radius:8px;padding:10px 12px;font-size:14px;">
+                <sc-for list="{{ sucursalesDisponibles }}" as="suc" hint-placeholder-count="2">
+                  <option value="{{ suc.id }}">{{ suc.label }}</option>
+                </sc-for>
+              </select>
             </div>
           </div>
 
@@ -331,6 +339,10 @@ const TERCEROS = [
   '20699988877 - AUDITORES DEL PERU S.A.',
 ];
 const TIPOS_OPERACION = ['40 - Recibo de Honorarios Local Terceros', '41 - Recibo de Honorarios No Domiciliado'];
+const EMPRESAS_PERMITIDAS = [
+  { id: 24, label: '24 - INVERSIONES GLOBALES PERÚ S.A.', usaEmpresaSucursal: true, sucursales: [{ id: 19, label: '19 - SEDE OPERATIVA SUR COSTA' }, { id: 20, label: '20 - SEDE OPERATIVA NORTE' }] },
+  { id: 31, label: '31 - CORPORATIVO ANDINO S.A.C.', usaEmpresaSucursal: false, sucursales: [{ id: 31, label: '31 - MATRIZ PRINCIPAL' }] },
+];
 const TC_TABLE = [
   { fecha: '2026-01-01', venta: 3.700, compra: 3.696 },
   { fecha: '2026-03-01', venta: 3.720, compra: 3.716 },
@@ -377,8 +389,10 @@ function emptyItem(id) {
 function nuevoDraftBase() {
   const fecha = '2026-07-20';
   const tc = getTC(fecha);
+  const emp = EMPRESAS_PERMITIDAS[0];
   return {
     tipoOperacion: '', proveedor: '', serie: 'E001', numero: '',
+    empresaId: emp.id, sucursalId: emp.sucursales[0].id,
     fechaEmision: fecha, fechaVencimiento: '2026-08-20',
     tcVenta: tc.venta, tcCompra: tc.compra,
     items: [emptyItem(1)],
@@ -413,6 +427,13 @@ class Component extends DCLogic {
   limpiarFiltros = () => this.setState({ filters: { ruc: '', correlativo: '', desde: '', hasta: '', estado: 'Todos', periodo: 'Todos' } });
 
   updateDraft = (patch) => this.setState(s => ({ modal: { ...s.modal, draft: { ...s.modal.draft, ...patch } } }));
+
+  setDraftEmpresa = (e) => {
+    const empId = Number(e.target.value);
+    const emp = EMPRESAS_PERMITIDAS.find(x => x.id === empId);
+    this.updateDraft({ empresaId: empId, sucursalId: emp && emp.sucursales[0] ? emp.sucursales[0].id : null });
+  };
+  setDraftSucursal = (e) => this.updateDraft({ sucursalId: Number(e.target.value) });
 
   updateItem = (idx, patch) => this.setState(s => {
     const items = s.modal.draft.items.slice();
@@ -507,6 +528,7 @@ class Component extends DCLogic {
     let modalOpen = !!modal;
     let draftVals = null;
     let draftReadOnly = true, draftEditable = false, draftTipoOpDisabled = true, draftSerieDisabled = true, modalTitulo = '', cancelarLabel = 'Cerrar', draftInputBg = '#161a24';
+    let sucursalesDisponibles = EMPRESAS_PERMITIDAS[0].sucursales, draftSucursalDisabled = true;
 
     if (modal) {
       const d = modal.draft;
@@ -514,6 +536,9 @@ class Component extends DCLogic {
       draftReadOnly = modal.mode === 'ver';
       draftTipoOpDisabled = modal.mode !== 'nuevo';
       draftSerieDisabled = modal.mode !== 'nuevo';
+      const empSel = EMPRESAS_PERMITIDAS.find(e => e.id === Number(d.empresaId)) || EMPRESAS_PERMITIDAS[0];
+      sucursalesDisponibles = empSel.sucursales;
+      draftSucursalDisabled = draftTipoOpDisabled || !empSel.usaEmpresaSucursal;
       draftInputBg = draftReadOnly ? '#12151d' : '#0b0e15';
       modalTitulo = modal.mode === 'ver' ? 'Detalle de Recibo por Honorarios' : (modal.mode === 'editar' ? 'Editar Recibo por Honorarios (Estado: BORRADOR)' : 'Registro de Recibo por Honorarios (Fase Borrador)');
       cancelarLabel = modal.mode === 'ver' ? 'Cerrar' : 'Cancelar';
@@ -574,7 +599,7 @@ class Component extends DCLogic {
 
       modalOpen, modalTitulo, cancelarLabel,
       draft: draftVals || {},
-      draftReadOnly, draftEditable, draftTipoOpDisabled, draftSerieDisabled, draftInputBg,
+      draftReadOnly, draftEditable, draftTipoOpDisabled, draftSerieDisabled, draftInputBg, empresasPermitidas: EMPRESAS_PERMITIDAS, sucursalesDisponibles, draftSucursalDisabled,
       tiposOperacion: TIPOS_OPERACION,
       terceros: TERCEROS,
       conceptos: CONCEPTOS,
@@ -584,6 +609,8 @@ class Component extends DCLogic {
       setDraftNumero: (e) => this.updateDraft({ numero: e.target.value.replace(/[^0-9a-zA-Z]/g, '') }),
       setDraftFechaEmision: (e) => this.onFechaEmisionChange(e.target.value),
       setDraftFechaVencimiento: (e) => this.updateDraft({ fechaVencimiento: e.target.value }),
+      setDraftEmpresa: this.setDraftEmpresa,
+      setDraftSucursal: this.setDraftSucursal,
       addItem: this.addItem,
       guardarBorrador: this.guardarBorrador,
 
