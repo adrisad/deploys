@@ -45,11 +45,19 @@
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:16px;">
         <div>
           <div style="font-size:12px;color:#8b95a5;text-transform:uppercase;letter-spacing:.04em;font-weight:700;margin-bottom:6px;">Empresa</div>
-          <div style="background:#161a24;border:1px solid #262b38;color:#7a8496;border-radius:8px;padding:10px 12px;font-size:14px;">🔒 24 - INVERSIONES GLOBALES PERÚ S.A.</div>
+          <select value="{{ filters.empresaId }}" onchange="{{ setFilterEmpresa }}" style="width:100%;background:#0b0e15;border:1px solid #232838;color:#f5f6f8;border-radius:8px;padding:10px 12px;font-size:14px;">
+            <sc-for list="{{ empresasPermitidas }}" as="emp" hint-placeholder-count="2">
+              <option value="{{ emp.id }}">{{ emp.label }}</option>
+            </sc-for>
+          </select>
         </div>
         <div>
           <div style="font-size:12px;color:#8b95a5;text-transform:uppercase;letter-spacing:.04em;font-weight:700;margin-bottom:6px;">Sucursal Operativa</div>
-          <div style="background:#161a24;border:1px solid #262b38;color:#7a8496;border-radius:8px;padding:10px 12px;font-size:14px;">🔒 19 - SEDE OPERATIVA SUR COSTA</div>
+          <select value="{{ filters.sucursalId }}" onchange="{{ setFilterSucursal }}" disabled="{{ filterSucursalDisabled }}" style="width:100%;background:{{ filterSucursalDisabled === true ? '#161a24' : '#0b0e15' }};border:1px solid #232838;color:{{ filterSucursalDisabled === true ? '#7a8496' : '#f5f6f8' }};border-radius:8px;padding:10px 12px;font-size:14px;">
+            <sc-for list="{{ filterSucursalesDisponibles }}" as="suc" hint-placeholder-count="2">
+              <option value="{{ suc.id }}">{{ suc.label }}</option>
+            </sc-for>
+          </select>
         </div>
         <div>
           <div style="font-size:12px;color:#8b95a5;text-transform:uppercase;letter-spacing:.04em;font-weight:700;margin-bottom:6px;">RUC / Proveedor</div>
@@ -409,7 +417,7 @@ class Component extends DCLogic {
       { id: 5, folioAuxiliar: 'HON-202607-0002', proveedor: 'AUDITORES DEL PERU S.A.', tipoOperacion: TIPOS_OPERACION[0], serie: 'E001', numero: '00000581', fechaEmision: '2026-07-10', fechaVencimiento: '2026-08-10', tcVenta: 3.740, tcCompra: 3.736, estado: 'BORRADOR', items: [{ id: 1, conceptoId: 502, cantidad: 1, precioUnitario: 3200, suspension: false }] },
     ],
     nextFolioSeq: 47,
-    filters: { ruc: '', correlativo: '', desde: '', hasta: '', estado: 'Todos', periodo: 'Todos' },
+    filters: { ruc: '', correlativo: '', desde: '', hasta: '', estado: 'Todos', periodo: 'Todos', empresaId: 24, sucursalId: 19 },
     modal: null,
     confirmId: null,
   };
@@ -424,7 +432,14 @@ class Component extends DCLogic {
 
   setFilter = (key, val) => this.setState(s => ({ filters: { ...s.filters, [key]: val } }));
 
-  limpiarFiltros = () => this.setState({ filters: { ruc: '', correlativo: '', desde: '', hasta: '', estado: 'Todos', periodo: 'Todos' } });
+  limpiarFiltros = () => this.setState({ filters: { ruc: '', correlativo: '', desde: '', hasta: '', estado: 'Todos', periodo: 'Todos', empresaId: 24, sucursalId: 19 } });
+
+  setFilterEmpresa = (e) => {
+    const empId = Number(e.target.value);
+    const emp = EMPRESAS_PERMITIDAS.find(x => x.id === empId);
+    this.setState(s => ({ filters: { ...s.filters, empresaId: empId, sucursalId: emp && emp.sucursales[0] ? emp.sucursales[0].id : null } }));
+  };
+  setFilterSucursal = (e) => this.setFilter('sucursalId', Number(e.target.value));
 
   updateDraft = (patch) => this.setState(s => ({ modal: { ...s.modal, draft: { ...s.modal.draft, ...patch } } }));
 
@@ -587,6 +602,10 @@ class Component extends DCLogic {
       setFilterHasta: (e) => this.setFilter('hasta', e.target.value),
       setFilterEstado: (e) => this.setFilter('estado', e.target.value),
       setFilterPeriodo: (e) => this.setFilter('periodo', e.target.value),
+      setFilterEmpresa: this.setFilterEmpresa,
+      setFilterSucursal: this.setFilterSucursal,
+      filterSucursalesDisponibles: (EMPRESAS_PERMITIDAS.find(e => e.id === Number(s.filters.empresaId)) || EMPRESAS_PERMITIDAS[0]).sucursales,
+      filterSucursalDisabled: !(EMPRESAS_PERMITIDAS.find(e => e.id === Number(s.filters.empresaId)) || EMPRESAS_PERMITIDAS[0]).usaEmpresaSucursal,
       estadosOptions: ['Todos', 'BORRADOR', 'CONTABILIZADO', 'ANULADO'],
       periodoOptions: [{ value: 'Todos', label: 'Todos' }, ...Array.from(new Set(s.registros.map(r => r.fechaEmision.slice(0, 7)))).sort().reverse().map(ym => {
         const [y, m] = ym.split('-');
