@@ -68,6 +68,14 @@
           <input type="date" value="{{ filters.hasta }}" onchange="{{ setFilterHasta }}" style="width:100%;background:#0b0e15;border:1px solid #232838;color:#f5f6f8;border-radius:8px;padding:9px 12px;font-size:14px;">
         </div>
         <div>
+          <div style="font-size:12px;color:#8b95a5;text-transform:uppercase;letter-spacing:.04em;font-weight:700;margin-bottom:6px;">Período Contable</div>
+          <select value="{{ filters.periodo }}" onchange="{{ setFilterPeriodo }}" style="width:100%;background:#0b0e15;border:1px solid #232838;color:#f5f6f8;border-radius:8px;padding:10px 12px;font-size:14px;">
+            <sc-for list="{{ periodoOptions }}" as="op" hint-placeholder-count="4">
+              <option value="{{ op.value }}">{{ op.label }}</option>
+            </sc-for>
+          </select>
+        </div>
+        <div>
           <div style="font-size:12px;color:#8b95a5;text-transform:uppercase;letter-spacing:.04em;font-weight:700;margin-bottom:6px;">Estado Documento</div>
           <select value="{{ filters.estado }}" onchange="{{ setFilterEstado }}" style="width:100%;background:#0b0e15;border:1px solid #232838;color:#f5f6f8;border-radius:8px;padding:10px 12px;font-size:14px;">
             <sc-for list="{{ estadosOptions }}" as="op" hint-placeholder-count="4">
@@ -164,14 +172,18 @@
             </datalist>
           </div>
 
-          <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:16px;">
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;">
             <div>
               <div style="font-size:12px;color:#8b95a5;text-transform:uppercase;letter-spacing:.04em;font-weight:700;margin-bottom:6px;">Serie</div>
-              <input value="{{ draft.serie }}" oninput="{{ setDraftSerie }}" disabled="{{ draftSerieDisabled }}" style="width:100%;background:{{ draftInputBg }};border:1px solid #232838;color:#f5f6f8;border-radius:8px;padding:10px 12px;font-size:14px;">
+              <input value="{{ draft.serie }}" oninput="{{ setDraftSerie }}" disabled="{{ draftSerieDisabled }}" placeholder="E001" style="width:100%;background:{{ draftInputBg }};border:1px solid #232838;color:#f5f6f8;border-radius:8px;padding:10px 12px;font-size:14px;">
+            </div>
+            <div>
+              <div style="font-size:12px;color:#8b95a5;text-transform:uppercase;letter-spacing:.04em;font-weight:700;margin-bottom:6px;">Folio Correlativo</div>
+              <input value="{{ draft.numero }}" oninput="{{ setDraftNumero }}" disabled="{{ draftSerieDisabled }}" placeholder="00000542" style="width:100%;background:{{ draftInputBg }};border:1px solid #232838;color:#f5f6f8;border-radius:8px;padding:10px 12px;font-size:14px;">
             </div>
             <div>
               <div style="font-size:12px;color:#8b95a5;text-transform:uppercase;letter-spacing:.04em;font-weight:700;margin-bottom:6px;">Número</div>
-              <input value="{{ draft.numero }}" oninput="{{ setDraftNumero }}" disabled="{{ draftSerieDisabled }}" style="width:100%;background:{{ draftInputBg }};border:1px solid #232838;color:#f5f6f8;border-radius:8px;padding:10px 12px;font-size:14px;">
+              <div style="background:#161a24;border:1px solid #262b38;color:#7a8496;border-radius:8px;padding:10px 12px;font-size:14px;">🔒 {{ draft.serieNumero }}</div>
             </div>
             <div>
               <div style="font-size:12px;color:#8b95a5;text-transform:uppercase;letter-spacing:.04em;font-weight:700;margin-bottom:6px;">Fecha Emisión</div>
@@ -193,8 +205,12 @@
               <div style="background:#161a24;border:1px solid #262b38;color:#7a8496;border-radius:8px;padding:10px 12px;font-size:14px;">🔒 DÓLARES</div>
             </div>
             <div>
-              <div style="font-size:12px;color:#8b95a5;text-transform:uppercase;letter-spacing:.04em;font-weight:700;margin-bottom:6px;">T.C. Venta / Compra</div>
-              <div style="background:#161a24;border:1px solid #262b38;color:#7a8496;border-radius:8px;padding:10px 12px;font-size:14px;">🔒 {{ draft.tcVentaFmt }} / {{ draft.tcCompraFmt }}</div>
+              <div style="font-size:12px;color:#8b95a5;text-transform:uppercase;letter-spacing:.04em;font-weight:700;margin-bottom:6px;">T.C. Venta</div>
+              <div style="background:#161a24;border:1px solid #262b38;color:#7a8496;border-radius:8px;padding:10px 12px;font-size:14px;">🔒 {{ draft.tcVentaFmt }}</div>
+            </div>
+            <div>
+              <div style="font-size:12px;color:#8b95a5;text-transform:uppercase;letter-spacing:.04em;font-weight:700;margin-bottom:6px;">T.C. Compra</div>
+              <div style="background:#161a24;border:1px solid #262b38;color:#7a8496;border-radius:8px;padding:10px 12px;font-size:14px;">🔒 {{ draft.tcCompraFmt }}</div>
             </div>
           </div>
 
@@ -203,12 +219,12 @@
           <div>
             <div style="font-weight:700;font-size:14px;color:#dfe3ea;margin-bottom:14px;">📋 Grilla Multilínea de Detalles Analíticos (Edición Directa Inline)</div>
 
-            <div style="display:grid;grid-template-columns:0.4fr 2fr 1fr 1.2fr 1fr 1.1fr 1.1fr 0.5fr;gap:10px;padding:0 6px 10px;font-size:11px;color:#8b95a5;text-transform:uppercase;letter-spacing:.04em;font-weight:700;">
-              <div>Item</div><div>Concepto Comercial</div><div>Cantidad</div><div>P. Unitario USD</div><div>Susp.?</div><div>Retención</div><div>Neto</div><div></div>
+            <div style="display:grid;grid-template-columns:0.4fr 2.4fr 1fr 1.2fr 1fr 0.6fr;gap:10px;padding:0 6px 10px;font-size:11px;color:#8b95a5;text-transform:uppercase;letter-spacing:.04em;font-weight:700;">
+              <div>Item</div><div>Concepto Comercial (Gasto)</div><div>Cantidad</div><div>P. Unitario</div><div>Suspensión?</div><div>Acciones</div>
             </div>
 
             <sc-for list="{{ draft.itemsView }}" as="it" hint-placeholder-count="1">
-              <div style="display:grid;grid-template-columns:0.4fr 2fr 1fr 1.2fr 1fr 1.1fr 1.1fr 0.5fr;gap:10px;padding:8px 6px;align-items:center;border-bottom:1px solid #171b24;">
+              <div style="display:grid;grid-template-columns:0.4fr 2.4fr 1fr 1.2fr 1fr 0.6fr;gap:10px;padding:8px 6px;align-items:center;border-bottom:1px solid #171b24;">
                 <div style="color:#9aa4b2;font-size:13px;">{{ it.indexLabel }}</div>
                 <div>
                   <select value="{{ it.conceptoId }}" onchange="{{ it.onConcepto }}" disabled="{{ draftReadOnly }}" style="width:100%;background:{{ draftInputBg }};border:1px solid #232838;color:#f5f6f8;border-radius:8px;padding:9px 10px;font-size:13px;">
@@ -226,8 +242,6 @@
                 <div style="display:flex;justify-content:center;">
                   <input type="checkbox" checked="{{ it.suspension }}" onchange="{{ it.onSuspension }}" disabled="{{ draftReadOnly }}" style="width:18px;height:18px;accent-color:#3b7cff;">
                 </div>
-                <div style="background:#161a24;border:1px solid #262b38;color:#7a8496;border-radius:8px;padding:9px 10px;font-size:13px;">🔒 {{ it.retencionFmt }}</div>
-                <div style="background:#161a24;border:1px solid #262b38;color:#7a8496;border-radius:8px;padding:9px 10px;font-size:13px;">🔒 {{ it.netoFmt }}</div>
                 <div style="display:flex;justify-content:center;">
                   <sc-if value="{{ draftEditable }}" hint-placeholder-val="{{ true }}">
                     <button onclick="{{ it.onEliminar }}" style="background:none;border:none;color:#ef4444;cursor:pointer;font-size:15px;">🗑️</button>
@@ -381,7 +395,7 @@ class Component extends DCLogic {
       { id: 5, folioAuxiliar: 'HON-202607-0002', proveedor: 'AUDITORES DEL PERU S.A.', tipoOperacion: TIPOS_OPERACION[0], serie: 'E001', numero: '00000581', fechaEmision: '2026-07-10', fechaVencimiento: '2026-08-10', tcVenta: 3.740, tcCompra: 3.736, estado: 'BORRADOR', items: [{ id: 1, conceptoId: 502, cantidad: 1, precioUnitario: 3200, suspension: false }] },
     ],
     nextFolioSeq: 47,
-    filters: { ruc: '', correlativo: '', desde: '', hasta: '', estado: 'Todos' },
+    filters: { ruc: '', correlativo: '', desde: '', hasta: '', estado: 'Todos', periodo: 'Todos' },
     modal: null,
     confirmId: null,
   };
@@ -396,7 +410,7 @@ class Component extends DCLogic {
 
   setFilter = (key, val) => this.setState(s => ({ filters: { ...s.filters, [key]: val } }));
 
-  limpiarFiltros = () => this.setState({ filters: { ruc: '', correlativo: '', desde: '', hasta: '', estado: 'Todos' } });
+  limpiarFiltros = () => this.setState({ filters: { ruc: '', correlativo: '', desde: '', hasta: '', estado: 'Todos', periodo: 'Todos' } });
 
   updateDraft = (patch) => this.setState(s => ({ modal: { ...s.modal, draft: { ...s.modal.draft, ...patch } } }));
 
@@ -423,13 +437,21 @@ class Component extends DCLogic {
 
   guardarBorrador = () => this.setState(s => {
     const d = s.modal.draft;
+    const numero = `${d.serie || ''}-${String(d.numero || '').padStart(8, '0')}`;
     if (s.modal.mode === 'nuevo') {
-      const seq = s.nextFolioSeq;
-      const folioAuxiliar = 'HON-202607-' + String(seq).padStart(4, '0');
+      // Paso 4.1: correlativo = Serie - Periodo Contable - Correlativo (secuencia por periodo vía correlativo_periodo_cache)
+      const periodo = (d.fechaEmision || '').slice(0, 7).replace('-', '');
+      const cache = { ...(s.correlativoPeriodoCache || {}) };
+      const seqPeriodo = (cache[periodo] || 0) + 1;
+      cache[periodo] = seqPeriodo;
+      const folioAuxiliar = `HON-${periodo}-${String(seqPeriodo).padStart(4, '0')}`;
+      // Paso 4.2/4.3: cabecera_libro_honorarios + detalle_libro_honorarios, estado_id = 'BORRADOR'
       const nuevo = { id: Date.now(), folioAuxiliar, proveedor: (d.proveedor || 'SIN NOMBRE').split(' - ').slice(1).join(' - ') || d.proveedor, tipoOperacion: d.tipoOperacion, serie: d.serie, numero: d.numero, fechaEmision: d.fechaEmision, fechaVencimiento: d.fechaVencimiento, tcVenta: d.tcVenta, tcCompra: d.tcCompra, estado: 'BORRADOR', items: d.items };
-      return { registros: s.registros.concat([nuevo]), nextFolioSeq: seq + 1, modal: null };
+      // Paso 4.4: fila espejo en documentos_cta_cte con numero = serie-numero (llave CxP)
+      const documentoCtaCte = { folioAuxiliar, numero, estado: 'BORRADOR' };
+      return { registros: s.registros.concat([nuevo]), correlativoPeriodoCache: cache, documentosCtaCte: (s.documentosCtaCte || []).concat([documentoCtaCte]), modal: null };
     } else {
-      const registros = s.registros.map(r => r.id === d.id ? { ...r, proveedor: (d.proveedor || r.proveedor).split(' - ').slice(1).join(' - ') || r.proveedor, fechaEmision: d.fechaEmision, fechaVencimiento: d.fechaVencimiento, tcVenta: d.tcVenta, tcCompra: d.tcCompra, items: d.items } : r);
+      const registros = s.registros.map(r => r.id === d.id ? { ...r, proveedor: (d.proveedor || r.proveedor).split(' - ').slice(1).join(' - ') || r.proveedor, serie: d.serie, numero: d.numero, fechaEmision: d.fechaEmision, fechaVencimiento: d.fechaVencimiento, tcVenta: d.tcVenta, tcCompra: d.tcCompra, items: d.items } : r);
       return { registros, modal: null };
     }
   });
@@ -457,6 +479,7 @@ class Component extends DCLogic {
       if (f.correlativo && !r.folioAuxiliar.toLowerCase().includes(f.correlativo.toLowerCase())) return false;
       if (f.desde && r.fechaEmision < f.desde) return false;
       if (f.hasta && r.fechaEmision > f.hasta) return false;
+      if (f.periodo !== 'Todos' && r.fechaEmision.slice(0, 7) !== f.periodo) return false;
       return true;
     }).map(r => {
       const totals = r.items.reduce((acc, it) => {
@@ -520,6 +543,7 @@ class Component extends DCLogic {
 
       draftVals = {
         ...d,
+        serieNumero: `${d.serie || ''}${d.numero ? '-' + String(d.numero).padStart(8, '0') : ''}`,
         periodoLabel: pInfo.label, periodoEstado: pInfo.estado,
         tcVentaFmt: fmt(d.tcVenta), tcCompraFmt: fmt(d.tcCompra),
         itemsView,
@@ -537,7 +561,13 @@ class Component extends DCLogic {
       setFilterDesde: (e) => this.setFilter('desde', e.target.value),
       setFilterHasta: (e) => this.setFilter('hasta', e.target.value),
       setFilterEstado: (e) => this.setFilter('estado', e.target.value),
+      setFilterPeriodo: (e) => this.setFilter('periodo', e.target.value),
       estadosOptions: ['Todos', 'BORRADOR', 'CONTABILIZADO', 'ANULADO'],
+      periodoOptions: [{ value: 'Todos', label: 'Todos' }, ...Array.from(new Set(s.registros.map(r => r.fechaEmision.slice(0, 7)))).sort().reverse().map(ym => {
+        const [y, m] = ym.split('-');
+        const nombres = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+        return { value: ym, label: `${nombres[+m - 1]} ${y}` };
+      })],
       limpiarFiltros: this.limpiarFiltros,
       openNuevo: this.openNuevo,
       closeModal: this.closeModal,
@@ -550,8 +580,8 @@ class Component extends DCLogic {
       conceptos: CONCEPTOS,
       setDraftTipoOperacion: (e) => this.updateDraft({ tipoOperacion: e.target.value }),
       setDraftProveedor: (e) => this.updateDraft({ proveedor: e.target.value }),
-      setDraftSerie: (e) => this.updateDraft({ serie: e.target.value }),
-      setDraftNumero: (e) => this.updateDraft({ numero: e.target.value }),
+      setDraftSerie: (e) => this.updateDraft({ serie: e.target.value.toUpperCase() }),
+      setDraftNumero: (e) => this.updateDraft({ numero: e.target.value.replace(/[^0-9a-zA-Z]/g, '') }),
       setDraftFechaEmision: (e) => this.onFechaEmisionChange(e.target.value),
       setDraftFechaVencimiento: (e) => this.updateDraft({ fechaVencimiento: e.target.value }),
       addItem: this.addItem,
