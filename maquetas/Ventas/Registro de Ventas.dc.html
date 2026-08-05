@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <style>
+    body { margin: 0; background: #0a0a0c; }
+    ::placeholder { color: #5b6270; }
+    input:focus, select:focus { outline: none; }
+  </style>
+</helmet>
+<div style="min-height: 100vh; background: #0a0a0c; color: #f4f4f6; font-family: -apple-system, 'Helvetica Neue', Helvetica, Arial, sans-serif; padding: 40px 48px;">
+
+  <div style="display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 28px; gap: 24px; flex-wrap: wrap;">
+    <div>
+      <div style="font-size: 34px; font-weight: 800; color: #ffffff; letter-spacing: -0.02em;">Registro de Ventas e Ingresos</div>
+      <div style="font-size: 15px; color: {{ accent }}; margin-top: 6px;">Libro de Ventas — Fase Borrador · SIRE 140000</div>
+    </div>
+    <button onClick="{{ openNuevo }}" style="display: flex; align-items: center; gap: 8px; background: {{ accent }}; color: #ffffff; border: none; padding: 13px 22px; border-radius: 10px; font-size: 15px; font-weight: 700; cursor: pointer;" style-hover="filter: brightness(1.1);">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14"></path><path d="M5 12h14"></path></svg>
+      Nuevo Registro
+    </button>
+  </div>
+
+  <div style="background: #151518; border: 1px solid #28282d; border-radius: 14px; padding: 24px; margin-bottom: 24px;">
+    <div style="font-size: 12px; font-weight: 700; letter-spacing: 0.06em; color: #8b93a1; text-transform: uppercase; margin-bottom: 14px;">Filtros de Búsqueda por Criterios Avanzados</div>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; margin-bottom: 14px;">
+      <div>
+        <div style="font-size: 12px; color: #8b93a1; margin-bottom: 6px;">Empresa</div>
+        <div style="background: #0d0d10; border: 1px solid #2c2c32; border-radius: 8px; padding: 11px 12px; font-size: 14px; color: #c7cbd3;">24 - INVERSIONES GLOBALES PERU S.A.</div>
+      </div>
+      <div>
+        <div style="font-size: 12px; color: #8b93a1; margin-bottom: 6px;">Sucursal Operativa</div>
+        <div style="background: #0d0d10; border: 1px solid #2c2c32; border-radius: 8px; padding: 11px 12px; font-size: 14px; color: #c7cbd3;">19 - SEDE OPERATIVA SUR COSTA</div>
+      </div>
+      <div>
+        <div style="font-size: 12px; color: #8b93a1; margin-bottom: 6px;">RUC / Cliente</div>
+        <input value="{{ filtroRuc }}" onChange="{{ onFiltroRuc }}" placeholder="Buscar por RUC o razón social..." style="width: 100%; box-sizing: border-box; background: #0d0d10; border: 1px solid #2c2c32; border-radius: 8px; padding: 11px 12px; font-size: 14px; color: #f4f4f6;"/>
+      </div>
+      <div>
+        <div style="font-size: 12px; color: #8b93a1; margin-bottom: 6px;">Correlativo Auxiliar</div>
+        <input value="{{ filtroCorrelativo }}" onChange="{{ onFiltroCorrelativo }}" placeholder="VTA-202607-0000" style="width: 100%; box-sizing: border-box; background: #0d0d10; border: 1px solid #2c2c32; border-radius: 8px; padding: 11px 12px; font-size: 14px; color: #f4f4f6;"/>
+      </div>
+      <div>
+        <div style="font-size: 12px; color: #8b93a1; margin-bottom: 6px;">Estado del Documento</div>
+        <select value="{{ filtroEstado }}" onChange="{{ onFiltroEstado }}" style="width: 100%; box-sizing: border-box; background: #0d0d10; border: 1px solid #2c2c32; border-radius: 8px; padding: 11px 12px; font-size: 14px; color: #f4f4f6;">
+          <option value="Todos">Todos</option>
+          <option value="BORRADOR">BORRADOR</option>
+          <option value="CONTABILIZADO">CONTABILIZADO</option>
+          <option value="ANULADO">ANULADO</option>
+        </select>
+      </div>
+      <div>
+        <div style="font-size: 12px; color: #8b93a1; margin-bottom: 6px;">Emisión desde</div>
+        <input type="date" value="{{ filtroFechaDesde }}" onChange="{{ onFiltroFechaDesde }}" style="width: 100%; box-sizing: border-box; background: #0d0d10; border: 1px solid #2c2c32; border-radius: 8px; padding: 10px 12px; font-size: 14px; color: #f4f4f6; color-scheme: dark;"/>
+      </div>
+      <div>
+        <div style="font-size: 12px; color: #8b93a1; margin-bottom: 6px;">Emisión hasta</div>
+        <input type="date" value="{{ filtroFechaHasta }}" onChange="{{ onFiltroFechaHasta }}" style="width: 100%; box-sizing: border-box; background: #0d0d10; border: 1px solid #2c2c32; border-radius: 8px; padding: 10px 12px; font-size: 14px; color: #f4f4f6; color-scheme: dark;"/>
+      </div>
+    </div>
+    <div style="display: flex; gap: 10px;">
+      <button onClick="{{ limpiarFiltros }}" style="background: #1c1c21; color: #d1d5db; border: 1px solid #2c2c32; padding: 11px 20px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer;">Limpiar</button>
+    </div>
+  </div>
+
+  <div style="background: #151518; border: 1px solid #28282d; border-radius: 14px; overflow: hidden;">
+    <div style="display: grid; grid-template-columns: 1.4fr 1.6fr 1fr 1fr 1fr 1fr; padding: 16px 22px; border-bottom: 1px solid #232328;">
+      <div style="font-size: 11px; font-weight: 700; letter-spacing: 0.07em; color: #8b93a1; text-transform: uppercase;">Folio Auxiliar</div>
+      <div style="font-size: 11px; font-weight: 700; letter-spacing: 0.07em; color: #8b93a1; text-transform: uppercase;">Cliente</div>
+      <div style="font-size: 11px; font-weight: 700; letter-spacing: 0.07em; color: #8b93a1; text-transform: uppercase;">Emisión</div>
+      <div style="font-size: 11px; font-weight: 700; letter-spacing: 0.07em; color: #8b93a1; text-transform: uppercase;">Total</div>
+      <div style="font-size: 11px; font-weight: 700; letter-spacing: 0.07em; color: #8b93a1; text-transform: uppercase;">Estado</div>
+      <div style="font-size: 11px; font-weight: 700; letter-spacing: 0.07em; color: #8b93a1; text-transform: uppercase; text-align: right;">Acciones</div>
+    </div>
+    <sc-for list="{{ filasTabla }}" as="fila" hint-placeholder-count="2">
+      <div style="display: grid; grid-template-columns: 1.4fr 1.6fr 1fr 1fr 1fr 1fr; align-items: center; padding: 18px 22px; border-bottom: 1px solid #1d1d21;">
+        <div style="font-size: 14px; font-weight: 700; color: {{ accent }};">{{ fila.folio }}</div>
+        <div style="font-size: 14px; color: #eceef1;">{{ fila.clienteLabel }}</div>
+        <div style="font-size: 14px; color: #b4b9c2;">{{ fila.fechaEmision }}</div>
+        <div style="font-size: 14px; color: #eceef1; font-variant-numeric: tabular-nums;">S/ {{ fila.totalLabel }}</div>
+        <div>
+          <span style="display: inline-flex; align-items: center; gap: 6px; background: {{ fila.estadoBg }}; color: {{ fila.estadoColor }}; padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: 700;">
+            <span style="width: 6px; height: 6px; border-radius: 50%; background: {{ fila.estadoColor }};"></span>
+            {{ fila.estado }}
+          </span>
+        </div>
+        <div style="display: flex; gap: 14px; justify-content: flex-end;">
+          <button onClick="{{ fila.onVer }}" title="Ver" style="background: none; border: none; color: #d1d5db; cursor: pointer; padding: 4px;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+          </button>
+          <sc-if value="{{ fila.puedeEditar }}" hint-placeholder-val="{{ true }}">
+            <button onClick="{{ fila.onEditar }}" title="Editar" style="background: none; border: none; color: #d1d5db; cursor: pointer; padding: 4px;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"></path></svg>
+            </button>
+          </sc-if>
+          <sc-if value="{{ fila.puedeEditar }}" hint-placeholder-val="{{ true }}">
+            <button onClick="{{ fila.onAnular }}" title="Anular" style="background: none; border: none; color: #ef4444; cursor: pointer; padding: 4px;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"></path><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"></path></svg>
+            </button>
+          </sc-if>
+        </div>
+      </div>
+    </sc-for>
+    <sc-if value="{{ tablaVacia }}" hint-placeholder-val="{{ false }}">
+      <div style="padding: 48px 22px; text-align: center; color: #6b7280; font-size: 14px;">No se encontraron comprobantes con los filtros aplicados.</div>
+    </sc-if>
+  </div>
+
+  <sc-if value="{{ wizardAbierto }}" hint-placeholder-val="{{ false }}">
+    <div style="position: fixed; inset: 0; background: rgba(0,0,0,0.65); display: flex; align-items: center; justify-content: center; padding: 24px; z-index: 50; overflow: auto;">
+      <div style="background: #151518; border: 1px solid #28282d; border-radius: 16px; width: 100%; max-width: 980px; max-height: 92vh; overflow: auto; padding: 32px;">
+        <div style="font-size: 20px; font-weight: 800; color: #ffffff; margin-bottom: 4px;">{{ wizardTitulo }}</div>
+        <div style="font-size: 13px; color: #8b93a1; margin-bottom: 24px;">Fase Borrador — Estado: BORRADOR</div>
+
+        <div style="display: flex; gap: 8px; margin-bottom: 28px;">
+          <sc-for list="{{ pasos }}" as="paso" hint-placeholder-count="3">
+            <div style="flex: 1; display: flex; flex-direction: column; gap: 8px;">
+              <div style="height: 4px; border-radius: 2px; background: {{ paso.barColor }};"></div>
+              <div style="font-size: 12px; font-weight: 700; color: {{ paso.textColor }};">{{ paso.label }}</div>
+            </div>
+          </sc-for>
+        </div>
+
+        <sc-if value="{{ enPaso1 }}" hint-placeholder-val="{{ true }}">
+          <div>
+            <div style="font-size: 12px; font-weight: 700; letter-spacing: 0.06em; color: #8b93a1; text-transform: uppercase; margin-bottom: 14px;">Cabecera del Documento</div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px;">
+              <div>
+                <div style="font-size: 12px; color: #8b93a1; margin-bottom: 6px;">Tipo de Operación *</div>
+                <select value="{{ form.tipoOperacionId }}" onChange="{{ onTipoOperacion }}" disabled="{{ tipoOperacionBloqueado }}" style="width: 100%; box-sizing: border-box; background: #0d0d10; border: 1px solid #2c2c32; border-radius: 8px; padding: 11px 12px; font-size: 14px; color: #f4f4f6;">
+                  <option value="">Seleccionar...</option>
+                  <sc-for list="{{ tiposOperacionOpciones }}" as="op" hint-placeholder-count="4">
+                    <option value="{{ op.id }}">{{ op.label }}</option>
+                  </sc-for>
+                </select>
+              </div>
+              <div>
+                <div style="font-size: 12px; color: #8b93a1; margin-bottom: 6px;">Cliente / Tercero *</div>
+                <select value="{{ form.terceroId }}" onChange="{{ onTercero }}" style="width: 100%; box-sizing: border-box; background: #0d0d10; border: 1px solid #2c2c32; border-radius: 8px; padding: 11px 12px; font-size: 14px; color: #f4f4f6;">
+                  <option value="">Seleccionar...</option>
+                  <sc-for list="{{ terceros }}" as="t" hint-placeholder-count="3">
+                    <option value="{{ t.id }}">{{ t.label }}</option>
+                  </sc-for>
+                </select>
+              </div>
+              <div>
+                <div style="font-size: 12px; color: #8b93a1; margin-bottom: 6px;">🔒 Tipo Documento SUNAT</div>
+                <div style="background: #0d0d10; border: 1px solid #2c2c32; border-radius: 8px; padding: 11px 12px; font-size: 14px; color: #7d8390;">{{ form.tipoDocumentoDisplay }}</div>
+              </div>
+              <div>
+                <div style="font-size: 12px; color: #8b93a1; margin-bottom: 6px;">🔒 Moneda / T.C. Venta</div>
+                <div style="background: #0d0d10; border: 1px solid #2c2c32; border-radius: 8px; padding: 11px 12px; font-size: 14px; color: #7d8390;">{{ form.monedaDisplay }}</div>
+              </div>
+              <div>
+                <div style="font-size: 12px; color: #8b93a1; margin-bottom: 6px;">Serie *</div>
+                <input value="{{ form.serie }}" onChange="{{ onSerie }}" disabled="{{ serieNumeroBloqueado }}" placeholder="F001" style="width: 100%; box-sizing: border-box; background: #0d0d10; border: 1px solid #2c2c32; border-radius: 8px; padding: 11px 12px; font-size: 14px; color: #f4f4f6;"/>
+              </div>
+              <div>
+                <div style="font-size: 12px; color: #8b93a1; margin-bottom: 6px;">Número *</div>
+                <input value="{{ form.numero }}" onChange="{{ onNumero }}" disabled="{{ serieNumeroBloqueado }}" placeholder="00001542" style="width: 100%; box-sizing: border-box; background: #0d0d10; border: 1px solid #2c2c32; border-radius: 8px; padding: 11px 12px; font-size: 14px; color: #f4f4f6;"/>
+              </div>
+              <div>
+                <div style="font-size: 12px; color: #8b93a1; margin-bottom: 6px;">Fecha de Emisión *</div>
+                <input type="date" value="{{ form.fechaEmision }}" onChange="{{ onFechaEmision }}" style="width: 100%; box-sizing: border-box; background: #0d0d10; border: 1px solid #2c2c32; border-radius: 8px; padding: 10px 12px; font-size: 14px; color: #f4f4f6; color-scheme: dark;"/>
+              </div>
+              <div>
+                <div style="font-size: 12px; color: #8b93a1; margin-bottom: 6px;">Fecha de Vencimiento</div>
+                <input type="date" value="{{ form.fechaVencimiento }}" onChange="{{ onFechaVencimiento }}" style="width: 100%; box-sizing: border-box; background: #0d0d10; border: 1px solid #2c2c32; border-radius: 8px; padding: 10px 12px; font-size: 14px; color: #f4f4f6; color-scheme: dark;"/>
+              </div>
+            </div>
+            <div style="font-size: 13px; color: #6b7280;">Periodo Contable: <span style="color: #b4b9c2;">{{ form.periodoDisplay }}</span> — {{ form.periodoEstado }}</div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ enPaso2 }}" hint-placeholder-val="{{ false }}">
+          <div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+              <div style="font-size: 12px; font-weight: 700; letter-spacing: 0.06em; color: #8b93a1; text-transform: uppercase;">Grilla Multilínea de Detalles Analíticos</div>
+              <button onClick="{{ addLinea }}" style="display: flex; align-items: center; gap: 6px; background: #1c1c21; color: #d1d5db; border: 1px solid #2c2c32; padding: 8px 14px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14"></path><path d="M5 12h14"></path></svg>
+                Añadir Línea de Venta
+              </button>
+            </div>
+            <div style="border: 1px solid #232328; border-radius: 10px; overflow: hidden; margin-bottom: 18px;">
+              <div style="display: grid; grid-template-columns: 2.2fr 0.8fr 1fr 1fr 1fr 0.5fr; padding: 12px 16px; background: #0f0f12; border-bottom: 1px solid #232328;">
+                <div style="font-size: 11px; font-weight: 700; color: #8b93a1; text-transform: uppercase;">Concepto Comercial</div>
+                <div style="font-size: 11px; font-weight: 700; color: #8b93a1; text-transform: uppercase;">Cant.</div>
+                <div style="font-size: 11px; font-weight: 700; color: #8b93a1; text-transform: uppercase;">P. Unit.</div>
+                <div style="font-size: 11px; font-weight: 700; color: #8b93a1; text-transform: uppercase;">Base</div>
+                <div style="font-size: 11px; font-weight: 700; color: #8b93a1; text-transform: uppercase;">IGV</div>
+                <div></div>
+              </div>
+              <sc-for list="{{ form.lineas }}" as="linea" hint-placeholder-count="2">
+                <div style="display: grid; grid-template-columns: 2.2fr 0.8fr 1fr 1fr 1fr 0.5fr; align-items: center; padding: 10px 16px; border-bottom: 1px solid #1d1d21; gap: 8px;">
+                  <select value="{{ linea.conceptoId }}" onChange="{{ linea.onConcepto }}" style="width: 100%; box-sizing: border-box; background: #0d0d10; border: 1px solid #2c2c32; border-radius: 6px; padding: 8px 10px; font-size: 13px; color: #f4f4f6;">
+                    <option value="">Seleccionar...</option>
+                    <sc-for list="{{ conceptosDisponibles }}" as="c" hint-placeholder-count="2">
+                      <option value="{{ c.id }}">{{ c.label }}</option>
+                    </sc-for>
+                  </select>
+                  <input type="number" step="0.01" value="{{ linea.cantidad }}" onChange="{{ linea.onCantidad }}" style="width: 100%; box-sizing: border-box; background: #0d0d10; border: 1px solid #2c2c32; border-radius: 6px; padding: 8px 10px; font-size: 13px; color: #f4f4f6;"/>
+                  <input type="number" step="0.01" value="{{ linea.precioUnit }}" onChange="{{ linea.onPrecio }}" style="width: 100%; box-sizing: border-box; background: #0d0d10; border: 1px solid #2c2c32; border-radius: 6px; padding: 8px 10px; font-size: 13px; color: #f4f4f6;"/>
+                  <div style="font-size: 13px; color: #7d8390; font-variant-numeric: tabular-nums;">{{ linea.baseLabel }}</div>
+                  <div style="font-size: 13px; color: #7d8390; font-variant-numeric: tabular-nums;">{{ linea.igvLabel }}</div>
+                  <button onClick="{{ linea.onEliminar }}" style="background: none; border: none; color: #ef4444; cursor: pointer; padding: 4px; justify-self: end;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"></path><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"></path></svg>
+                  </button>
+                </div>
+              </sc-for>
+              <sc-if value="{{ sinLineas }}" hint-placeholder-val="{{ false }}">
+                <div style="padding: 24px 16px; text-align: center; color: #6b7280; font-size: 13px;">Sin líneas. Añade una línea de venta para continuar.</div>
+              </sc-if>
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; background: #0f0f12; border: 1px solid #232328; border-radius: 10px; padding: 16px;">
+              <div>
+                <div style="font-size: 11px; color: #8b93a1; margin-bottom: 4px;">Base Gravada</div>
+                <div style="font-size: 15px; font-weight: 700; color: #f4f4f6;">S/ {{ totalesPreview.baseGravada }}</div>
+              </div>
+              <div>
+                <div style="font-size: 11px; color: #8b93a1; margin-bottom: 4px;">Exonerado / Inafecto</div>
+                <div style="font-size: 15px; font-weight: 700; color: #f4f4f6;">S/ {{ totalesPreview.exoneradoInafecto }}</div>
+              </div>
+              <div>
+                <div style="font-size: 11px; color: #8b93a1; margin-bottom: 4px;">IGV ({{ igvRateLabel }}%)</div>
+                <div style="font-size: 15px; font-weight: 700; color: #f4f4f6;">S/ {{ totalesPreview.igv }}</div>
+              </div>
+              <div>
+                <div style="font-size: 11px; color: #8b93a1; margin-bottom: 4px;">Total Comprobante</div>
+                <div style="font-size: 16px; font-weight: 800; color: {{ accent }};">S/ {{ totalesPreview.total }}</div>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ enPaso3 }}" hint-placeholder-val="{{ false }}">
+          <div>
+            <div style="font-size: 12px; font-weight: 700; letter-spacing: 0.06em; color: #8b93a1; text-transform: uppercase; margin-bottom: 14px;">Confirmación del Registro</div>
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 20px; background: #0f0f12; border: 1px solid #232328; border-radius: 10px; padding: 16px;">
+              <div><div style="font-size: 11px; color: #8b93a1;">Tipo de Operación</div><div style="font-size: 14px; color: #eceef1; margin-top: 4px;">{{ form.tipoOperacionLabel }}</div></div>
+              <div><div style="font-size: 11px; color: #8b93a1;">Cliente</div><div style="font-size: 14px; color: #eceef1; margin-top: 4px;">{{ form.terceroLabel }}</div></div>
+              <div><div style="font-size: 11px; color: #8b93a1;">Comprobante</div><div style="font-size: 14px; color: #eceef1; margin-top: 4px;">{{ form.serie }}-{{ form.numero }}</div></div>
+              <div><div style="font-size: 11px; color: #8b93a1;">Emisión</div><div style="font-size: 14px; color: #eceef1; margin-top: 4px;">{{ form.fechaEmision }}</div></div>
+              <div><div style="font-size: 11px; color: #8b93a1;">Vencimiento</div><div style="font-size: 14px; color: #eceef1; margin-top: 4px;">{{ form.fechaVencimiento }}</div></div>
+              <div><div style="font-size: 11px; color: #8b93a1;">Moneda</div><div style="font-size: 14px; color: #eceef1; margin-top: 4px;">{{ form.monedaDisplay }}</div></div>
+            </div>
+            <div style="border: 1px solid #232328; border-radius: 10px; overflow: hidden; margin-bottom: 18px;">
+              <div style="display: grid; grid-template-columns: 2.5fr 1fr 1fr 1fr 1fr; padding: 10px 16px; background: #0f0f12; border-bottom: 1px solid #232328;">
+                <div style="font-size: 11px; font-weight: 700; color: #8b93a1; text-transform: uppercase;">Concepto</div>
+                <div style="font-size: 11px; font-weight: 700; color: #8b93a1; text-transform: uppercase;">Cant.</div>
+                <div style="font-size: 11px; font-weight: 700; color: #8b93a1; text-transform: uppercase;">P. Unit.</div>
+                <div style="font-size: 11px; font-weight: 700; color: #8b93a1; text-transform: uppercase;">Base</div>
+                <div style="font-size: 11px; font-weight: 700; color: #8b93a1; text-transform: uppercase;">IGV</div>
+              </div>
+              <sc-for list="{{ form.lineas }}" as="linea" hint-placeholder-count="2">
+                <div style="display: grid; grid-template-columns: 2.5fr 1fr 1fr 1fr 1fr; padding: 10px 16px; border-bottom: 1px solid #1d1d21;">
+                  <div style="font-size: 13px; color: #eceef1;">{{ linea.conceptoLabel }}</div>
+                  <div style="font-size: 13px; color: #b4b9c2;">{{ linea.cantidad }}</div>
+                  <div style="font-size: 13px; color: #b4b9c2;">{{ linea.precioUnit }}</div>
+                  <div style="font-size: 13px; color: #b4b9c2;">{{ linea.baseLabel }}</div>
+                  <div style="font-size: 13px; color: #b4b9c2;">{{ linea.igvLabel }}</div>
+                </div>
+              </sc-for>
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; background: #0f0f12; border: 1px solid #232328; border-radius: 10px; padding: 16px;">
+              <div>
+                <div style="font-size: 11px; color: #8b93a1; margin-bottom: 4px;">🔒 Base Gravada</div>
+                <div style="font-size: 15px; font-weight: 700; color: #f4f4f6;">S/ {{ totalesPreview.baseGravada }}</div>
+              </div>
+              <div>
+                <div style="font-size: 11px; color: #8b93a1; margin-bottom: 4px;">🔒 Exon. / Inafecto</div>
+                <div style="font-size: 15px; font-weight: 700; color: #f4f4f6;">S/ {{ totalesPreview.exoneradoInafecto }}</div>
+              </div>
+              <div>
+                <div style="font-size: 11px; color: #8b93a1; margin-bottom: 4px;">🔒 IGV ({{ igvRateLabel }}%)</div>
+                <div style="font-size: 15px; font-weight: 700; color: #f4f4f6;">S/ {{ totalesPreview.igv }}</div>
+              </div>
+              <div>
+                <div style="font-size: 11px; color: #8b93a1; margin-bottom: 4px;">🔒 Total Comprobante</div>
+                <div style="font-size: 16px; font-weight: 800; color: {{ accent }};">S/ {{ totalesPreview.total }}</div>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+
+        <div style="display: flex; justify-content: space-between; margin-top: 28px; padding-top: 20px; border-top: 1px solid #232328;">
+          <button onClick="{{ cerrarWizard }}" style="background: none; border: 1px solid #2c2c32; color: #d1d5db; padding: 11px 20px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer;">❌ Cancelar</button>
+          <div style="display: flex; gap: 10px;">
+            <sc-if value="{{ mostrarAtras }}" hint-placeholder-val="{{ false }}">
+              <button onClick="{{ pasoAnterior }}" style="background: #1c1c21; border: 1px solid #2c2c32; color: #d1d5db; padding: 11px 20px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer;">Atrás</button>
+            </sc-if>
+            <sc-if value="{{ mostrarSiguiente }}" hint-placeholder-val="{{ true }}">
+              <button onClick="{{ pasoSiguiente }}" disabled="{{ siguienteBloqueado }}" style="background: {{ accent }}; border: none; color: #ffffff; padding: 11px 22px; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; opacity: {{ siguienteOpacity }};">Siguiente</button>
+            </sc-if>
+            <sc-if value="{{ mostrarGuardar }}" hint-placeholder-val="{{ false }}">
+              <button onClick="{{ guardar }}" style="background: {{ accent }}; border: none; color: #ffffff; padding: 11px 22px; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer;">💾 Guardar Borrador</button>
+            </sc-if>
+          </div>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ verAbierto }}" hint-placeholder-val="{{ false }}">
+    <div style="position: fixed; inset: 0; background: rgba(0,0,0,0.65); display: flex; align-items: center; justify-content: center; padding: 24px; z-index: 50;">
+      <div style="background: #151518; border: 1px solid #28282d; border-radius: 16px; width: 100%; max-width: 780px; max-height: 90vh; overflow: auto; padding: 32px;">
+        <div style="font-size: 20px; font-weight: 800; color: #ffffff; margin-bottom: 4px;">Comprobante {{ verRegistro.folio }}</div>
+        <div style="font-size: 13px; color: #8b93a1; margin-bottom: 24px;">Detalle de solo lectura</div>
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 20px; background: #0f0f12; border: 1px solid #232328; border-radius: 10px; padding: 16px;">
+          <div><div style="font-size: 11px; color: #8b93a1;">Cliente</div><div style="font-size: 14px; color: #eceef1; margin-top: 4px;">{{ verRegistro.terceroLabel }}</div></div>
+          <div><div style="font-size: 11px; color: #8b93a1;">Comprobante</div><div style="font-size: 14px; color: #eceef1; margin-top: 4px;">{{ verRegistro.numeroCompleto }}</div></div>
+          <div><div style="font-size: 11px; color: #8b93a1;">Estado</div><div style="font-size: 14px; color: #eceef1; margin-top: 4px;">{{ verRegistro.estado }}</div></div>
+          <div><div style="font-size: 11px; color: #8b93a1;">Emisión</div><div style="font-size: 14px; color: #eceef1; margin-top: 4px;">{{ verRegistro.fechaEmision }}</div></div>
+          <div><div style="font-size: 11px; color: #8b93a1;">Vencimiento</div><div style="font-size: 14px; color: #eceef1; margin-top: 4px;">{{ verRegistro.fechaVencimiento }}</div></div>
+          <div><div style="font-size: 11px; color: #8b93a1;">Moneda</div><div style="font-size: 14px; color: #eceef1; margin-top: 4px;">{{ verRegistro.monedaDisplay }}</div></div>
+        </div>
+        <div style="border: 1px solid #232328; border-radius: 10px; overflow: hidden; margin-bottom: 20px;">
+          <div style="display: grid; grid-template-columns: 2.5fr 1fr 1fr 1fr 1fr; padding: 10px 16px; background: #0f0f12; border-bottom: 1px solid #232328;">
+            <div style="font-size: 11px; font-weight: 700; color: #8b93a1; text-transform: uppercase;">Concepto</div>
+            <div style="font-size: 11px; font-weight: 700; color: #8b93a1; text-transform: uppercase;">Cant.</div>
+            <div style="font-size: 11px; font-weight: 700; color: #8b93a1; text-transform: uppercase;">P. Unit.</div>
+            <div style="font-size: 11px; font-weight: 700; color: #8b93a1; text-transform: uppercase;">Base</div>
+            <div style="font-size: 11px; font-weight: 700; color: #8b93a1; text-transform: uppercase;">IGV</div>
+          </div>
+          <sc-for list="{{ verRegistro.lineas }}" as="linea" hint-placeholder-count="2">
+            <div style="display: grid; grid-template-columns: 2.5fr 1fr 1fr 1fr 1fr; padding: 10px 16px; border-bottom: 1px solid #1d1d21;">
+              <div style="font-size: 13px; color: #eceef1;">{{ linea.conceptoLabel }}</div>
+              <div style="font-size: 13px; color: #b4b9c2;">{{ linea.cantidad }}</div>
+              <div style="font-size: 13px; color: #b4b9c2;">{{ linea.precioUnit }}</div>
+              <div style="font-size: 13px; color: #b4b9c2;">{{ linea.baseLabel }}</div>
+              <div style="font-size: 13px; color: #b4b9c2;">{{ linea.igvLabel }}</div>
+            </div>
+          </sc-for>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; background: #0f0f12; border: 1px solid #232328; border-radius: 10px; padding: 16px; margin-bottom: 24px;">
+          <div><div style="font-size: 11px; color: #8b93a1; margin-bottom: 4px;">Base Gravada</div><div style="font-size: 15px; font-weight: 700;">S/ {{ verRegistro.totales.baseGravada }}</div></div>
+          <div><div style="font-size: 11px; color: #8b93a1; margin-bottom: 4px;">Exon. / Inafecto</div><div style="font-size: 15px; font-weight: 700;">S/ {{ verRegistro.totales.exoneradoInafecto }}</div></div>
+          <div><div style="font-size: 11px; color: #8b93a1; margin-bottom: 4px;">IGV</div><div style="font-size: 15px; font-weight: 700;">S/ {{ verRegistro.totales.igv }}</div></div>
+          <div><div style="font-size: 11px; color: #8b93a1; margin-bottom: 4px;">Total</div><div style="font-size: 16px; font-weight: 800; color: {{ accent }};">S/ {{ verRegistro.totales.total }}</div></div>
+        </div>
+        <div style="display: flex; justify-content: flex-end;">
+          <button onClick="{{ cerrarVer }}" style="background: {{ accent }}; border: none; color: #ffffff; padding: 11px 22px; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer;">Cerrar</button>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ anularAbierto }}" hint-placeholder-val="{{ false }}">
+    <div style="position: fixed; inset: 0; background: rgba(0,0,0,0.65); display: flex; align-items: center; justify-content: center; padding: 24px; z-index: 50;">
+      <div style="background: #151518; border: 1px solid #3a1414; border-radius: 16px; width: 100%; max-width: 560px; padding: 30px;">
+        <div style="font-size: 17px; font-weight: 800; color: #f87171; margin-bottom: 20px;">⚠️ Confirmación de Anulación Lógica de Comprobante Borrador</div>
+        <div style="font-size: 14px; color: #d1d5db; margin-bottom: 18px; line-height: 1.6;">¿Está seguro que desea dar de baja la venta <span style="color: #ffffff; font-weight: 700;">{{ anularRegistro.folio }}</span>?</div>
+        <div style="font-size: 13px; color: #9aa1ae; margin-bottom: 18px; line-height: 1.6;">El sistema ejecutará una actualización de estado en cascada:</div>
+        <div style="background: #0f0f12; border: 1px solid #232328; border-radius: 10px; padding: 16px; margin-bottom: 20px; font-size: 13px; color: #b4b9c2; line-height: 1.9;">
+          — Estado en Sublibro → ANULADO (se preservan importes históricos)<br/>
+          — Estado en Cta. Cte. → ANULADO (se actualiza el hito de la CxC)
+        </div>
+        <div style="display: flex; justify-content: flex-end; gap: 10px;">
+          <button onClick="{{ cerrarAnular }}" style="background: none; border: 1px solid #2c2c32; color: #d1d5db; padding: 11px 20px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer;">❌ Cancelar</button>
+          <button onClick="{{ confirmarAnular }}" style="background: #dc2626; border: none; color: #ffffff; padding: 11px 20px; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer;">✓ Confirmar Baja</button>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{
+  &quot;igvRate&quot;: {&quot;editor&quot;: &quot;range&quot;, &quot;default&quot;: 18, &quot;min&quot;: 0, &quot;max&quot;: 30, &quot;step&quot;: 1, &quot;unit&quot;: &quot;%&quot;, &quot;tsType&quot;: &quot;number&quot;, &quot;section&quot;: &quot;Motor de Conceptos&quot;},
+  &quot;mostrarAnulados&quot;: {&quot;editor&quot;: &quot;boolean&quot;, &quot;default&quot;: true, &quot;tsType&quot;: &quot;boolean&quot;, &quot;section&quot;: &quot;Consola Principal&quot;},
+  &quot;accentColor&quot;: {&quot;editor&quot;: &quot;color&quot;, &quot;default&quot;: &quot;#3b82f6&quot;, &quot;options&quot;: [&quot;#3b82f6&quot;, &quot;#22c55e&quot;, &quot;#a855f7&quot;, &quot;#f59e0b&quot;], &quot;tsType&quot;: &quot;string&quot;, &quot;section&quot;: &quot;Apariencia&quot;}
+}">
+class Component extends DCLogic {
+  tiposOperacion = [
+    { id: 55, label: '55 - Factura/Boleta Venta Nacional', grupo: 'VENTA_NACIONAL', tipoDocumento: '01 - FACTURA', moneda: 'SOLES', tasa: 1.0 },
+    { id: 60, label: '60 - Factura Exportación de Bienes', grupo: 'EXPORTACION', tipoDocumento: '01 - FACTURA', moneda: 'DÓLARES', tasa: 3.752 },
+    { id: 80, label: '80 - Nota de Crédito Venta Nacional', grupo: 'NOTA_CREDITO', tipoDocumento: '07 - NOTA DE CRÉDITO', moneda: 'SOLES', tasa: 1.0 },
+    { id: 81, label: '81 - Nota de Débito Venta Nacional', grupo: 'NOTA_DEBITO', tipoDocumento: '08 - NOTA DE DÉBITO', moneda: 'SOLES', tasa: 1.0 },
+  ];
+  conceptos = [
+    { id: 610, label: '610 - Venta de Mercadería Nacional', grupo: 'VENTA_NACIONAL', gravada: true },
+    { id: 615, label: '615 - Venta Exonerada (Apéndice I/II)', grupo: 'VENTA_NACIONAL', gravada: false },
+    { id: 620, label: '620 - Venta Inafecta', grupo: 'VENTA_NACIONAL', gravada: false },
+    { id: 710, label: '710 - Exportación de Bienes', grupo: 'EXPORTACION', gravada: false },
+    { id: 810, label: '810 - Nota de Crédito por Anulación', grupo: 'NOTA_CREDITO', gravada: false },
+    { id: 910, label: '910 - Nota de Débito por Intereses', grupo: 'NOTA_DEBITO', gravada: true },
+  ];
+  terceros = [
+    { id: 1830, label: '20712345678 - Comercial ABC S.A.' },
+    { id: 1831, label: '20456789012 - Distribuidora XYZ E.I.R.L.' },
+    { id: 1845, label: '10456123789 - Cliente Grupo 7 S.A.C.' },
+  ];
+
+  state = {
+    registros: [
+      { id: 9021, folio: 'VTA-202607-0128', tipoOperacionId: 55, terceroId: 1830, serie: 'F001', numero: '00001542', fechaEmision: '2026-07-28', fechaVencimiento: '2026-08-27', estado: 'BORRADOR',
+        lineas: [ { id: 40001, conceptoId: 610, cantidad: 2, precioUnit: 150 }, { id: 40002, conceptoId: 615, cantidad: 1, precioUnit: 120 } ] },
+      { id: 9022, folio: 'VTA-202607-0129', tipoOperacionId: 55, terceroId: 1831, serie: 'F001', numero: '00001543', fechaEmision: '2026-07-29', fechaVencimiento: '2026-08-28', estado: 'BORRADOR',
+        lineas: [ { id: 40003, conceptoId: 610, cantidad: 2, precioUnit: 500 } ] },
+    ],
+    filtroRuc: '', filtroCorrelativo: '', filtroEstado: 'Todos', filtroFechaDesde: '2026-07-01', filtroFechaHasta: '2026-07-31',
+    modal: null, step: 1, form: null,
+    verRegistro: null, anularRegistro: null,
+  };
+
+  money(n) { return (Math.round((n + Number.EPSILON) * 100) / 100).toFixed(2); }
+
+  addDays(iso, days) {
+    if (!iso) return '';
+    const d = new Date(iso + 'T00:00:00');
+    d.setDate(d.getDate() + days);
+    return d.toISOString().slice(0, 10);
+  }
+
+  periodoDe(iso) {
+    if (!iso) return { label: '', estado: '' };
+    const meses = ['ENERO','FEBRERO','MARZO','ABRIL','MAYO','JUNIO','JULIO','AGOSTO','SEPTIEMBRE','OCTUBRE','NOVIEMBRE','DICIEMBRE'];
+    const [y, m] = iso.split('-');
+    return { label: `${y}${m} - ${meses[parseInt(m, 10) - 1]} ${y}`, estado: 'ABIERTO' };
+  }
+
+  igvRate() { return this.props.igvRateOverride ?? this.props.igvRate ?? 18; }
+
+  computeLinea(linea) {
+    const concepto = this.conceptos.find(c => c.id === Number(linea.conceptoId));
+    const cantidad = Number(linea.cantidad) || 0;
+    const precioUnit = Number(linea.precioUnit) || 0;
+    const base = cantidad * precioUnit;
+    const igv = concepto && concepto.gravada ? base * (this.igvRate() / 100) : 0;
+    return { base, igv, gravada: !!(concepto && concepto.gravada) };
+  }
+
+  computeTotales(lineas) {
+    let baseGravada = 0, exoneradoInafecto = 0, igv = 0;
+    lineas.forEach(l => {
+      const c = this.computeLinea(l);
+      if (c.gravada) baseGravada += c.base; else exoneradoInafecto += c.base;
+      igv += c.igv;
+    });
+    const total = baseGravada + exoneradoInafecto + igv;
+    return { baseGravada: this.money(baseGravada), exoneradoInafecto: this.money(exoneradoInafecto), igv: this.money(igv), total: this.money(total), totalRaw: total };
+  }
+
+  generateFolio() {
+    const nums = this.state.registros.map(r => parseInt(r.folio.split('-').pop(), 10)).filter(n => !isNaN(n));
+    const next = (nums.length ? Math.max(...nums) : 127) + 1;
+    return `VTA-202607-${String(next).padStart(4, '0')}`;
+  }
+
+  openNuevo() {
+    this.setState({
+      modal: 'nuevo', step: 1,
+      form: { id: null, tipoOperacionId: '', terceroId: '', serie: 'F001', numero: '', fechaEmision: '', fechaVencimiento: '', lineas: [] },
+    });
+  }
+
+  openEditar(id) {
+    const reg = this.state.registros.find(r => r.id === id);
+    if (!reg) return;
+    this.setState({ modal: 'editar', step: 1, form: JSON.parse(JSON.stringify(reg)) });
+  }
+
+  cerrarWizard() { this.setState({ modal: null, step: 1, form: null }); }
+  pasoSiguiente() { this.setState(s => ({ step: Math.min(3, s.step + 1) })); }
+  pasoAnterior() { this.setState(s => ({ step: Math.max(1, s.step - 1) })); }
+
+  onTipoOperacion(e) {
+    const id = Number(e.target.value);
+    this.setState(s => ({ form: { ...s.form, tipoOperacionId: id, lineas: s.form.id ? s.form.lineas : [] } }));
+  }
+  onTercero(e) { const id = Number(e.target.value); this.setState(s => ({ form: { ...s.form, terceroId: id } })); }
+  onSerie(e) { const v = e.target.value; this.setState(s => ({ form: { ...s.form, serie: v } })); }
+  onNumero(e) { const v = e.target.value; this.setState(s => ({ form: { ...s.form, numero: v } })); }
+  onFechaEmision(e) {
+    const v = e.target.value;
+    this.setState(s => ({ form: { ...s.form, fechaEmision: v, fechaVencimiento: this.addDays(v, 30) } }));
+  }
+  onFechaVencimiento(e) { const v = e.target.value; this.setState(s => ({ form: { ...s.form, fechaVencimiento: v } })); }
+
+  addLinea() {
+    this.setState(s => ({ form: { ...s.form, lineas: [...s.form.lineas, { id: Date.now(), conceptoId: '', cantidad: 1, precioUnit: 0 }] } }));
+  }
+  removeLinea(id) {
+    this.setState(s => ({ form: { ...s.form, lineas: s.form.lineas.filter(l => l.id !== id) } }));
+  }
+  updateLineaField(id, field, value) {
+    this.setState(s => ({ form: { ...s.form, lineas: s.form.lineas.map(l => l.id === id ? { ...l, [field]: value } : l) } }));
+  }
+
+  guardar() {
+    const f = this.state.form;
+    if (!f) return;
+    if (f.id) {
+      this.setState(s => ({ registros: s.registros.map(r => r.id === f.id ? { ...f } : r), modal: null, form: null, step: 1 }));
+    } else {
+      const folio = this.generateFolio();
+      const nuevo = { ...f, id: Date.now(), folio, estado: 'BORRADOR' };
+      this.setState(s => ({ registros: [...s.registros, nuevo], modal: null, form: null, step: 1 }));
+    }
+  }
+
+  openVer(id) { this.setState({ verRegistro: id }); }
+  cerrarVer() { this.setState({ verRegistro: null }); }
+  openAnular(id) { this.setState({ anularRegistro: id }); }
+  cerrarAnular() { this.setState({ anularRegistro: null }); }
+  confirmarAnular() {
+    const id = this.state.anularRegistro;
+    this.setState(s => ({ registros: s.registros.map(r => r.id === id ? { ...r, estado: 'ANULADO' } : r), anularRegistro: null }));
+  }
+
+  onFiltroRuc(e) { this.setState({ filtroRuc: e.target.value }); }
+  onFiltroCorrelativo(e) { this.setState({ filtroCorrelativo: e.target.value }); }
+  onFiltroEstado(e) { this.setState({ filtroEstado: e.target.value }); }
+  onFiltroFechaDesde(e) { this.setState({ filtroFechaDesde: e.target.value }); }
+  onFiltroFechaHasta(e) { this.setState({ filtroFechaHasta: e.target.value }); }
+  limpiarFiltros() { this.setState({ filtroRuc: '', filtroCorrelativo: '', filtroEstado: 'Todos', filtroFechaDesde: '2026-07-01', filtroFechaHasta: '2026-07-31' }); }
+
+  buildLineaVals(linea) {
+    const concepto = this.conceptos.find(c => c.id === Number(linea.conceptoId));
+    const computed = this.computeLinea(linea);
+    return {
+      ...linea,
+      conceptoLabel: concepto ? concepto.label : '—',
+      baseLabel: this.money(computed.base),
+      igvLabel: this.money(computed.igv),
+      onConcepto: (e) => this.updateLineaField(linea.id, 'conceptoId', e.target.value),
+      onCantidad: (e) => this.updateLineaField(linea.id, 'cantidad', e.target.value),
+      onPrecio: (e) => this.updateLineaField(linea.id, 'precioUnit', e.target.value),
+      onEliminar: () => this.removeLinea(linea.id),
+    };
+  }
+
+  renderVals() {
+    const accent = this.props.accentColor ?? '#3b82f6';
+    const igvRateLabel = this.igvRate();
+    const mostrarAnulados = this.props.mostrarAnulados ?? true;
+
+    const filasTabla = this.state.registros
+      .filter(r => mostrarAnulados || r.estado !== 'ANULADO')
+      .filter(r => this.state.filtroEstado === 'Todos' || r.estado === this.state.filtroEstado)
+      .filter(r => !this.state.filtroCorrelativo || r.folio.toLowerCase().includes(this.state.filtroCorrelativo.toLowerCase()))
+      .filter(r => {
+        if (!this.state.filtroRuc) return true;
+        const t = this.terceros.find(x => x.id === r.terceroId);
+        return t && t.label.toLowerCase().includes(this.state.filtroRuc.toLowerCase());
+      })
+      .filter(r => (!this.state.filtroFechaDesde || r.fechaEmision >= this.state.filtroFechaDesde) && (!this.state.filtroFechaHasta || r.fechaEmision <= this.state.filtroFechaHasta))
+      .map(r => {
+        const tercero = this.terceros.find(t => t.id === r.terceroId);
+        const totales = this.computeTotales(r.lineas);
+        const isAnulado = r.estado === 'ANULADO';
+        return {
+          ...r,
+          clienteLabel: tercero ? tercero.label.split(' - ')[1] : '—',
+          totalLabel: totales.total,
+          estadoBg: isAnulado ? '#3a1414' : '#123a22',
+          estadoColor: isAnulado ? '#f87171' : '#4ade80',
+          puedeEditar: !isAnulado,
+          onVer: () => this.openVer(r.id),
+          onEditar: () => this.openEditar(r.id),
+          onAnular: () => this.openAnular(r.id),
+        };
+      });
+
+    const form = this.state.form;
+    let formVals = null, conceptosDisponibles = [], totalesPreview = { baseGravada: '0.00', exoneradoInafecto: '0.00', igv: '0.00', total: '0.00' };
+    if (form) {
+      const tipoOp = this.tiposOperacion.find(t => t.id === Number(form.tipoOperacionId));
+      const tercero = this.terceros.find(t => t.id === Number(form.terceroId));
+      conceptosDisponibles = tipoOp ? this.conceptos.filter(c => c.grupo === tipoOp.grupo) : [];
+      const periodo = this.periodoDe(form.fechaEmision);
+      totalesPreview = this.computeTotales(form.lineas);
+      formVals = {
+        ...form,
+        tipoOperacionLabel: tipoOp ? tipoOp.label : '—',
+        terceroLabel: tercero ? tercero.label : '—',
+        tipoDocumentoDisplay: tipoOp ? tipoOp.tipoDocumento : 'Seleccione tipo de operación',
+        monedaDisplay: tipoOp ? `${tipoOp.moneda} · T.C. ${tipoOp.tasa.toFixed(6)}` : '—',
+        periodoDisplay: periodo.label,
+        periodoEstado: periodo.estado,
+        lineas: form.lineas.map(l => this.buildLineaVals(l)),
+      };
+    }
+
+    let verRegistro = null;
+    if (this.state.verRegistro != null) {
+      const r = this.state.registros.find(x => x.id === this.state.verRegistro);
+      if (r) {
+        const tipoOp = this.tiposOperacion.find(t => t.id === r.tipoOperacionId);
+        const tercero = this.terceros.find(t => t.id === r.terceroId);
+        verRegistro = {
+          ...r,
+          terceroLabel: tercero ? tercero.label : '—',
+          numeroCompleto: `${r.serie}-${r.numero}`,
+          monedaDisplay: tipoOp ? tipoOp.moneda : '—',
+          lineas: r.lineas.map(l => this.buildLineaVals(l)),
+          totales: this.computeTotales(r.lineas),
+        };
+      }
+    }
+
+    let anularRegistro = null;
+    if (this.state.anularRegistro != null) {
+      anularRegistro = this.state.registros.find(x => x.id === this.state.anularRegistro);
+    }
+
+    const step = this.state.step;
+    const pasos = ['Cabecera', 'Detalle', 'Confirmar'].map((label, i) => {
+      const n = i + 1;
+      const active = n === step, done = n < step;
+      return { label: `${n}. ${label}`, barColor: active || done ? accent : '#232328', textColor: active ? '#ffffff' : done ? '#8b93a1' : '#5b6270' };
+    });
+
+    const canSaveStep1 = form && form.tipoOperacionId && form.terceroId && form.serie && form.numero && form.fechaEmision;
+    const canSaveStep2 = form && form.lineas.length > 0 && form.lineas.every(l => l.conceptoId);
+
+    return {
+      accent, igvRateLabel,
+      filtroRuc: this.state.filtroRuc, filtroCorrelativo: this.state.filtroCorrelativo, filtroEstado: this.state.filtroEstado,
+      filtroFechaDesde: this.state.filtroFechaDesde, filtroFechaHasta: this.state.filtroFechaHasta,
+      onFiltroRuc: (e) => this.onFiltroRuc(e), onFiltroCorrelativo: (e) => this.onFiltroCorrelativo(e), onFiltroEstado: (e) => this.onFiltroEstado(e),
+      onFiltroFechaDesde: (e) => this.onFiltroFechaDesde(e), onFiltroFechaHasta: (e) => this.onFiltroFechaHasta(e),
+      limpiarFiltros: () => this.limpiarFiltros(),
+      filasTabla, tablaVacia: filasTabla.length === 0,
+      openNuevo: () => this.openNuevo(),
+      wizardAbierto: this.state.modal !== null,
+      wizardTitulo: this.state.modal === 'editar' ? 'Editar Registro de Venta Nacional' : 'Registro de Venta Nacional',
+      pasos, enPaso1: step === 1, enPaso2: step === 2, enPaso3: step === 3,
+      mostrarAtras: step > 1, mostrarSiguiente: step < 3, mostrarGuardar: step === 3,
+      siguienteBloqueado: step === 1 ? !canSaveStep1 : !canSaveStep2,
+      siguienteOpacity: (step === 1 ? !canSaveStep1 : !canSaveStep2) ? 0.5 : 1,
+      tipoOperacionBloqueado: this.state.modal === 'editar',
+      serieNumeroBloqueado: this.state.modal === 'editar',
+      form: formVals, tiposOperacionOpciones: this.tiposOperacion, terceros: this.terceros, conceptosDisponibles,
+      sinLineas: form ? form.lineas.length === 0 : false,
+      totalesPreview,
+      onTipoOperacion: (e) => this.onTipoOperacion(e), onTercero: (e) => this.onTercero(e), onSerie: (e) => this.onSerie(e), onNumero: (e) => this.onNumero(e),
+      onFechaEmision: (e) => this.onFechaEmision(e), onFechaVencimiento: (e) => this.onFechaVencimiento(e),
+      addLinea: () => this.addLinea(),
+      pasoSiguiente: () => this.pasoSiguiente(), pasoAnterior: () => this.pasoAnterior(), cerrarWizard: () => this.cerrarWizard(), guardar: () => this.guardar(),
+      verAbierto: verRegistro !== null, verRegistro, cerrarVer: () => this.cerrarVer(),
+      anularAbierto: anularRegistro !== null, anularRegistro, cerrarAnular: () => this.cerrarAnular(), confirmarAnular: () => this.confirmarAnular(),
+    };
+  }
+}
+
+</script>
+</body>
+</html>
