@@ -30,13 +30,43 @@
   <div style="background: #151518; border: 1px solid #28282d; border-radius: 14px; padding: 24px; margin-bottom: 24px;">
     <div style="font-size: 12px; font-weight: 700; letter-spacing: 0.06em; color: #8b93a1; text-transform: uppercase; margin-bottom: 14px;">Filtros de Búsqueda por Criterios Avanzados</div>
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; margin-bottom: 14px;">
-      <div>
+      <div style="position: relative;">
         <div style="font-size: 12px; color: #8b93a1; margin-bottom: 6px;">Empresa</div>
-        <div style="background: #0d0d10; border: 1px solid #2c2c32; border-radius: 8px; padding: 11px 12px; font-size: 14px; color: #c7cbd3;">24 - INVERSIONES GLOBALES PERU S.A.</div>
+        <input value="{{ filtroEmpresaSearchText }}" onChange="{{ onFiltroEmpresaSearch }}" onFocus="{{ onFiltroEmpresaFocus }}" placeholder="Buscar empresa..." style="width: 100%; box-sizing: border-box; background: #0d0d10; border: 1px solid #2c2c32; border-radius: 8px; padding: 11px 34px 11px 12px; font-size: 14px; color: #f4f4f6;"/>
+        <sc-if value="{{ filtroEmpresaId }}" hint-placeholder-val="{{ false }}">
+          <button onClick="{{ onFiltroEmpresaClear }}" style="position: absolute; right: 8px; top: 34px; background: none; border: none; color: #8b93a1; cursor: pointer; padding: 4px; display: flex;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6 6 18"></path><path d="M6 6l12 12"></path></svg>
+          </button>
+        </sc-if>
+        <sc-if value="{{ filtroEmpresaDropdownAbierto }}" hint-placeholder-val="{{ false }}">
+          <div style="position: absolute; top: calc(100% + 4px); left: 0; right: 0; background: #1c1c21; border: 1px solid #2c2c32; border-radius: 8px; max-height: 220px; overflow: auto; z-index: 10; box-shadow: 0 8px 24px rgba(0,0,0,0.4);">
+            <sc-for list="{{ filtroEmpresaOpciones }}" as="e" hint-placeholder-count="2">
+              <div onClick="{{ e.onSelect }}" style="padding: 10px 12px; font-size: 13px; color: #eceef1; cursor: pointer; border-bottom: 1px solid #232328;" style-hover="background: #26262c;">{{ e.label }}</div>
+            </sc-for>
+            <sc-if value="{{ filtroEmpresaSinResultados }}" hint-placeholder-val="{{ false }}">
+              <div style="padding: 10px 12px; font-size: 13px; color: #6b7280;">Sin coincidencias.</div>
+            </sc-if>
+          </div>
+        </sc-if>
       </div>
-      <div>
+      <div style="position: relative;">
         <div style="font-size: 12px; color: #8b93a1; margin-bottom: 6px;">Sucursal Operativa</div>
-        <div style="background: #0d0d10; border: 1px solid #2c2c32; border-radius: 8px; padding: 11px 12px; font-size: 14px; color: #c7cbd3;">19 - SEDE OPERATIVA SUR COSTA</div>
+        <input value="{{ filtroSucursalSearchText }}" onChange="{{ onFiltroSucursalSearch }}" onFocus="{{ onFiltroSucursalFocus }}" placeholder="Buscar sucursal..." style="width: 100%; box-sizing: border-box; background: #0d0d10; border: 1px solid #2c2c32; border-radius: 8px; padding: 11px 34px 11px 12px; font-size: 14px; color: #f4f4f6;"/>
+        <sc-if value="{{ filtroSucursalId }}" hint-placeholder-val="{{ false }}">
+          <button onClick="{{ onFiltroSucursalClear }}" style="position: absolute; right: 8px; top: 34px; background: none; border: none; color: #8b93a1; cursor: pointer; padding: 4px; display: flex;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6 6 18"></path><path d="M6 6l12 12"></path></svg>
+          </button>
+        </sc-if>
+        <sc-if value="{{ filtroSucursalDropdownAbierto }}" hint-placeholder-val="{{ false }}">
+          <div style="position: absolute; top: calc(100% + 4px); left: 0; right: 0; background: #1c1c21; border: 1px solid #2c2c32; border-radius: 8px; max-height: 220px; overflow: auto; z-index: 10; box-shadow: 0 8px 24px rgba(0,0,0,0.4);">
+            <sc-for list="{{ filtroSucursalOpciones }}" as="s" hint-placeholder-count="2">
+              <div onClick="{{ s.onSelect }}" style="padding: 10px 12px; font-size: 13px; color: #eceef1; cursor: pointer; border-bottom: 1px solid #232328;" style-hover="background: #26262c;">{{ s.label }}</div>
+            </sc-for>
+            <sc-if value="{{ filtroSucursalSinResultados }}" hint-placeholder-val="{{ false }}">
+              <div style="padding: 10px 12px; font-size: 13px; color: #6b7280;">Sin coincidencias.</div>
+            </sc-if>
+          </div>
+        </sc-if>
       </div>
       <div>
         <div style="font-size: 12px; color: #8b93a1; margin-bottom: 6px;">RUC / Cliente</div>
@@ -130,6 +160,46 @@
         <sc-if value="{{ enPaso1 }}" hint-placeholder-val="{{ true }}">
           <div>
             <div style="font-size: 12px; font-weight: 700; letter-spacing: 0.06em; color: #8b93a1; text-transform: uppercase; margin-bottom: 14px;">Cabecera del Documento</div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+              <div style="position: relative;">
+                <div style="font-size: 12px; color: #8b93a1; margin-bottom: 6px;">[Seguridad] Empresa</div>
+                <input value="{{ empresaSearchText }}" onChange="{{ onEmpresaSearch }}" onFocus="{{ onEmpresaFocus }}" placeholder="Buscar empresa..." style="width: 100%; box-sizing: border-box; background: #0d0d10; border: 1px solid #2c2c32; border-radius: 8px; padding: 11px 34px 11px 12px; font-size: 14px; color: #f4f4f6;"/>
+                <sc-if value="{{ form.empresaId }}" hint-placeholder-val="{{ false }}">
+                  <button onClick="{{ onEmpresaClear }}" style="position: absolute; right: 8px; top: 34px; background: none; border: none; color: #8b93a1; cursor: pointer; padding: 4px; display: flex;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6 6 18"></path><path d="M6 6l12 12"></path></svg>
+                  </button>
+                </sc-if>
+                <sc-if value="{{ empresaDropdownAbierto }}" hint-placeholder-val="{{ false }}">
+                  <div style="position: absolute; top: calc(100% + 4px); left: 0; right: 0; background: #1c1c21; border: 1px solid #2c2c32; border-radius: 8px; max-height: 220px; overflow: auto; z-index: 10; box-shadow: 0 8px 24px rgba(0,0,0,0.4);">
+                    <sc-for list="{{ empresaOpciones }}" as="e" hint-placeholder-count="2">
+                      <div onClick="{{ e.onSelect }}" style="padding: 10px 12px; font-size: 13px; color: #eceef1; cursor: pointer; border-bottom: 1px solid #232328;" style-hover="background: #26262c;">{{ e.label }}</div>
+                    </sc-for>
+                    <sc-if value="{{ empresaSinResultados }}" hint-placeholder-val="{{ false }}">
+                      <div style="padding: 10px 12px; font-size: 13px; color: #6b7280;">Sin coincidencias.</div>
+                    </sc-if>
+                  </div>
+                </sc-if>
+              </div>
+              <div style="position: relative;">
+                <div style="font-size: 12px; color: #8b93a1; margin-bottom: 6px;">[Seguridad] Sucursal</div>
+                <input value="{{ sucursalSearchText }}" onChange="{{ onSucursalSearch }}" onFocus="{{ onSucursalFocus }}" placeholder="Buscar sucursal..." style="width: 100%; box-sizing: border-box; background: #0d0d10; border: 1px solid #2c2c32; border-radius: 8px; padding: 11px 34px 11px 12px; font-size: 14px; color: #f4f4f6;"/>
+                <sc-if value="{{ form.sucursalId }}" hint-placeholder-val="{{ false }}">
+                  <button onClick="{{ onSucursalClear }}" style="position: absolute; right: 8px; top: 34px; background: none; border: none; color: #8b93a1; cursor: pointer; padding: 4px; display: flex;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6 6 18"></path><path d="M6 6l12 12"></path></svg>
+                  </button>
+                </sc-if>
+                <sc-if value="{{ sucursalDropdownAbierto }}" hint-placeholder-val="{{ false }}">
+                  <div style="position: absolute; top: calc(100% + 4px); left: 0; right: 0; background: #1c1c21; border: 1px solid #2c2c32; border-radius: 8px; max-height: 220px; overflow: auto; z-index: 10; box-shadow: 0 8px 24px rgba(0,0,0,0.4);">
+                    <sc-for list="{{ sucursalOpciones }}" as="s" hint-placeholder-count="2">
+                      <div onClick="{{ s.onSelect }}" style="padding: 10px 12px; font-size: 13px; color: #eceef1; cursor: pointer; border-bottom: 1px solid #232328;" style-hover="background: #26262c;">{{ s.label }}</div>
+                    </sc-for>
+                    <sc-if value="{{ sucursalSinResultados }}" hint-placeholder-val="{{ false }}">
+                      <div style="padding: 10px 12px; font-size: 13px; color: #6b7280;">Sin coincidencias.</div>
+                    </sc-if>
+                  </div>
+                </sc-if>
+              </div>
+            </div>
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px;">
               <div>
                 <div style="font-size: 12px; color: #8b93a1; margin-bottom: 6px;">Tipo de Operación *</div>
@@ -140,14 +210,19 @@
                   </sc-for>
                 </select>
               </div>
-              <div>
-                <div style="font-size: 12px; color: #8b93a1; margin-bottom: 6px;">Cliente / Tercero *</div>
-                <select value="{{ form.terceroId }}" onChange="{{ onTercero }}" style="width: 100%; box-sizing: border-box; background: #0d0d10; border: 1px solid #2c2c32; border-radius: 8px; padding: 11px 12px; font-size: 14px; color: #f4f4f6;">
-                  <option value="">Seleccionar...</option>
-                  <sc-for list="{{ terceros }}" as="t" hint-placeholder-count="3">
-                    <option value="{{ t.id }}">{{ t.label }}</option>
-                  </sc-for>
-                </select>
+              <div style="position: relative;">
+                <div style="font-size: 12px; color: #8b93a1; margin-bottom: 6px;">Tercero *</div>
+                <input value="{{ terceroSearchText }}" onChange="{{ onTerceroSearch }}" onFocus="{{ onTerceroFocus }}" placeholder="Buscar por RUC o razón social..." style="width: 100%; box-sizing: border-box; background: #0d0d10; border: 1px solid #2c2c32; border-radius: 8px; padding: 11px 12px; font-size: 14px; color: #f4f4f6;"/>
+                <sc-if value="{{ terceroDropdownAbierto }}" hint-placeholder-val="{{ false }}">
+                  <div style="position: absolute; top: calc(100% + 4px); left: 0; right: 0; background: #1c1c21; border: 1px solid #2c2c32; border-radius: 8px; max-height: 220px; overflow: auto; z-index: 10; box-shadow: 0 8px 24px rgba(0,0,0,0.4);">
+                    <sc-for list="{{ terceroOpciones }}" as="t" hint-placeholder-count="3">
+                      <div onClick="{{ t.onSelect }}" style="padding: 10px 12px; font-size: 13px; color: #eceef1; cursor: pointer; border-bottom: 1px solid #232328;" style-hover="background: #26262c;">{{ t.label }}</div>
+                    </sc-for>
+                    <sc-if value="{{ terceroSinResultados }}" hint-placeholder-val="{{ false }}">
+                      <div style="padding: 10px 12px; font-size: 13px; color: #6b7280;">Sin coincidencias.</div>
+                    </sc-if>
+                  </div>
+                </sc-if>
               </div>
               <div>
                 <div style="font-size: 12px; color: #8b93a1; margin-bottom: 6px;">🔒 Tipo Documento SUNAT</div>
@@ -396,6 +471,15 @@ class Component extends DCLogic {
     { id: 1831, label: '20456789012 - Distribuidora XYZ E.I.R.L.' },
     { id: 1845, label: '10456123789 - Cliente Grupo 7 S.A.C.' },
   ];
+  sucursales = [
+    { id: 19, label: '19 - SEDE OPERATIVA SUR COSTA' },
+    { id: 22, label: '22 - SEDE OPERATIVA NORTE' },
+    { id: 30, label: '30 - MATRIZ PRINCIPAL' },
+  ];
+  empresas = [
+    { id: 24, label: '24 - INVERSIONES GLOBALES PERU S.A.' },
+    { id: 31, label: '31 - CORPORACION ANDINA DEL SUR S.A.C.' },
+  ];
 
   state = {
     registros: [
@@ -405,8 +489,13 @@ class Component extends DCLogic {
         lineas: [ { id: 40003, conceptoId: 610, cantidad: 2, precioUnit: 500 } ] },
     ],
     filtroRuc: '', filtroCorrelativo: '', filtroEstado: 'Todos', filtroFechaDesde: '2026-07-01', filtroFechaHasta: '2026-07-31',
+    filtroEmpresaId: 24, filtroEmpresaSearchText: '24 - INVERSIONES GLOBALES PERU S.A.', filtroEmpresaDropdownAbierto: false,
+    filtroSucursalId: 19, filtroSucursalSearchText: '19 - SEDE OPERATIVA SUR COSTA', filtroSucursalDropdownAbierto: false,
     modal: null, step: 1, form: null,
     verRegistro: null, anularRegistro: null,
+    terceroSearchText: '', terceroDropdownAbierto: false,
+    empresaSearchText: '24 - INVERSIONES GLOBALES PERU S.A.', empresaDropdownAbierto: false,
+    sucursalSearchText: '19 - SEDE OPERATIVA SUR COSTA', sucursalDropdownAbierto: false,
   };
 
   money(n) { return (Math.round((n + Number.EPSILON) * 100) / 100).toFixed(2); }
@@ -456,14 +545,18 @@ class Component extends DCLogic {
   openNuevo() {
     this.setState({
       modal: 'nuevo', step: 1,
-      form: { id: null, tipoOperacionId: '', terceroId: '', serie: 'F001', numero: '', fechaEmision: '', fechaVencimiento: '', lineas: [] },
+      form: { id: null, tipoOperacionId: '', terceroId: '', empresaId: 24, sucursalId: 19, serie: 'F001', numero: '', fechaEmision: '', fechaVencimiento: '', lineas: [] },
+      terceroSearchText: '', terceroDropdownAbierto: false,
+      empresaSearchText: '24 - INVERSIONES GLOBALES PERU S.A.', empresaDropdownAbierto: false,
+      sucursalSearchText: '19 - SEDE OPERATIVA SUR COSTA', sucursalDropdownAbierto: false,
     });
   }
 
   openEditar(id) {
     const reg = this.state.registros.find(r => r.id === id);
     if (!reg) return;
-    this.setState({ modal: 'editar', step: 1, form: JSON.parse(JSON.stringify(reg)) });
+    const t = this.terceros.find(x => x.id === reg.terceroId);
+    this.setState({ modal: 'editar', step: 1, form: JSON.parse(JSON.stringify(reg)), terceroSearchText: t ? t.label : '', terceroDropdownAbierto: false });
   }
 
   cerrarWizard() { this.setState({ modal: null, step: 1, form: null }); }
@@ -474,7 +567,44 @@ class Component extends DCLogic {
     const id = Number(e.target.value);
     this.setState(s => ({ form: { ...s.form, tipoOperacionId: id, lineas: s.form.id ? s.form.lineas : [] } }));
   }
-  onTercero(e) { const id = Number(e.target.value); this.setState(s => ({ form: { ...s.form, terceroId: id } })); }
+  onTercero(id) {
+    const t = this.terceros.find(x => x.id === id);
+    this.setState(s => ({ form: { ...s.form, terceroId: id }, terceroSearchText: t ? t.label : '', terceroDropdownAbierto: false }));
+  }
+  onTerceroSearch(e) {
+    const v = e.target.value;
+    this.setState({ terceroSearchText: v, terceroDropdownAbierto: true, form: { ...this.state.form, terceroId: '' } });
+  }
+  onTerceroFocus() { this.setState({ terceroDropdownAbierto: true }); }
+  onEmpresa(id) {
+    const e = this.empresas.find(x => x.id === id);
+    this.setState(s => ({ form: { ...s.form, empresaId: id }, empresaSearchText: e ? e.label : '', empresaDropdownAbierto: false }));
+  }
+  onEmpresaSearch(e) { this.setState({ empresaSearchText: e.target.value, empresaDropdownAbierto: true, form: { ...this.state.form, empresaId: '' } }); }
+  onEmpresaFocus() { this.setState({ empresaDropdownAbierto: true }); }
+  onSucursal(id) {
+    const s = this.sucursales.find(x => x.id === id);
+    this.setState(st => ({ form: { ...st.form, sucursalId: id }, sucursalSearchText: s ? s.label : '', sucursalDropdownAbierto: false }));
+  }
+  onSucursalSearch(e) { this.setState({ sucursalSearchText: e.target.value, sucursalDropdownAbierto: true, form: { ...this.state.form, sucursalId: '' } }); }
+  onSucursalFocus() { this.setState({ sucursalDropdownAbierto: true }); }
+  onEmpresaClear() { this.setState(s => ({ form: { ...s.form, empresaId: '' }, empresaSearchText: '', empresaDropdownAbierto: false })); }
+  onSucursalClear() { this.setState(s => ({ form: { ...s.form, sucursalId: '' }, sucursalSearchText: '', sucursalDropdownAbierto: false })); }
+
+  onFiltroEmpresa(id) {
+    const e = this.empresas.find(x => x.id === id);
+    this.setState({ filtroEmpresaId: id, filtroEmpresaSearchText: e ? e.label : '', filtroEmpresaDropdownAbierto: false });
+  }
+  onFiltroEmpresaSearch(e) { this.setState({ filtroEmpresaSearchText: e.target.value, filtroEmpresaDropdownAbierto: true, filtroEmpresaId: '' }); }
+  onFiltroEmpresaFocus() { this.setState({ filtroEmpresaDropdownAbierto: true }); }
+  onFiltroEmpresaClear() { this.setState({ filtroEmpresaId: '', filtroEmpresaSearchText: '', filtroEmpresaDropdownAbierto: false }); }
+  onFiltroSucursal(id) {
+    const s = this.sucursales.find(x => x.id === id);
+    this.setState({ filtroSucursalId: id, filtroSucursalSearchText: s ? s.label : '', filtroSucursalDropdownAbierto: false });
+  }
+  onFiltroSucursalSearch(e) { this.setState({ filtroSucursalSearchText: e.target.value, filtroSucursalDropdownAbierto: true, filtroSucursalId: '' }); }
+  onFiltroSucursalFocus() { this.setState({ filtroSucursalDropdownAbierto: true }); }
+  onFiltroSucursalClear() { this.setState({ filtroSucursalId: '', filtroSucursalSearchText: '', filtroSucursalDropdownAbierto: false }); }
   onSerie(e) { const v = e.target.value; this.setState(s => ({ form: { ...s.form, serie: v } })); }
   onNumero(e) { const v = e.target.value; this.setState(s => ({ form: { ...s.form, numero: v } })); }
   onFechaEmision(e) {
@@ -519,7 +649,13 @@ class Component extends DCLogic {
   onFiltroEstado(e) { this.setState({ filtroEstado: e.target.value }); }
   onFiltroFechaDesde(e) { this.setState({ filtroFechaDesde: e.target.value }); }
   onFiltroFechaHasta(e) { this.setState({ filtroFechaHasta: e.target.value }); }
-  limpiarFiltros() { this.setState({ filtroRuc: '', filtroCorrelativo: '', filtroEstado: 'Todos', filtroFechaDesde: '2026-07-01', filtroFechaHasta: '2026-07-31' }); }
+  limpiarFiltros() {
+    this.setState({
+      filtroRuc: '', filtroCorrelativo: '', filtroEstado: 'Todos', filtroFechaDesde: '2026-07-01', filtroFechaHasta: '2026-07-31',
+      filtroEmpresaId: 24, filtroEmpresaSearchText: '24 - INVERSIONES GLOBALES PERU S.A.', filtroEmpresaDropdownAbierto: false,
+      filtroSucursalId: 19, filtroSucursalSearchText: '19 - SEDE OPERATIVA SUR COSTA', filtroSucursalDropdownAbierto: false,
+    });
+  }
 
   buildLineaVals(linea) {
     const concepto = this.conceptos.find(c => c.id === Number(linea.conceptoId));
@@ -570,10 +706,26 @@ class Component extends DCLogic {
 
     const form = this.state.form;
     let formVals = null, conceptosDisponibles = [], totalesPreview = { baseGravada: '0.00', exoneradoInafecto: '0.00', igv: '0.00', total: '0.00' };
+    let terceroOpciones = [], empresaOpciones = [], sucursalOpciones = [];
+    const filtroEmpresaOpciones = this.empresas
+      .filter(e => e.label.toLowerCase().includes((this.state.filtroEmpresaSearchText || '').toLowerCase()))
+      .map(e => ({ ...e, onSelect: () => this.onFiltroEmpresa(e.id) }));
+    const filtroSucursalOpciones = this.sucursales
+      .filter(s => s.label.toLowerCase().includes((this.state.filtroSucursalSearchText || '').toLowerCase()))
+      .map(s => ({ ...s, onSelect: () => this.onFiltroSucursal(s.id) }));
     if (form) {
       const tipoOp = this.tiposOperacion.find(t => t.id === Number(form.tipoOperacionId));
       const tercero = this.terceros.find(t => t.id === Number(form.terceroId));
       conceptosDisponibles = tipoOp ? this.conceptos.filter(c => c.grupo === tipoOp.grupo) : [];
+      terceroOpciones = this.terceros
+        .filter(t => t.label.toLowerCase().includes((this.state.terceroSearchText || '').toLowerCase()))
+        .map(t => ({ ...t, onSelect: () => this.onTercero(t.id) }));
+      empresaOpciones = this.empresas
+        .filter(e => e.label.toLowerCase().includes((this.state.empresaSearchText || '').toLowerCase()))
+        .map(e => ({ ...e, onSelect: () => this.onEmpresa(e.id) }));
+      sucursalOpciones = this.sucursales
+        .filter(s => s.label.toLowerCase().includes((this.state.sucursalSearchText || '').toLowerCase()))
+        .map(s => ({ ...s, onSelect: () => this.onSucursal(s.id) }));
       const periodo = this.periodoDe(form.fechaEmision);
       totalesPreview = this.computeTotales(form.lineas);
       formVals = {
@@ -627,6 +779,12 @@ class Component extends DCLogic {
       onFiltroRuc: (e) => this.onFiltroRuc(e), onFiltroCorrelativo: (e) => this.onFiltroCorrelativo(e), onFiltroEstado: (e) => this.onFiltroEstado(e),
       onFiltroFechaDesde: (e) => this.onFiltroFechaDesde(e), onFiltroFechaHasta: (e) => this.onFiltroFechaHasta(e),
       limpiarFiltros: () => this.limpiarFiltros(),
+      filtroEmpresaId: this.state.filtroEmpresaId, filtroEmpresaSearchText: this.state.filtroEmpresaSearchText, filtroEmpresaDropdownAbierto: this.state.filtroEmpresaDropdownAbierto,
+      filtroEmpresaOpciones, filtroEmpresaSinResultados: filtroEmpresaOpciones.length === 0,
+      onFiltroEmpresaSearch: (e) => this.onFiltroEmpresaSearch(e), onFiltroEmpresaFocus: () => this.onFiltroEmpresaFocus(), onFiltroEmpresaClear: () => this.onFiltroEmpresaClear(),
+      filtroSucursalId: this.state.filtroSucursalId, filtroSucursalSearchText: this.state.filtroSucursalSearchText, filtroSucursalDropdownAbierto: this.state.filtroSucursalDropdownAbierto,
+      filtroSucursalOpciones, filtroSucursalSinResultados: filtroSucursalOpciones.length === 0,
+      onFiltroSucursalSearch: (e) => this.onFiltroSucursalSearch(e), onFiltroSucursalFocus: () => this.onFiltroSucursalFocus(), onFiltroSucursalClear: () => this.onFiltroSucursalClear(),
       filasTabla, tablaVacia: filasTabla.length === 0,
       openNuevo: () => this.openNuevo(),
       wizardAbierto: this.state.modal !== null,
@@ -638,6 +796,16 @@ class Component extends DCLogic {
       tipoOperacionBloqueado: this.state.modal === 'editar',
       serieNumeroBloqueado: this.state.modal === 'editar',
       form: formVals, tiposOperacionOpciones: this.tiposOperacion, terceros: this.terceros, conceptosDisponibles,
+      empresaSearchText: this.state.empresaSearchText, empresaDropdownAbierto: this.state.empresaDropdownAbierto,
+      empresaOpciones, empresaSinResultados: empresaOpciones.length === 0,
+      onEmpresaSearch: (e) => this.onEmpresaSearch(e), onEmpresaFocus: () => this.onEmpresaFocus(),
+      sucursalSearchText: this.state.sucursalSearchText, sucursalDropdownAbierto: this.state.sucursalDropdownAbierto,
+      sucursalOpciones, sucursalSinResultados: sucursalOpciones.length === 0,
+      onSucursalSearch: (e) => this.onSucursalSearch(e), onSucursalFocus: () => this.onSucursalFocus(),
+      onEmpresaClear: () => this.onEmpresaClear(), onSucursalClear: () => this.onSucursalClear(),
+      terceroSearchText: this.state.terceroSearchText, terceroDropdownAbierto: this.state.terceroDropdownAbierto,
+      terceroOpciones, terceroSinResultados: terceroOpciones.length === 0,
+      onTerceroSearch: (e) => this.onTerceroSearch(e), onTerceroFocus: () => this.onTerceroFocus(),
       sinLineas: form ? form.lineas.length === 0 : false,
       totalesPreview,
       onTipoOperacion: (e) => this.onTipoOperacion(e), onTercero: (e) => this.onTercero(e), onSerie: (e) => this.onSerie(e), onNumero: (e) => this.onNumero(e),
