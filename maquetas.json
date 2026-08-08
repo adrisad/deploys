@@ -1,6 +1,11 @@
 {
-  "generatedAt": "2026-08-05T00:00:00.000Z",
+  "generatedAt": "2026-08-07T00:00:00.000Z",
   "items": [
+    {
+      "id": "gastos/Conceptos de Gasto",
+      "name": "Conceptos De Gasto",
+      "path": "maquetas/gastos/Conceptos de Gasto.dc.html"
+    },
     {
       "id": "HU Actualizacion motor de conceptos",
       "name": "HU Actualizacion motor de conceptos",
