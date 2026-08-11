@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet><link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700&amp;display=swap" rel="stylesheet"><style>body{margin:0;background:#0a0a0b;font-family:'Inter Tight',system-ui,sans-serif;color:#e8e8ea}a{color:#3b82f6}a:hover{color:#60a5fa}::placeholder{color:#5b5b62}</style></helmet>
+<div style="display:flex;min-height:100vh;background:#0a0a0b">
+<main style="flex:1;min-width:0;display:flex;flex-direction:column">
+
+
+<sc-if value="{{ isList }}" hint-placeholder-val="{{ true }}">
+<div style="padding:32px 32px 56px;display:flex;flex-direction:column;gap:22px">
+<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:24px">
+<div style="display:flex;flex-direction:column;gap:6px">
+<h1 style="margin:0;font-size:32px;font-weight:700;letter-spacing:-.02em">Registro de Compras</h1>
+<p style="margin:0;font-size:14px;color:#8a8a93">Gestión de comprobantes de compra: Compra Nacional, Notas de Crédito y Notas de Débito.</p>
+</div>
+<button onClick="{{ goNuevo }}" style="flex:none;display:flex;align-items:center;gap:9px;background:#2563eb;color:#fff;border:0;border-radius:10px;padding:13px 22px;font:600 14px 'Inter Tight',sans-serif;cursor:pointer" style-hover="background:#1d4ed8">+ Nuevo registro</button>
+</div>
+
+<div style="border:1px solid #4a3b12;background:#1c1607;border-radius:12px;padding:14px 18px;display:flex;flex-direction:column;gap:6px;font-size:13px;color:#e3c86a">
+<span>⚠ No hay una tasa de IGV configurada para Compra Nacional: el IGV se calculará en cero.</span>
+<span>No hay ningún balde tributario mapeado en campos_destino para Compra Nacional: no se podrá guardar ningún comprobante.</span>
+</div>
+
+<section style="border:1px solid #1f1f23;background:#111113;border-radius:14px;padding:22px 24px 24px;display:flex;flex-direction:column;gap:18px">
+<h2 style="margin:0;font-size:15px;font-weight:600">Filtros de búsqueda por criterios avanzados</h2>
+<div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px 18px">
+<sc-for list="{{ filters }}" as="f" hint-placeholder-count="8">
+<label style="display:flex;flex-direction:column;gap:7px;font-size:12px;color:#9a9aa3">{{ f.label }}
+<input placeholder="{{ f.ph }}" value="{{ f.value }}" onChange="{{ f.onChange }}" style="background:#08080a;border:1px solid #26262b;border-radius:9px;padding:11px 13px;color:#e8e8ea;font:400 13px 'Inter Tight',sans-serif;outline:none" style-focus="border-color:#2563eb">
+</label>
+</sc-for>
+</div>
+<div style="display:flex;gap:10px">
+<button onClick="{{ clearFilters }}" style="background:#1a1a1e;color:#e8e8ea;border:1px solid #2e2e34;border-radius:9px;padding:11px 24px;font:600 13px 'Inter Tight',sans-serif;cursor:pointer" style-hover="background:#22222a">Limpiar</button>
+<button onClick="{{ runSearch }}" style="background:#2563eb;color:#fff;border:0;border-radius:9px;padding:11px 24px;font:600 13px 'Inter Tight',sans-serif;cursor:pointer">Buscar</button>
+</div>
+</section>
+
+<section style="border:1px solid #1f1f23;background:#111113;border-radius:14px;overflow:hidden">
+<div style="padding:18px 24px;display:flex;align-items:baseline;gap:9px;border-bottom:1px solid #1f1f23">
+<h2 style="margin:0;font-size:15px;font-weight:600">Comprobantes de compra registrados</h2>
+<span style="font-size:13px;color:#3b82f6">({{ docCount }} documentos)</span>
+<sc-if value="{{ hasSearchNote }}" hint-placeholder-val="{{ false }}"><span style="font-size:12px;color:#8a8a93">— {{ searchNote }}</span></sc-if>
+</div>
+<table style="width:100%;border-collapse:collapse;font-size:13.5px">
+<thead><tr>
+<th style="text-align:left;padding:13px 24px;font:600 10.5px 'Inter Tight',sans-serif;letter-spacing:.1em;color:#7b7b85;border-bottom:1px solid #1f1f23">FOLIO AUXILIAR</th>
+<th style="text-align:left;padding:13px 16px;font:600 10.5px 'Inter Tight',sans-serif;letter-spacing:.1em;color:#7b7b85;border-bottom:1px solid #1f1f23">COMPROBANTE</th>
+<th style="text-align:left;padding:13px 16px;font:600 10.5px 'Inter Tight',sans-serif;letter-spacing:.1em;color:#7b7b85;border-bottom:1px solid #1f1f23">PROVEEDOR</th>
+<th style="text-align:left;padding:13px 16px;font:600 10.5px 'Inter Tight',sans-serif;letter-spacing:.1em;color:#7b7b85;border-bottom:1px solid #1f1f23">EMISIÓN</th>
+<th style="text-align:right;padding:13px 16px;font:600 10.5px 'Inter Tight',sans-serif;letter-spacing:.1em;color:#7b7b85;border-bottom:1px solid #1f1f23">TOTAL</th>
+<th style="text-align:left;padding:13px 16px;font:600 10.5px 'Inter Tight',sans-serif;letter-spacing:.1em;color:#7b7b85;border-bottom:1px solid #1f1f23">ESTADO</th>
+<th style="text-align:right;padding:13px 24px;font:600 10.5px 'Inter Tight',sans-serif;letter-spacing:.1em;color:#7b7b85;border-bottom:1px solid #1f1f23">ACCIONES</th>
+</tr></thead>
+<tbody>
+<sc-for list="{{ docs }}" as="d" hint-placeholder-count="4">
+<tr>
+<td style="padding:16px 24px;border-bottom:1px solid #191a1d;color:#3b82f6;font-weight:600">{{ d.folio }}</td>
+<td style="padding:16px;border-bottom:1px solid #191a1d">{{ d.comprobante }}</td>
+<td style="padding:16px;border-bottom:1px solid #191a1d;color:#c3c3ca">{{ d.proveedor }}</td>
+<td style="padding:16px;border-bottom:1px solid #191a1d;color:#c3c3ca">{{ d.emision }}</td>
+<td style="padding:16px;border-bottom:1px solid #191a1d;text-align:right">{{ d.total }}</td>
+<td style="padding:16px;border-bottom:1px solid #191a1d"><span style="{{ d.badge }}">● {{ d.estado }}</span></td>
+<td style="padding:16px 24px;border-bottom:1px solid #191a1d;text-align:right;color:#8a8a93;letter-spacing:.35em">{{ d.acciones }}</td>
+</tr>
+</sc-for>
+</tbody>
+</table>
+<div style="padding:16px 24px;font-size:12px;color:#5f5f68;border-top:1px solid #1f1f23">Acciones por estado — 👁 Ver siempre; ✏️ Editar y 🚫 Anular solo en BORRADOR (secciones 7.5 y 7.6).</div>
+</section>
+</div>
+</sc-if>
+
+<sc-if value="{{ isForm }}" hint-placeholder-val="{{ true }}">
+<div style="display:flex;border-bottom:1px solid #1f1f23;background:#0d0d0f">
+<sc-for list="{{ tabs }}" as="t" hint-placeholder-count="3">
+<button onClick="{{ t.go }}" style="{{ t.style }}">{{ t.label }}</button>
+</sc-for>
+</div>
+<div style="padding:28px 32px 60px;display:flex;flex-direction:column;gap:20px">
+<sc-if value="{{ saved }}" hint-placeholder-val="{{ false }}">
+<div style="border:1px solid #1c4d31;background:#0c1e14;border-radius:12px;padding:14px 18px;font-size:13px;color:#5fd08b">✓ Comprobante guardado en estado BORRADOR — correlativo auxiliar {{ folioNuevo }} asignado. Transacción atómica completa (documentos_cta_cte → cabecera → detalle → detracciones → correlativo).</div>
+</sc-if>
+<div style="display:flex;align-items:center;justify-content:space-between;gap:20px">
+<h1 style="margin:0;font-size:26px;font-weight:700;letter-spacing:-.01em">{{ formTitle }}</h1>
+<span style="{{ modeBadge }}">{{ modeLabel }}</span>
+</div>
+
+<section style="border:1px solid #1f1f23;background:#111113;border-radius:14px;padding:22px 24px 24px;display:flex;flex-direction:column;gap:18px">
+<h2 style="margin:0;font-size:14px;font-weight:600;color:#3b82f6">Cabecera</h2>
+<div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px 18px">
+<sc-for list="{{ headerFields }}" as="f" hint-placeholder-count="12">
+<label style="display:flex;flex-direction:column;gap:7px;font:600 10.5px 'Inter Tight',sans-serif;letter-spacing:.08em;color:#7b7b85">{{ f.label }}
+<sc-if value="{{ f.isSelect }}" hint-placeholder-val="{{ false }}">
+<select key="{{ f.value }}" defaultValue="{{ f.value }}" onChange="{{ f.onChange }}" style="{{ f.box }}">
+<sc-for list="{{ f.options }}" as="o" hint-placeholder-count="3">
+<option value="{{ o }}">{{ o }}</option>
+</sc-for>
+</select>
+</sc-if>
+<sc-if value="{{ f.isSearch }}" hint-placeholder-val="{{ false }}">
+<div style="position:relative">
+<input value="{{ f.value }}" onChange="{{ f.onChange }}" onFocus="{{ f.onFocus }}" onClick="{{ f.onClick }}" placeholder="Buscar..." style="{{ f.box }}">
+<sc-if value="{{ f.hasValue }}" hint-placeholder-val="{{ false }}">
+<button onClick="{{ f.clear }}" title="Quitar" style="position:absolute;right:9px;top:50%;transform:translateY(-50%);width:20px;height:20px;display:flex;align-items:center;justify-content:center;background:#26262b;border:0;border-radius:999px;color:#b6b6bd;cursor:pointer;font-size:11px;line-height:1" style-hover="background:#3a3a42;color:#fff">✕</button>
+</sc-if>
+<div style="{{ f.listStyle }}">
+<sc-for list="{{ f.options }}" as="o" hint-placeholder-count="2">
+<button onClick="{{ o.pick }}" style="text-align:left;background:transparent;border:0;color:#d6d6dc;padding:9px 10px;border-radius:7px;cursor:pointer;font:400 12.5px 'Inter Tight',sans-serif" style-hover="background:#22222a">{{ o.label }}</button>
+</sc-for>
+<span style="{{ f.noMatchStyle }}">Sin resultados</span>
+<button onClick="{{ f.close }}" style="text-align:left;background:transparent;border:0;border-top:1px solid #26262b;margin-top:3px;color:#7b7b85;padding:8px 10px;cursor:pointer;font:400 11.5px 'Inter Tight',sans-serif">Cerrar</button>
+</div>
+</div>
+</sc-if>
+<sc-if value="{{ f.notSelect }}" hint-placeholder-val="{{ true }}">
+<sc-if value="{{ f.locked }}" hint-placeholder-val="{{ false }}">
+<div style="{{ f.box }}"><span>{{ f.value }}</span><span style="color:#6b6b74;font-size:11px">{{ f.lock }}</span></div>
+</sc-if>
+<sc-if value="{{ f.editable }}" hint-placeholder-val="{{ false }}">
+<input value="{{ f.value }}" onChange="{{ f.onChange }}" style="{{ f.box }}">
+</sc-if>
+</sc-if>
+</label>
+</sc-for>
+</div>
+<p style="margin:0;font-size:12px;color:#5f5f68">{{ headerNote }}</p>
+</section>
+
+<section style="border:1px solid #1f1f23;background:#111113;border-radius:14px;overflow:hidden">
+<div style="padding:18px 24px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #1f1f23">
+<h2 style="margin:0;font-size:14px;font-weight:600;color:#3b82f6">Detalle</h2>
+<button onClick="{{ addLine }}" style="background:#1a1a1e;color:#e8e8ea;border:1px solid #2e2e34;border-radius:9px;padding:9px 18px;font:600 12.5px 'Inter Tight',sans-serif;cursor:pointer" style-hover="background:#22222a">+ Agregar línea</button>
+</div>
+<table style="width:100%;border-collapse:collapse;font-size:13px">
+<thead><tr>
+<th style="text-align:left;padding:12px 24px;font:600 10.5px 'Inter Tight',sans-serif;letter-spacing:.1em;color:#7b7b85;border-bottom:1px solid #1f1f23">CONCEPTO COMERCIAL</th>
+<th style="text-align:left;padding:12px 12px;font:600 10.5px 'Inter Tight',sans-serif;letter-spacing:.1em;color:#7b7b85;border-bottom:1px solid #1f1f23">AFECTACIÓN</th>
+<th style="text-align:right;padding:12px 12px;font:600 10.5px 'Inter Tight',sans-serif;letter-spacing:.1em;color:#7b7b85;border-bottom:1px solid #1f1f23">CANT.</th>
+<th style="text-align:right;padding:12px 12px;font:600 10.5px 'Inter Tight',sans-serif;letter-spacing:.1em;color:#7b7b85;border-bottom:1px solid #1f1f23">P. UNIT.</th>
+<th style="text-align:right;padding:12px 12px;font:600 10.5px 'Inter Tight',sans-serif;letter-spacing:.1em;color:#7b7b85;border-bottom:1px solid #1f1f23">DESCUENTO</th>
+<th style="text-align:right;padding:12px 12px;font:600 10.5px 'Inter Tight',sans-serif;letter-spacing:.1em;color:#7b7b85;border-bottom:1px solid #1f1f23">BASE</th>
+<th style="text-align:right;padding:12px 12px;font:600 10.5px 'Inter Tight',sans-serif;letter-spacing:.1em;color:#7b7b85;border-bottom:1px solid #1f1f23">IGV</th>
+<th style="padding:12px 16px;border-bottom:1px solid #1f1f23"></th>
+</tr></thead>
+<tbody>
+<sc-for list="{{ lines }}" as="l" hint-placeholder-count="3">
+<tr>
+<td style="padding:9px 24px;border-bottom:1px solid #191a1d">
+<select value="{{ l.concepto }}" onChange="{{ l.onConcepto }}" style="width:100%;background:#08080a;border:1px solid #26262b;border-radius:7px;padding:8px 9px;color:#e8e8ea;font:400 13px 'Inter Tight',sans-serif">
+<sc-for list="{{ l.conceptoOpts }}" as="c" hint-placeholder-count="3">
+<option value="{{ c }}">{{ c }}</option>
+</sc-for>
+</select>
+</td>
+<td style="padding:15px 12px;border-bottom:1px solid #191a1d"><span style="{{ l.chip }}">{{ l.afectacion }}</span></td>
+<td style="padding:9px 12px;border-bottom:1px solid #191a1d;text-align:right"><input value="{{ l.cant }}" onChange="{{ l.onCant }}" style="width:56px;text-align:right;background:#08080a;border:1px solid #26262b;border-radius:7px;padding:7px 8px;color:#e8e8ea;font:400 13px 'Inter Tight',sans-serif"></td>
+<td style="padding:9px 12px;border-bottom:1px solid #191a1d;text-align:right"><input value="{{ l.punit }}" onChange="{{ l.onPunit }}" style="width:88px;text-align:right;background:#08080a;border:1px solid #26262b;border-radius:7px;padding:7px 8px;color:#e8e8ea;font:400 13px 'Inter Tight',sans-serif"></td>
+<td style="padding:15px 12px;border-bottom:1px solid #191a1d;text-align:right;color:#8a8a93">{{ l.desc }}</td>
+<td style="padding:15px 12px;border-bottom:1px solid #191a1d;text-align:right">{{ l.base }}</td>
+<td style="padding:15px 12px;border-bottom:1px solid #191a1d;text-align:right">{{ l.igv }}</td>
+<td style="padding:15px 16px;border-bottom:1px solid #191a1d;text-align:right"><button onClick="{{ l.onRemove }}" style="background:transparent;border:0;color:#f08a80;cursor:pointer;font-size:13px">✕</button></td>
+</tr>
+</sc-for>
+</tbody>
+</table>
+<div style="display:flex;justify-content:flex-end;padding:20px 24px">
+<div style="width:380px;display:flex;flex-direction:column;gap:9px">
+<sc-for list="{{ totals }}" as="t" hint-placeholder-count="5">
+<div style="display:flex;justify-content:space-between;font-size:13px;color:#b6b6bd"><span>{{ t.label }}</span><span>{{ t.value }}</span></div>
+</sc-for>
+<div style="display:flex;justify-content:space-between;padding-top:12px;margin-top:4px;border-top:1px solid #26262b;font-size:17px;font-weight:700"><span>Total</span><span>{{ totalValue }}</span></div>
+</div>
+</div>
+</section>
+
+<div style="display:flex;justify-content:flex-end;gap:10px">
+<sc-for list="{{ actions }}" as="a" hint-placeholder-count="2">
+<button onClick="{{ a.go }}" style="{{ a.style }}">{{ a.label }}</button>
+</sc-for>
+</div>
+<p style="margin:0;font-size:12px;line-height:1.7;color:#5f5f68">{{ formNote }}</p>
+</div>
+</sc-if>
+
+<sc-if value="{{ modal }}" hint-placeholder-val="{{ false }}">
+<div style="position:fixed;inset:0;background:rgba(4,4,6,.72);display:flex;align-items:center;justify-content:center;padding:24px;z-index:20">
+<div style="width:440px;background:#131316;border:1px solid #2b2b31;border-radius:16px;padding:26px;display:flex;flex-direction:column;gap:14px">
+<h3 style="margin:0;font-size:18px;font-weight:700">Anular comprobante</h3>
+<p style="margin:0;font-size:13.5px;line-height:1.65;color:#a5a5ae">Se actualizará en cascada el estado a ANULADO (documento, cabecera y detalle), preservando los montos históricos. Solo procede en BORRADOR; en cualquier otro estado el servidor responde HTTP 422.</p>
+<div style="display:flex;justify-content:flex-end;gap:10px;margin-top:6px">
+<button onClick="{{ closeModal }}" style="background:#1a1a1e;color:#e8e8ea;border:1px solid #2e2e34;border-radius:9px;padding:11px 20px;font:600 13px 'Inter Tight',sans-serif;cursor:pointer">Cancelar</button>
+<button onClick="{{ confirmAnular }}" style="background:#b42318;color:#fff;border:0;border-radius:9px;padding:11px 20px;font:600 13px 'Inter Tight',sans-serif;cursor:pointer">Sí, anular</button>
+</div>
+</div>
+</div>
+</sc-if>
+</main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{}">
+const S = {
+  list: 'Pantalla Inicial',
+  nuevo: 'Compra Nacional — Nuevo',
+  guardado: 'Compra Nacional — Guardado',
+  editar: 'Compra Nacional — Edición',
+  nc: 'Nota de Crédito',
+  nd: 'Nota de Débito'
+};
+const LOCKED_BOX = "display:flex;align-items:center;justify-content:space-between;gap:8px;background:#0e0e11;border:1px solid #202024;border-radius:9px;padding:11px 13px;font:400 13px 'Inter Tight',sans-serif;color:#9a9aa3;min-height:20px";
+const F = (label, value, lock) => ({ label, value, lock: lock ? '🔒' : '', notSelect: true, isSelect: false, locked: true, editable: false, box: LOCKED_BOX });
+
+class Component extends DCLogic {
+  state = { screen: 'list', modal: false, tipoOperacion: null, empresa: null, sucursal: null, filterVals: {}, lines: null, fieldVals: {}, searchNote: '', openSearch: null };
+
+  fmt(n) { return n.toLocaleString('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+  num(s) { const n = parseFloat(String(s).replace(/[^0-9.]/g, '')); return isNaN(n) ? 0 : n; }
+
+  ensureLines(kind) {
+    if (!this.state.lines || this.state.linesKind !== kind) {
+      this.state.lines = this.lineSets()[kind].map((l, i) => ({ ...l, id: i + '-' + kind }));
+      this.state.linesKind = kind;
+    }
+    return this.state.lines;
+  }
+  recalc(lines) {
+    return lines.map(l => {
+      const cant = this.num(l.cant), punit = this.num(l.punit);
+      const base = cant * punit;
+      const gravada = l.afectacion !== 'No Gravada' && l.afectacion !== 'Inafecto';
+      const igv = gravada ? base * 0.18 : 0;
+      return { ...l, base: this.fmt(base), igv: this.fmt(igv), _base: base, _igv: igv };
+    });
+  }
+  conceptCatalog(kind) {
+    const nac = [
+      ['Compra de Mercadería — Gravada (Crédito Pleno)', 'DG'],
+      ['Servicio de Asesoría — Gravada (Mixto)', 'DGNG'],
+      ['Compra de Mercadería — Gravada (Sin Crédito)', 'DNG'],
+      ['Compra de Mercadería — No Gravada', 'No Gravada'],
+      ['Compra de Activo Fijo — Gravada (Crédito Pleno)', 'DG'],
+      ['Servicio de Transporte — Gravada (Crédito Pleno)', 'DG']
+    ];
+    const nc = [
+      ['Descuento sobre Mercadería (NC) — Gravada D1', 'DG'],
+      ['Devolución de Mercadería (NC) — No Gravada', 'No Gravada'],
+      ['Anulación de la Operación (NC) — Gravada D1', 'DG'],
+      ['Descuento sobre Servicios (NC) — Gravada Mixto', 'DGNG']
+    ];
+    const nd = [
+      ['COM_ND_AUMENTO_VALOR_D1 — Aumento de valor', 'DG'],
+      ['COM_ND_AUMENTO_VALOR_D2 — Aumento de valor mixto', 'DGNG'],
+      ['COM_ND_INTERES_MORA — Intereses moratorios', 'Inafecto'],
+      ['COM_ND_PENALIDAD — Penalidad contractual', 'Inafecto']
+    ];
+    return { nac, nc, nd }[kind];
+  }
+  setLine(idx, patch) {
+    const lines = this.state.lines.slice();
+    lines[idx] = { ...lines[idx], ...patch };
+    this.setState({ lines });
+  }
+
+  select(label, val, opts, key, onSet) {
+    return { label, value: val, lock: '', isSelect: true, notSelect: false, options: opts, box: this.box(false), onChange: (e) => onSet(e.target.value) };
+  }
+  search(label, val, opts, listId, onSet) {
+    const q = String(val || '').toLowerCase();
+    const open = this.state.openSearch === listId;
+    const matches = opts.filter(o => o.toLowerCase().includes(q));
+    return {
+      label, value: val, lock: '', isSelect: false, notSelect: false, isSearch: true,
+      options: (matches.length ? matches : []).map(o => ({ label: o, pick: () => { onSet(o); this.setState({ openSearch: null }); } })),
+      noMatchStyle: `padding:9px 10px;font-size:12.5px;color:#6b6b74;display:${open && matches.length === 0 ? 'block' : 'none'}`,
+      listStyle: `position:absolute;top:calc(100% + 4px);left:0;right:0;z-index:12;background:#16161a;border:1px solid #2e2e34;border-radius:9px;padding:5px;flex-direction:column;gap:2px;box-shadow:0 12px 28px rgba(0,0,0,.55);max-height:200px;overflow:auto;display:${open ? 'flex' : 'none'}`,
+      listId, box: this.box(false) + ';padding-right:36px',
+      hasValue: !!String(val || '').length,
+      clear: () => { onSet(''); this.setState({ openSearch: null }); },
+      onChange: (e) => onSet(e.target.value),
+      onFocus: () => this.setState({ openSearch: listId }),
+      onClick: () => this.setState({ openSearch: listId }),
+      pick: (o) => () => { onSet(o); this.setState({ openSearch: null }); },
+      close: () => this.setState({ openSearch: null })
+    };
+  }
+  go = (screen) => () => this.setState({ screen, modal: false });
+
+  navBtn(active) {
+    return `padding:6px 12px;border-radius:999px;border:0;cursor:pointer;white-space:nowrap;font:${active ? 600 : 400} 11.5px 'Inter Tight',sans-serif;background:${active ? '#1c2740' : 'transparent'};color:${active ? '#8ab4ff' : '#7b7b85'}`;
+  }
+  tabBtn(active) {
+    return `padding:14px 30px;border:0;background:transparent;cursor:pointer;font:${active ? 600 : 400} 13.5px 'Inter Tight',sans-serif;color:${active ? '#e8e8ea' : '#7b7b85'};border-bottom:2px solid ${active ? '#2563eb' : 'transparent'}`;
+  }
+  chip(kind) {
+    const c = { DG: ['#0f2a1b', '#5fd08b'], DGNG: ['#2a2410', '#e3c86a'], DNG: ['#2a1414', '#f08a80'], 'No Gravada': ['#1a1a1e', '#9a9aa3'], Inafecto: ['#1a1a1e', '#9a9aa3'] }[kind] || ['#1a1a1e', '#9a9aa3'];
+    return `display:inline-block;padding:3px 9px;border-radius:999px;font:600 11px 'Inter Tight',sans-serif;background:${c[0]};color:${c[1]}`;
+  }
+  box(locked) {
+    return `display:flex;align-items:center;justify-content:space-between;gap:8px;background:${locked ? '#0e0e11' : '#08080a'};border:1px solid ${locked ? '#202024' : '#26262b'};border-radius:9px;padding:11px 13px;font:400 13px 'Inter Tight',sans-serif;color:${locked ? '#9a9aa3' : '#e8e8ea'};min-height:20px`;
+  }
+  badge(estado) {
+    const c = { BORRADOR: ['#2a2410', '#e3c86a'], CONTABILIZADO: ['#0f2a1b', '#5fd08b'], ANULADO: ['#2a1414', '#f08a80'] }[estado];
+    return `display:inline-block;padding:4px 10px;border-radius:999px;font:600 11.5px 'Inter Tight',sans-serif;background:${c[0]};color:${c[1]}`;
+  }
+
+  lineSets() {
+    const nac = [
+      { concepto: 'Compra de Mercadería — Gravada (Crédito Pleno)', afectacion: 'DG', cant: '10', punit: 'S/ 150.00', desc: '0.00', base: '1,500.00', igv: '270.00' },
+      { concepto: 'Servicio de Asesoría — Gravada (Mixto)', afectacion: 'DGNG', cant: '1', punit: 'S/ 800.00', desc: '0.00', base: '800.00', igv: '144.00' },
+      { concepto: 'Compra de Mercadería — Gravada (Sin Crédito)', afectacion: 'DNG', cant: '1', punit: 'S/ 400.00', desc: '0.00', base: '400.00', igv: '72.00' },
+      { concepto: 'Compra de Mercadería — No Gravada', afectacion: 'No Gravada', cant: '1', punit: 'S/ 150.00', desc: '0.00', base: '150.00', igv: '0.00' }
+    ];
+    const nc = [
+      { concepto: 'Descuento sobre Mercadería (NC) — Gravada D1', afectacion: 'DG', cant: '2', punit: 'S/ 150.00', desc: '0.00', base: '300.00', igv: '54.00' },
+      { concepto: 'Devolución de Mercadería (NC) — No Gravada', afectacion: 'No Gravada', cant: '1', punit: 'S/ 150.00', desc: '0.00', base: '150.00', igv: '0.00' }
+    ];
+    const nd = [
+      { concepto: 'COM_ND_AUMENTO_VALOR_D1 — Aumento de valor', afectacion: 'DG', cant: '1', punit: 'S/ 500.00', desc: '0.00', base: '500.00', igv: '90.00' },
+      { concepto: 'COM_ND_INTERES_MORA — Intereses moratorios', afectacion: 'Inafecto', cant: '1', punit: 'S/ 120.00', desc: '0.00', base: '120.00', igv: '0.00' }
+    ];
+    return { nac, nc, nd };
+  }
+
+  renderVals() {
+    const sc = this.state.screen;
+    const isForm = sc !== 'list';
+    const kind = sc === 'nc' ? 'nc' : sc === 'nd' ? 'nd' : 'nac';
+    const L = this.recalc(isForm ? this.ensureLines(kind) : []);
+
+    const bucket = { DG: 0, DGNG: 0, DNG: 0, NoGrav: 0 };
+    const bucketIgv = { DG: 0, DGNG: 0, DNG: 0 };
+    L.forEach(l => {
+      const key = l.afectacion === 'No Gravada' || l.afectacion === 'Inafecto' ? 'NoGrav' : l.afectacion;
+      bucket[key] = (bucket[key] || 0) + l._base;
+      if (bucketIgv[key] !== undefined) bucketIgv[key] += l._igv;
+    });
+    const totalsByKind = {
+      nac: [['Base DG', bucket.DG], ['IGV DG', bucketIgv.DG], ['Base DGNG', bucket.DGNG], ['IGV DGNG', bucketIgv.DGNG], ['Base DNG', bucket.DNG], ['IGV DNG', bucketIgv.DNG], ['Adquisiciones No Gravadas', bucket.NoGrav]],
+      nc: [['Base DG', bucket.DG], ['IGV DG', bucketIgv.DG], ['Adquisiciones No Gravadas', bucket.NoGrav]],
+      nd: [['Base DG', bucket.DG], ['IGV DG', bucketIgv.DG], ['Adquisiciones No Gravadas (inafecto)', bucket.NoGrav]]
+    };
+    const total = L.reduce((s, l) => s + l._base + l._igv, 0);
+    const totalValue = 'S/ ' + this.fmt(total);
+
+    const headerCommon = [
+      this.search('EMPRESA', this.state.empresa ?? 'Constructora Andina SAC', ['Constructora Andina SAC', 'Grupo Grande S.A.C.', 'Ferretería del Sur EIRL', 'Servicios Lima SAC'], 'dl-empresa', (v) => this.setState({ empresa: v })),
+      this.search('SUCURSAL', this.state.sucursal ?? 'Matriz Principal', ['Matriz Principal', 'Sucursal Sur', 'Sucursal Norte', 'Almacén Callao'], 'dl-sucursal', (v) => this.setState({ sucursal: v })),
+      (() => {
+        const opts = ['Compra Nacional', 'Notas de Crédito', 'Notas de Débito'];
+        const val = { nac: 'Compra Nacional', nc: 'Notas de Crédito', nd: 'Notas de Débito' }[kind];
+        const map = { 'Compra Nacional': 'nuevo', 'Notas de Crédito': 'nc', 'Notas de Débito': 'nd' };
+        return { label: 'TIPO DE OPERACIÓN', value: val, lock: '', isSelect: true, notSelect: false, options: opts, box: this.box(false), onChange: (e) => this.setState({ screen: map[e.target.value], modal: false }) };
+      })(),
+      F('TIPO DOC. / SERIE-NÚMERO', kind === 'nac' ? 'Factura F001-004521' : kind === 'nc' ? 'Nota de Crédito FC01-000118' : 'Nota de Débito FD01-000042', true)
+    ];
+    const ref = kind === 'nac' ? [] : [F('DOCUMENTO DE REFERENCIA', 'Factura F001-004521 · CONTABILIZADO', false), F('MOTIVO ' + (kind === 'nc' ? '(CATÁLOGO 09)' : '(CATÁLOGO 10)'), kind === 'nc' ? '06 — Devolución total' : '02 — Aumento en el valor', false)];
+    const fv = this.state.fieldVals;
+    const proveedores = ['20601234567 — Distribuidora Andina SAC', '20512223334 — Ferretería del Sur EIRL', '20487771122 — Servicios Lima SAC', '20603334455 — Transportes Cusco SAC'];
+    const editableDefs = [
+      ['FECHA DE EMISIÓN', '26/08/2026', false],
+      ['FECHA DE REGISTRO', '26/08/2026', false],
+      ['MONEDA', 'Soles (S/.)', true],
+      ['DETRACCIÓN — TIPO BIEN/SERVICIO', kind === 'nac' ? 'Servicios empresariales (12%)' : 'No aplica', kind !== 'nac'],
+      ['MONTO DETRACCIÓN (CALCULADO)', kind === 'nac' ? 'S/ 297.00' : '—', true],
+      ['CANTIDAD DE BOLSAS (ICBPER)', '0', false],
+      ['OTROS TRIBUTOS', '0.00', false],
+      ['IMB (CAMPO 36 RCE)', '0.00', false],
+      ['PERIODO CONTABLE / EJERCICIO', 'Agosto 2026 · Ejercicio 2026 (ABIERTO)', true]
+    ];
+    const refDocs = ['Factura F001-004521 · CONTABILIZADO', 'Factura F001-004498 · CONTABILIZADO', 'Factura F001-004380 · CONTABILIZADO'];
+    const motivos09 = ['01 — Anulación de la operación', '06 — Devolución total', '07 — Devolución por ítem', '13 — Ajustes - montos y/o fechas de pago'];
+    const motivos10 = ['01 — Intereses moratorios', '02 — Aumento en el valor', '03 — Penalidades/otros'];
+    const refSelects = kind === 'nac' ? [] : [
+      this.search('DOCUMENTO DE REFERENCIA', fv['DOCUMENTO DE REFERENCIA'] ?? refDocs[0], refDocs, 'dl-ref', (v) => this.setState({ fieldVals: { ...this.state.fieldVals, 'DOCUMENTO DE REFERENCIA': v } })),
+      this.select('MOTIVO ' + (kind === 'nc' ? '(CATÁLOGO 09)' : '(CATÁLOGO 10)'), fv['MOTIVO'] ?? (kind === 'nc' ? motivos09[1] : motivos10[1]), kind === 'nc' ? motivos09 : motivos10, 'motivo', (v) => this.setState({ fieldVals: { ...this.state.fieldVals, MOTIVO: v } }))
+    ];
+    const headerFields = [
+      ...headerCommon,
+      this.search('PROVEEDOR', fv['PROVEEDOR'] ?? proveedores[0], proveedores, 'dl-prov', (v) => this.setState({ fieldVals: { ...this.state.fieldVals, PROVEEDOR: v } })),
+      ...refSelects,
+      ...editableDefs.map(([label, def, lock]) => ({
+        label, value: fv[label] ?? def, lock: lock ? '🔒' : '', notSelect: true, isSelect: false,
+        locked: !!lock, editable: !lock, box: this.box(!!lock),
+        onChange: (e) => this.setState({ fieldVals: { ...this.state.fieldVals, [label]: e.target.value } })
+      }))
+    ].map(f => ({ ...f, box: f.box || this.box(!!f.lock) }));
+
+    const notes = {
+      nuevo: 'Base e IGV se calculan vía Motor de Conceptos (solo lectura) y se acumulan en el balde DG/DGNG/DNG de la afectación de cada línea. Detracción = TRUNC(monto_total_pais × 12% , 0) = 297. La Fecha de Registro resuelve periodo y ejercicio (CA.12).',
+      guardado: 'Documento en modo solo lectura, estado BORRADOR. Acciones disponibles: Volver, Editar, Anular.',
+      editar: 'Tipo de Operación, Serie y Número bloqueados (🔒). Al guardar se recalculan por completo los 3 baldes de cabecera en la misma transacción (CA.15).',
+      nc: 'Documento de Referencia obligatorio, solo CONTABILIZADO, mismo proveedor y misma moneda. Proveedor autocompletado y bloqueado. Anular la NC nunca revierte una detracción ya depositada (7.1).',
+      nd: 'Motivo del Catálogo 10 debe corresponder al concepto de la línea: 02 → COM_ND_AUMENTO_VALOR_D1/D2/D3. Interés moratorio es Inafecto y cae en monto_adq_no_grab.'
+    };
+
+    const btn = (variant) => ({
+      primary: "background:#2563eb;color:#fff;border:0;border-radius:9px;padding:12px 26px;font:600 13.5px 'Inter Tight',sans-serif;cursor:pointer",
+      ghost: "background:#1a1a1e;color:#e8e8ea;border:1px solid #2e2e34;border-radius:9px;padding:12px 26px;font:600 13.5px 'Inter Tight',sans-serif;cursor:pointer",
+      danger: "background:transparent;color:#f08a80;border:1px solid #59211c;border-radius:9px;padding:12px 26px;font:600 13.5px 'Inter Tight',sans-serif;cursor:pointer"
+    })[variant];
+
+    const actions = sc === 'guardado'
+      ? [{ label: 'Volver', style: btn('ghost'), go: this.go('list') }, { label: '🚫 Anular', style: btn('danger'), go: () => this.setState({ modal: true }) }, { label: '✏️ Editar', style: btn('primary'), go: this.go('editar') }]
+      : [{ label: 'Cancelar', style: btn('ghost'), go: this.go('list') }, { label: 'Guardar', style: btn('primary'), go: this.go('guardado') }];
+
+    const modeLabel = sc === 'guardado' ? 'BORRADOR · solo lectura' : sc === 'editar' ? 'BORRADOR · edición' : 'Nuevo registro';
+    const modeBadge = `padding:6px 13px;border-radius:999px;font:600 11.5px 'Inter Tight',sans-serif;background:${sc === 'guardado' ? '#2a2410' : '#1c2740'};color:${sc === 'guardado' ? '#e3c86a' : '#8ab4ff'}`;
+
+    return {
+      screens: Object.keys(S).map(k => ({ label: S[k], go: this.go(k), style: this.navBtn(sc === k) })),
+      crumb: S[sc],
+      isList: sc === 'list',
+      isForm,
+      saved: sc === 'guardado',
+      folioNuevo: 'C-2026-08-000148',
+      goNuevo: this.go('nuevo'),
+      docCount: [
+        { proveedor: '20601234567 — Distribuidora Andina SAC' }, { proveedor: '20601234567 — Distribuidora Andina SAC' },
+        { proveedor: '20512223334 — Ferretería del Sur EIRL' }, { proveedor: '20487771122 — Servicios Lima SAC' }
+      ].filter(d => { const q = (this.state.filterVals['RUC / Proveedor'] || '').trim().toLowerCase(); return !q || d.proveedor.toLowerCase().includes(q); }).length,
+      filters: ['Empresa', 'Sucursal operativa', 'RUC / Proveedor', 'Periodo contable', 'Correlativo auxiliar', 'Emisión desde', 'Emisión hasta', 'Estado del documento'].map((label, i) => ({
+        label, ph: ['GRUPO GRANDE S.A.C.', 'Todas', '', 'Todos', '', 'dd/mm/aaaa', 'dd/mm/aaaa', 'Todos'][i],
+        value: this.state.filterVals[label] || '',
+        onChange: (e) => this.setState({ filterVals: { ...this.state.filterVals, [label]: e.target.value } })
+      })),
+      searchNote: this.state.searchNote,
+      hasSearchNote: !!this.state.searchNote,
+      clearFilters: () => this.setState({ filterVals: {}, searchNote: '' }),
+      runSearch: () => {
+        const q = (this.state.filterVals['RUC / Proveedor'] || '').trim().toLowerCase();
+        this.setState({ searchNote: q ? 'Filtrando por RUC/Proveedor: "' + q + '"' : '' });
+      },
+      docs: [
+        { folio: 'C-2026-08-000147', comprobante: 'Factura F001-004520', proveedor: '20601234567 — Distribuidora Andina SAC', emision: '24/08/2026', total: 'S/ 2,478.00', estado: 'CONTABILIZADO', acciones: '👁 ' },
+        { folio: 'C-2026-08-000146', comprobante: 'N. Crédito FC01-000117', proveedor: '20601234567 — Distribuidora Andina SAC', emision: '22/08/2026', total: 'S/ 504.00', estado: 'BORRADOR', acciones: '👁 ✏️ 🚫' },
+        { folio: 'C-2026-08-000145', comprobante: 'N. Débito FD01-000041', proveedor: '20512223334 — Ferretería del Sur EIRL', emision: '20/08/2026', total: 'S/ 710.00', estado: 'BORRADOR', acciones: '👁 ✏️ 🚫' },
+        { folio: 'C-2026-08-000144', comprobante: 'Factura F002-000883', proveedor: '20487771122 — Servicios Lima SAC', emision: '18/08/2026', total: 'S/ 1,180.00', estado: 'ANULADO', acciones: '👁 ' }
+      ].filter(d => {
+        const q = (this.state.filterVals['RUC / Proveedor'] || '').trim().toLowerCase();
+        return !q || d.proveedor.toLowerCase().includes(q);
+      }).map(d => ({ ...d, badge: this.badge(d.estado) })),
+      tabs: [
+        { label: 'Compra Nacional', go: this.go('nuevo'), style: this.tabBtn(kind === 'nac') },
+        { label: 'Notas de Crédito', go: this.go('nc'), style: this.tabBtn(kind === 'nc') },
+        { label: 'Notas de Débito', go: this.go('nd'), style: this.tabBtn(kind === 'nd') }
+      ],
+      formTitle: 'Registro de Compras — ' + S[sc],
+      modeLabel, modeBadge,
+      headerFields,
+      headerNote: kind === 'nac' ? 'Cascada Empresa → Sucursal → Tipo de Operación fija Tipo Documento, Moneda y Correlativo de Libro (7.2).' : 'Proveedor heredado del Documento de Referencia y bloqueado (4.3). Validación requiere_referencia=true al elegir el Tipo de Operación y en el guardado server-side (4.2).',
+      lines: L.map((l, i) => ({
+        ...l, chip: this.chip(l.afectacion),
+        conceptoOpts: this.conceptCatalog(kind).map(c => c[0]),
+        onConcepto: (e) => {
+          const hit = this.conceptCatalog(kind).find(c => c[0] === e.target.value);
+          this.setLine(i, { concepto: e.target.value, afectacion: hit ? hit[1] : 'DG' });
+        },
+        onCant: (e) => this.setLine(i, { cant: e.target.value }),
+        onPunit: (e) => this.setLine(i, { punit: e.target.value }),
+        onRemove: () => this.setState({ lines: this.state.lines.filter((_, j) => j !== i) })
+      })),
+      addLine: () => {
+        const cat = this.conceptCatalog(kind)[0];
+        this.setState({ lines: [...this.state.lines, { concepto: cat[0], afectacion: cat[1], cant: '1', punit: '0.00', desc: '0.00' }] });
+      },
+      totals: totalsByKind[kind].map(t => ({ label: t[0], value: 'S/ ' + this.fmt(t[1]) })),
+      totalValue,
+      actions,
+      formNote: notes[sc] || '',
+      modal: this.state.modal,
+      closeModal: () => this.setState({ modal: false }),
+      confirmAnular: () => this.setState({ modal: false, screen: 'list' })
+    };
+  }
+}
+</script>
+</body>
+</html>

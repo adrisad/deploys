@@ -1,0 +1,448 @@
+LUMINA ERP — SUNAT / SIRE
+HU-012 — LIBRO COMPRAS (BORRADOR MEJORADA)
+Registro de Compras: Diccionario Completo, Motor de Conceptos, NC/ND, Importación (deshabilitada), Destino del Crédito Fiscal, Detracciones, Periodo Contable y Guardado Atómico
+
+[TABLE]
+
+|ROW| Campo
+ || Detalle
+ || 
+|ROW| Reemplaza a
+ || HU-012 v1 (2026-08-11) — queda como historial
+ || 
+|ROW| Fecha de esta versión
+ || 2026-08-11
+ || 
+|ROW| Script de datos
+ || SCRIPT-MAESTRO-HU-012-Registro_Compras.sql (100% aditivo, sin TRUNCATE — no afecta data ya cargada de Ventas/Honorarios)
+ || 
+|ROW| Nota de nomenclatura
+ || Mismo tenor y estructura que HU-011 — Libro Ventas (Borrador Mejorada), adaptado a Compras. La pantalla de búsqueda usa el estándar confirmado en esta sesión (sección 9.1) — no la versión original de HU-011.
+ || 
+[/TABLE]
+1. Contexto y alcance
+Este documento consolida TODO lo decidido para el Libro de Registro de Compras: diccionario completo de campos_destino, reglas del Motor de Conceptos, NC/ND, Importación (catálogo tributario cargado, sin uso en frontend), Destino del Crédito Fiscal (DG/DGNG/DNG), Detracciones, Periodo Contable/Ejercicio (infraestructura compartida con Ventas), guardado atómico de las tablas involucradas, y el barrido tributario completo verificado contra la normativa SIRE/RCE real (Anexo 8, RS 040-2022/SUNAT) — no contra memoria ni supuestos.
+Es exhaustivo a propósito, mismo criterio que HU-011: una sola fuente de verdad, coordinable entre Eduardo (producto), el desarrollador y QA.
+Ruta de menú: Operaciones &gt; Registro de Compras (pantalla nueva, mismo patrón visual y de filtros que Registro de Ventas — sección 9.1). Alcance: Compra Nacional únicamente. Importación queda con su catálogo tributario cargado en base (tipo_afectacion_tributaria, grupo IMPORTACION_DUA) pero sin pestaña habilitada en frontend — requiere HU propia (carpetas_importacion, detalle_costos_importacion, dam_id).
+2. Diccionario completo (campos_destino)
+8 variables de línea + 9 de cabecera (24 filas reales en campos_destino: 8 × 3 funcionalidades — COMP_NAC/NOTA_CREDITO/NOTA_DEBITO).
+2.1 Nivel línea
+
+[TABLE]
+
+|ROW| Variable
+ || Tipo
+ || Columna base
+ || Aplica en
+ || 
+|ROW| COM_CANTIDAD
+ || CAMPO
+ || cantidad
+ || Las 3 funcionalidades
+ || 
+|ROW| COM_PRECIO_UNIT
+ || CAMPO
+ || precio_unitario_origen
+ || Las 3 funcionalidades
+ || 
+|ROW| COM_BASE_LINEA
+ || FORMULA (CANTIDAD × PRECIO_UNIT)
+ || monto_base_imponible
+ || Las 3
+ || 
+|ROW| COM_IGV_LINEA
+ || FORMULA
+ || monto_igv
+ || Las 3 — 0 si la afectación es No Gravada
+ || 
+|ROW| COM_ISC_LINEA
+ || Pendiente — sin fórmula cargada
+ || monto_isc
+ || Bloqueado por mecanismo de COM_CODIGO_AFECTACION_LINEA (igual que VTA_ISC_LINEA en Ventas)
+ || 
+|ROW| COM_DESCUENTO_LINEA
+ || CAMPO
+ || monto_descuento
+ || Las 3 funcionalidades
+ || 
+[/TABLE]
+A diferencia de Ventas, no existe equivalente a VTA_ES_GRATUITA — no hay Operación Gratuita en Compras (nadie recibe bienes/servicios de un proveedor a título gratuito como parte de este flujo).
+2.2 Nivel cabecera — 3 baldes por Destino del Crédito Fiscal + otros totales
+
+[TABLE]
+
+|ROW| Variable
+ || Columna base
+ || Nota
+ || 
+|ROW| COM_BASE_DG / COM_IGV_DG
+ || monto_base_dg / monto_igv_dg
+ || Destino 1 — crédito fiscal pleno
+ || 
+|ROW| COM_BASE_DGNG / COM_IGV_DGNG
+ || monto_base_dgng / monto_igv_dgng
+ || Destino 2 — mixto, sujeto a prorrata (Art. 23 Ley IGV)
+ || 
+|ROW| COM_BASE_DNG / COM_IGV_DNG
+ || monto_base_dng / monto_igv_dng
+ || Destino 3 — sin crédito fiscal
+ || 
+|ROW| COM_ADQ_NO_GRAB
+ || monto_adq_no_grab
+ || Inafecta/exonerada — nunca genera crédito fiscal (campo 21 RCE)
+ || 
+|ROW| COM_MONTO_OTROS
+ || monto_otros
+ || CAMPO manual, no SUM — ver sección 6
+ || 
+|ROW| COM_CANTIDAD_BOLSAS / COM_ICBPER_CAB
+ || cantidad_bolsas / monto_icbper
+ || ICBPER optativo (admite 0), mismo mecanismo que Ventas
+ || 
+|ROW| COM_ISC_CAB
+ || monto_isc
+ || Pendiente, igual que línea (2.1)
+ || 
+|ROW| — (sin variable de motor)
+ || monto_imb
+ || Campo 36 RCE, manual, sin fórmula — ver sección 6
+ || 
+|ROW| — (no implementado)
+ || monto_retencion_igv_pais
+ || Decisión de negocio: no se implementa por ahora
+ || 
+[/TABLE]
+3. Motor de Conceptos — reglas cargadas y verificadas
+Verificado contra las 30 filas reales de motor_conceptos cargadas por el script de esta HU (CAMPO ×15, MONTO ×6, FORMULA ×9), más las 7 filas de tipo_afectacion_tributaria del grupo COMPRA_NACIONAL/COMPRA_NOTA_DEBITO.
+
+[TABLE]
+
+|ROW| Regla
+ || Tipo
+ || Alcance
+ || Estado
+ || 
+|ROW| COM_TASA_IGV (+_NC/_ND)
+ || MONTO 18%
+ || NAC/NC/ND
+ || Cargado
+ || 
+|ROW| COM_IGV_LINEA (+_NC/_ND)
+ || FORMULA
+ || NAC/NC/ND
+ || Cargado
+ || 
+|ROW| COM_TASA_ICBPER / COM_ICBPER_CAB (+_NC/_ND)
+ || MONTO S/0.50 / FORMULA
+ || NAC/NC/ND
+ || Cargado
+ || 
+|ROW| COM_CANTIDAD, COM_PRECIO_UNIT, COM_DESCUENTO_LINEA, COM_MONTO_OTROS, COM_CANTIDAD_BOLSAS
+ || CAMPO
+ || Según funcionalidad
+ || Cargado (15 filas)
+ || 
+|ROW| COM_ISC_LINEA / COM_ISC_CAB
+ || Sin fórmula
+ || —
+ || Pendiente (3.1)
+ || 
+[/TABLE]
+3.1 COM_ISC_LINEA — sigue pendiente
+No tiene fórmula cargada. Bloqueado por el mismo mecanismo que VTA_ISC_LINEA en Ventas — depende de conceptos_comercial.sistema_isc/tasa_isc/monto_isc_especifico, cuya resolución (token del motor vs. cálculo directo en Go) no está confirmada con el desarrollador. La columna física (monto_isc_origen/pais) ya existe por el ALTER de esta HU.
+3.2 COM_CODIGO_AFECTACION_LINEA — mismo mecanismo que Ventas
+Las fórmulas de COM_IGV_LINEA deben resolver este token vía JOIN detalle_libro_compras → conceptos_comercial → tipo_afectacion_tributaria.codigo, comparándolo contra &apos;COM_GRAVADA_D1&apos;/&apos;COM_GRAVADA_D2&apos;/&apos;COM_GRAVADA_D3&apos; para decidir si calcula IGV o retorna 0. Mismo mecanismo ya asumido por las fórmulas reales de Ventas (VTA_IGV_LINEA) — falta confirmar que el backend Go lo implementa igual para Compras.
+3.3 Destino D1/D2/D3 en Nota de Débito — Aumento de Valor y Penalidad
+A diferencia de Ventas (donde ND nunca necesita destino porque no existe &apos;crédito fiscal de venta&apos;), en Compras un Aumento de Valor o Penalidad gravado SÍ se suma al crédito fiscal del comprador y debe caer en el balde correcto. Por eso COM_ND_AUMENTO_VALOR y COM_ND_PENALIDAD se dividen en variantes _D1/_D2/_D3 (mismo patrón que COM_GRAVADA). COM_ND_INTERES_MORA queda único — es Inafecto (RTF 214-5-2000), nunca genera crédito fiscal, cae en monto_adq_no_grab.
+3.4 conceptos_comercial — validado, sin errores
+motor_concepto_id de conceptos_comercial NO clasifica el tipo de bien/servicio (eso lo hace tipo_afectacion_tributaria_id) — identifica a qué FUNCIONALIDAD pertenece el concepto (COM_CANTIDAD para COMP_NAC, variantes _NC/_ND para NC/ND). El filtro real del combo de cada pantalla es por tipo_afectacion_tributaria.grupo_operacion, no por el &apos;módulo&apos; de la fila — mismo patrón que Ventas/Honorarios.
+3.5 IVAP en Compras — no aplica, confirmado
+El IVAP (Ley 28211) es monofásico y NO otorga crédito fiscal al comprador (confirmado por Casación 17474-2023-Lima) — a diferencia de Ventas, donde IVAP sí es un tributo de salida a calcular. Si la empresa compra arroz pilado a quien ya pagó IVAP, el monto se absorbe como costo de adquisición (monto_base_imponible). No existe columna IVAP en Compras — no es un hueco.
+3.6 clasificacion_libro_igv — descartado del diseño
+El campo clasificacion_libro_igv que existía físicamente en cabecera_libro_compras NO correspondía al Destino del Crédito Fiscal (D1/D2/D3) — era el campo 33/Tabla 23 RCE (&apos;Clasificación de los Bienes y Servicios Adquiridos&apos;: mercadería, activo fijo, gastos), un eje totalmente distinto sin relación con crédito fiscal ni con detracciones (eso ya lo cubre tipo_bienes_servicios). Se ELIMINÓ del modelo (DROP COLUMN, sección 8). El Destino del Crédito Fiscal real se resuelve con 3 baldes de cabecera — ver sección 5.
+4. Notas de Crédito/Débito e Importación
+
+[TABLE]
+
+|ROW| Funcionalidad
+ || codigo_sunat
+ || grupo_operacion_conceptos
+ || Estado en frontend
+ || 
+|ROW| COMP_NAC
+ || 01
+ || COMPRA_NACIONAL
+ || Activo
+ || 
+|ROW| COMP_NAC_NOTA_CREDITO
+ || 07
+ || COMPRA_NACIONAL
+ || Activo
+ || 
+|ROW| COMP_NAC_NOTA_DEBITO
+ || 08
+ || COMPRA_NOTA_DEBITO
+ || Activo
+ || 
+|ROW| — (Importación, sin funcionalidad_sistema)
+ || —
+ || IMPORTACION_DUA (solo catálogo tipo_afectacion_tributaria)
+ || No existe pestaña — HU propia pendiente
+ || 
+[/TABLE]
+4.1 Configuración real de tipo_operacion_contable — 6 filas
+
+[TABLE]
+
+|ROW| Capítulo
+ || Funcionalidades
+ || Monedas
+ || Filas
+ || 
+|ROW| Nacional
+ || COMP_NAC (Factura), NOTA_CREDITO, NOTA_DEBITO
+ || Soles y Dólares
+ || 6
+ || 
+|ROW| Importación (solo catálogo tributario, sin tipo_operacion_contable)
+ || —
+ || —
+ || 0
+ || 
+[/TABLE]
+4.2 Validación de integridad — requiere_referencia en NC/ND
+Antes de permitir el registro de una NC o ND, el sistema valida que el tipo_documento_id resuelto por el tipo_operacion_contable elegido tenga requiere_referencia=true. Si no lo tiene, se bloquea con advertencia. Corre en DOS momentos: (1) al elegir el Tipo de Operación (UX temprana), y (2) en el guardado final server-side (garantía real). Con la data actual, codigo_sunat &apos;07&apos;/&apos;08&apos; ya tienen requiere_referencia=true.
+4.3 Proveedor obligatorio y bloqueado en NC/ND
+El Proveedor de la NC/ND se autocompleta desde el tercero_id del Documento de Referencia y queda bloqueado (solo informativo, no editable) — debe ser obligatoriamente el mismo proveedor de la factura original.
+4.4 Búsqueda de Documento de Referencia — solo CONTABILIZADO
+Solo considera documentos en estado CONTABILIZADO (no BORRADOR) — &apos;emitido&apos; equivale a CONTABILIZADO. Filtra también por: mismo Libro de Compras, mismo proveedor, y misma moneda del Tipo de Operación elegido.
+5. Destino del Crédito Fiscal (DG / DGNG / DNG)
+Sección específica de Compras — no tiene equivalente en Ventas. El RCE (Anexo 8 RS 040-2022/SUNAT, campos 15-20) reporta 3 pares de columnas físicas simultáneas por comprobante: DG (destino exclusivo a gravadas/exportación, crédito pleno), DGNG (destino mixto, sujeto a prorrata Art. 23 Ley IGV) y DNG (destino exclusivo a no gravadas, sin crédito). No es un código único — son 3 baldes que pueden llenarse simultáneamente en el mismo comprobante según cómo se distribuyan sus líneas.
+Ejemplo: una factura con una línea 100% DG y otra 100% DNG no se clasifica como &apos;mixta&apos; — cada línea aporta su base+IGV al balde que le corresponde. DGNG es solo para líneas cuyo destino, por naturaleza propia, ya es mixto (ej. un servicio que sirve a ambos tipos de operación).
+
+[TABLE]
+
+|ROW| Código
+ || Descripción
+ || Balde de cabecera
+ || 
+|ROW| COM_GRAVADA_D1
+ || Destinada exclusivamente a operaciones gravadas y/o exportación
+ || DG
+ || 
+|ROW| COM_GRAVADA_D2
+ || Destinada a operaciones gravadas y no gravadas (mixto)
+ || DGNG
+ || 
+|ROW| COM_GRAVADA_D3
+ || Destinada exclusivamente a operaciones no gravadas
+ || DNG
+ || 
+|ROW| COM_NO_GRAVADA
+ || Inafecta / exonerada
+ || monto_adq_no_grab (sin cambio)
+ || 
+[/TABLE]
+Motivo ↔ Concepto en Nota de Débito (CA): motivo_ajuste_documento (Catálogo 10 SUNAT, campo de DOCUMENTO) debe corresponderse con el concepto elegido en la línea:
+
+[TABLE]
+
+|ROW| Motivo (Catálogo 10)
+ || Concepto Comercial esperado
+ || 
+|ROW| 01 — Intereses moratorios
+ || COM_ND_INTERES_MORA
+ || 
+|ROW| 02 — Aumento en el valor
+ || COM_ND_AUMENTO_VALOR_D1 / _D2 / _D3
+ || 
+|ROW| 03 — Penalidades/otros
+ || COM_ND_PENALIDAD_D1 / _D2 / _D3
+ || 
+[/TABLE]
+Extensión de catálogo: el CHECK constraint ck_tipo_afectacion_grupo de tipo_afectacion_tributaria solo tenía VENTA_NOTA_DEBITO — se agregó COMPRA_NOTA_DEBITO a la lista permitida (sección 8).
+6. Otros Tributos
+monto_otros: casilla editable en cabecera para tributos/cargos que no forman parte de la base imponible, default 0.00, sin fórmula — mismo patrón que Ventas.
+monto_imb (campo 36 RCE, &apos;Impuesto materia de beneficio&apos;): corresponde al beneficio tributario de fomento a la actividad editorial (Art. 30 Ley 31053, num. 6 Art. 39 DS 08-2004-ED). Aplica solo a empresas acogidas a ese régimen (editoriales/imprentas de libros). Campo editable, opcional, sin validación en este BORRADOR.
+7. Detracciones
+
+[TABLE]
+
+|ROW| Regla
+ || Detalle
+ || 
+|ROW| Aplica a
+ || Solo tipo_documento.usa_detraccion=true (hoy solo Factura, codigo_sunat 01)
+ || 
+|ROW| Base de cálculo
+ || cabecera_libro_compras.monto_total_pais — nunca recalcula tipo de cambio propio
+ || 
+|ROW| Redondeo
+ || TRUNC(monto_total_pais × porcentaje_detraccion / 100, 0) — nunca ROUND()
+ || 
+|ROW| Selección de bien/servicio
+ || A NIVEL DE PROVEEDOR, vía terceros_tipo_bienes_servicios — si tiene más de uno, se listan al registrar la factura para que el usuario elija cuál aplica
+ || 
+|ROW| Umbral mínimo
+ || Varía por tipo de bien/servicio (tipo_bienes_servicios.monto_minimo) — no es constante global en Go
+ || 
+|ROW| Constancia posterior
+ || Pantalla separada (HU-104-AJUSTE-03, compartida con Ventas) — no reabre el comprobante
+ || 
+[/TABLE]
+7.1 La Nota de Crédito NO revierte la detracción
+Informe N° 103-2013-SUNAT/4B0000: la normativa del SPOT no estableció regla específica para este efecto; no corresponde devolución del importe ya depositado solo por emitir la NC. Recuperar los fondos requiere la Solicitud de Libre Disposición de Fondos (Art. 25, R.S. 183-2004/SUNAT).
+7.2 Patrón de cascada Empresa → Sucursal → Tipo de Operación
+Idéntico a Ventas: Empresa (Cerbero) → Sucursal (fija o cargada según configuracion_contable.usa_empresa_sucursal) → Tipo de Operación (fija Tipo Documento, Moneda, Correlativo de Libro y grupo_operacion que filtra Conceptos Comerciales).
+7.3 Periodo Contable y Ejercicio — validación de registro
+Infraestructura 100% compartida con Ventas — ejercicios.estado (ABIERTO/CERRADO) + configuracion_local_contable (empresa_id+ejercicio_id) para el rango de fechas. La Fecha de Registro (no la de Emisión) resuelve el periodo/ejercicio. Validación de registro — 2 checks activos: (a) Fecha de Registro dentro del rango fecha_inicio_contable/fecha_cierre_contable; (b) ejercicio resuelto no debe estar CERRADO.
+7.4 Guardado atómico — mapeo completo
+
+[TABLE]
+
+|ROW| Paso
+ || Tabla
+ || Qué se resuelve/inserta
+ || 
+|ROW| 1
+ || (resolución previa)
+ || Tipo de Operación → tipo_documento_id, moneda_id, tipo_correlativo_libro_id. Fecha de Registro → periodo_id.
+ || 
+|ROW| 2
+ || documentos_cta_cte
+ || Se inserta PRIMERO — bolsa compartida entre libros. Incluye tercero_id (proveedor), tipo_documento_id, serie/numero, fecha_emision, moneda_id, estado_id=&apos;BORRADOR&apos;. En NC/ND: documento_referencia_id = la factura original.
+ || 
+|ROW| 3
+ || cabecera_libro_compras
+ || documento_cta_cte_id (paso 2), fecha_registro, tipo_operacion_contable_id, periodo_id, los 3 baldes DG/DGNG/DNG + monto_adq_no_grab, monto_igv por balde, cantidad_bolsas, monto_imb, valor_diario_1/2, monto_total, estado_id=&apos;BORRADOR&apos;.
+ || 
+|ROW| 4
+ || detalle_libro_compras (N filas)
+ || cabecera_libro_compra_id (paso 3), concepto_comercial_id, cantidad, precio_unitario_origen, montos base/igv/isc/descuento _origen/_pais.
+ || 
+|ROW| 5
+ || detracciones (condicional)
+ || Solo si usa_detraccion=true y monto_total_pais &gt; monto_minimo. documento_cta_cte_id (paso 2), tercero_tipo_bienes_servicios_id elegido, monto_detraccion=TRUNC(...).
+ || 
+|ROW| 6
+ || correlativo_periodo_cache
+ || UPSERT numero_actual para tipo_correlativo_id=LBR_COMPRAS + periodo_id.
+ || 
+[/TABLE]
+7.5 Edición a nivel cabecera y detalle
+Editar una línea de detalle dispara un RECÁLCULO COMPLETO de los 3 baldes de cabecera (no incremental) — mismo patrón atómico que el guardado inicial. Edición simétrica (✏️, solo BORRADOR): campos que espejan a documentos_cta_cte son editables; Tipo de Operación/Serie/Número quedan bloqueados.
+7.6 Anulación lógica — regla transversal a TODOS los libros contables
+El evento Anular (🚫) solo procede en estado BORRADOR — regla TRANSVERSAL a Ventas, Compras, No Domiciliado y Honorarios. UPDATE en cascada a estado_id=&apos;ANULADO&apos;, preserva montos históricos, HTTP 422 si no está en BORRADOR.
+8. DDL — cambios de estructura acordados
+Script completo: SCRIPT-MAESTRO-HU-012-Registro_Compras.sql (ya ejecutado en base según confirmación de Eduardo, 2026-08-11).
+BEGIN;
+ALTER TABLE detalle_libro_compras ADD COLUMN IF NOT EXISTS uuid, precio_unitario_origen, monto_isc_origen/pais, monto_descuento_origen/pais, activo, 6 columnas de auditoría; RENAME concepto_gasto_id → concepto_comercial_id + FK a conceptos_comercial.
+ALTER TABLE tipo_afectacion_tributaria: extiende ck_tipo_afectacion_grupo agregando &apos;COMPRA_NOTA_DEBITO&apos;.
+ALTER TABLE cabecera_libro_compras: ADD cantidad_bolsas, car_sire, indicador_operacion_sire, indicador_estado_sire; ALTER estado_id SET DEFAULT &apos;BORRADOR&apos;; RENAME tipo_ajuste_rvie → tipo_ajuste_rce; RENAME monto_base_imponible_origen/pais → monto_base_dg_origen/pais; RENAME monto_igv_origen/pais → monto_igv_dg_origen/pais; ADD monto_base_dgng/dng + monto_igv_dgng/dng (origen/pais); DROP COLUMN clasificacion_libro_igv.
+COMMIT;
+8.1 Cambios específicos en detalle_libro_compras y cabecera_libro_compras
+Para que quede explícito: detalle_libro_compras pasa de 10 a 23 columnas (paridad con detalle_libro_ventas). cabecera_libro_compras reemplaza su único balde base+IGV por 3 baldes DG/DGNG/DNG y elimina clasificacion_libro_igv — es el cambio estructural más importante de esta HU (sección 5).
+9. Mockups gráficos — flujo paso a paso completo
+Mockups reales para que QA entienda el flujo completo desde la Pantalla Inicial hasta el Guardado, Edición y Anulación. Ruta de menú: Operaciones &gt; Registro de Compras.
+9.1 Pantalla Inicial (estándar nuevo — reemplaza el layout original de HU-011)
+Estándar confirmado por Eduardo en esta sesión: filtros de búsqueda por criterios avanzados (8 campos + Limpiar) en tarjeta separada, banner de advertencias de configuración condicional, tabla de resultados con contador. Este layout es el que debe usarse también retroactivamente en HU-011 (Ventas) — no el de pestañas con filtro simple que tenía la versión original.
+
+Figura 1 — Pantalla Inicial de Registro de Compras. RUC/Proveedor en vez de RUC/Cliente; columna PROVEEDOR en la grilla; SIRE 080100.
+9.2 Compra Nacional — paso a paso
+Paso 1 — Nuevo (Cabecera + Detalle)
+Desde la Pantalla Inicial, + Nuevo registro. La cascada Empresa → Sucursal → Tipo de Operación fija Tipo Documento, Moneda y Correlativo de Libro. El usuario completa Proveedor, fechas y el detalle de líneas (Concepto Comercial, Cantidad, Precio Unitario); Base e IGV se calculan solos vía Motor de Conceptos y se acumulan en el balde DG/DGNG/DNG correspondiente. Si el proveedor tiene detracción configurada, el sistema la calcula automáticamente sobre el total (TRUNC).
+
+Figura 2 — Compra Nacional, pantalla de Nuevo registro: Cabecera + Detalle + Totales por balde (DG/DNG/No Gravada en el ejemplo), botón Guardar.
+Paso 2 — Guardado
+Al presionar Guardar se ejecuta la transacción atómica de la sección 7.4. El documento queda en estado BORRADOR con su correlativo asignado. Mismo patrón visual que HU-011 (Figura 3): banner de éxito, documento en modo solo-lectura, acciones Volver/Editar/Anular.
+Paso 3 — Edición (Cabecera + Detalle) y Guardado
+Solo posible en BORRADOR. Tipo de Operación/Serie/Número bloqueados (🔒); resto editable. Al guardar, se recalculan los 3 baldes de cabecera completos (sección 7.5). Mismo patrón visual que HU-011 (Figura 4).
+Paso 4 — Anulación
+Disponible solo en BORRADOR (regla transversal, sección 7.6). Modal de confirmación antes del UPDATE en cascada a ANULADO — mismo patrón visual que HU-011 (Figura 5), adaptado a &apos;Registro de Compras&apos;.
+9.3 Nota de Crédito — paso a paso
+Diferencias clave frente a Compra Nacional: Documento de Referencia obligatorio (solo CONTABILIZADO — 4.4); Proveedor autocompletado y bloqueado (4.3); Motivo filtrado por Catálogo SUNAT 09 (13 motivos); Detalle hereda los conceptos de la factura original (grupo_operacion=COMPRA_NACIONAL). Guardado, Edición y Anulación siguen el mismo patrón visual que Compra Nacional (9.2) y que HU-011 Figuras 7-9.
+Importante — no confundir con la reversión de detracción: anular una NC nunca revierte una detracción ya depositada de la factura original (sección 7.1).
+9.4 Nota de Débito — paso a paso
+Igual que NC en Documento de Referencia obligatorio y Proveedor bloqueado, pero el Motivo usa el Catálogo SUNAT 10 (5 motivos) y el Detalle usa los conceptos PROPIOS de Nota de Débito (grupo_operacion=COMPRA_NOTA_DEBITO): Interés Moratorio (Inafecto, cae en monto_adq_no_grab) y Aumento de Valor / Penalidad por destino D1/D2/D3 (gravados, sección 3.3/5). Guardado, Edición y Anulación siguen el mismo patrón visual que HU-011 Figuras 11-13.
+9.5 Totales de cabecera y Constancias de Detracción (referencia adicional)
+La sección de totales de cabecera (3 baldes DG/DGNG/DNG + No Gravada) es la que se muestra a la derecha en el mockup de Cabecera+Detalle (Figura 2). La pantalla de Constancias de Detracción es independiente y compartida con Ventas (HU-104-AJUSTE-03) — no incluida en los mockups de esta HU.
+10. Criterios de aceptación
+CA.1 — IGV vía Motor de Conceptos
+DADO un concepto con afectación COM_GRAVADA_D1/D2/D3, CUANDO se ingresa cantidad y precio, ENTONCES COM_BASE_LINEA y COM_IGV_LINEA (18%) se calculan solos, en solo lectura, y se acumulan en el balde de cabecera correspondiente.
+CA.2 — Destino mixto se resuelve por balde, no por código único
+DADO un comprobante con una línea COM_GRAVADA_D1 y otra COM_GRAVADA_D3, ENTONCES cada línea suma su base+IGV al balde DG y DNG respectivamente — NUNCA se reclasifica todo el documento como &apos;mixto&apos; en un solo campo.
+CA.3 — clasificacion_libro_igv eliminado
+DADO cualquier registro nuevo de Compra, ENTONCES no existe ni se solicita el campo clasificacion_libro_igv (columna eliminada, sección 3.6/8).
+CA.4 — ICBPER optativo
+DADO Cantidad de Bolsas=0, ENTONCES COM_ICBPER_CAB=0 sin bloquear el guardado.
+CA.5 — IVAP no existe en Compras
+DADO cualquier registro de Compra, ENTONCES no existe ningún campo ni cálculo de IVAP — el monto pagado por IVAP al proveedor se ingresa como parte de COM_BASE_LINEA (costo), nunca como tributo aparte.
+CA.6 — Detracción truncada
+DADO monto_total_pais=2478.00 y porcentaje=12%, ENTONCES monto_detraccion=297 (TRUNC), nunca 297.36 ni 298.
+CA.7 — Detracción solo en Factura
+DADO un documento con tipo_documento.usa_detraccion=false, ENTONCES no se crea fila en detracciones.
+CA.8 — Múltiples tipos de bien/servicio
+DADO un proveedor con más de un tipo_bienes_servicios, ENTONCES se listan todos para que el usuario elija antes de guardar la factura.
+CA.9 — Constancia no reabre el documento
+DADO un registro de constancia_detraccion, ENTONCES solo se actualizan constancia_detraccion y fecha_deposito — ningún otro campo del documento.
+CA.10 — Filtro de Concepto Comercial por capítulo
+DADO un Tipo de Operación con grupo_operacion=COMPRA_NOTA_DEBITO, ENTONCES el combo de Concepto Comercial solo muestra COM_ND_INTERES_MORA, COM_ND_AUMENTO_VALOR_D1/D2/D3 y COM_ND_PENALIDAD_D1/D2/D3.
+CA.11 — Motivo corresponde al Concepto elegido en ND
+DADO Motivo=&apos;02 — Aumento en el valor&apos;, ENTONCES el sistema espera que la línea use COM_ND_AUMENTO_VALOR_D1/D2/D3 — advertir si no corresponde (sección 5).
+CA.12 — Resolución de periodo por Fecha de Registro
+DADO que el usuario ingresa la Fecha de Registro, ENTONCES el sistema resuelve el periodo/ejercicio contable a partir de ESA fecha (no de la Fecha de Emisión).
+CA.13 — Bloqueo por rango de imputación cerrado
+DADO que la Fecha de Registro no cae dentro del rango de configuracion_local_contable, ENTONCES se muestra advertencia y no se permite el registro.
+CA.14 — Bloqueo por ejercicio cerrado
+DADO que el ejercicio resuelto tiene estado=&apos;CERRADO&apos;, ENTONCES se bloquea el registro sin evaluar el rango de fechas.
+CA.15 — Recálculo completo al editar detalle
+DADO que se edita una línea de detalle en un documento BORRADOR, ENTONCES los 3 baldes de cabecera se recalculan y regraban en la misma transacción.
+CA.16 — Anulación solo en BORRADOR (todos los libros)
+DADO un documento en cualquier libro contable que NO está en BORRADOR, ENTONCES el intento de Anular devuelve HTTP 422 y no se ejecuta.
+CA.17 — requiere_referencia en NC/ND (doble check)
+DADO un Tipo de Operación de NC/ND cuyo tipo_documento resuelto tiene requiere_referencia=false, ENTONCES el sistema bloquea al seleccionar el Tipo de Operación Y en el guardado final server-side.
+CA.18 — Proveedor bloqueado en NC/ND
+DADO que el usuario selecciona un Documento de Referencia, ENTONCES el campo Proveedor se autocompleta con el tercero_id de ese documento y queda no editable.
+CA.19 — Búsqueda de Documento de Referencia solo CONTABILIZADO
+DADO la búsqueda de Documento de Referencia en NC/ND, ENTONCES solo se muestran documentos en estado CONTABILIZADO, del mismo proveedor y de la misma moneda del Tipo de Operación elegido.
+CA.20 — Importación fuera del frontend
+DADO el catálogo tipo_afectacion_tributaria grupo IMPORTACION_DUA, ENTONCES no existe ninguna pestaña, funcionalidad_sistema ni tipo_operacion_contable asociado — los códigos existen solo para uso futuro.
+CA.21 — Pantalla Inicial con estándar de filtros
+DADO el ingreso a Registro de Compras, ENTONCES se muestran los 8 filtros de búsqueda avanzada (Empresa, Sucursal, RUC/Proveedor, Periodo contable, Correlativo auxiliar, Emisión desde/hasta, Estado) + botón Limpiar, mismo estándar que Ventas (sección 9.1).
+11. Anexo Técnico — resumen
+Tokens derivados de JOIN (COM_CODIGO_AFECTACION_LINEA, COM_ISC_LINEA): mecanismo asumido por analogía con Ventas (sección 3.2) — falta confirmación del backend Go.
+Filtro de Concepto Comercial por grupo_operacion — regla ya validada en Ventas, aplica igual aquí.
+Destino del Crédito Fiscal (DG/DGNG/DNG) — 3 baldes de cabecera, no un código único (sección 5) — cambio estructural más relevante de esta HU.
+Umbral de Detracción — confirmado como tipo_bienes_servicios.monto_minimo variable, no constante Go.
+IMB (campo 36 RCE) — confirmado, beneficio Ley 31053, campo de nicho sin validación.
+Guardado atómico de tablas (documentos_cta_cte → cabecera_libro_compras → detalle_libro_compras → detracciones → correlativo_periodo_cache) — sección 7.4.
+12. Pendientes abiertos
+12.1 Pendientes técnicos inmediatos
+COM_ISC_LINEA — bloqueado por el mecanismo de COM_CODIGO_AFECTACION_LINEA (sección 3.1/3.2).
+Confirmar que el backend Go ya resuelve COM_CODIGO_AFECTACION_LINEA vía el JOIN asumido.
+Confirmar si el filtro de Concepto Comercial por grupo_operacion ya está construido en el frontend React para Compras (ya existe para Ventas).
+monto_imb — validar con desarrollo si algún cliente real está acogido al beneficio Ley 31053 antes de exponerlo en UI.
+12.2 Temas pendientes para más adelante (deferred, no bloquean esta HU)
+Retención de IGV (R.S. 037-2002, monto_retencion_igv_pais) — decisión explícita de no implementar por ahora.
+Registro de Compras — Operaciones con Sujetos No Domiciliados — tabla y flujo propios, HU independiente.
+Importaciones (DAM) — requiere HU propia con carpetas_importacion, detalle_costos_importacion y dam_id; solo el catálogo tributario queda precargado.
+Saldo pendiente con NC/ND — mismo pendiente heredado de Ventas, no resuelto aún para ningún libro.
+Tipo de cambio venta/compra configurable por funcionalidad — regla global cerrada (valor_diario_1), no se reabre ahora.
+Retrofit de la Pantalla Inicial (sección 9.1) en HU-011 (Ventas) — mismo estándar de filtros, pendiente de aplicar.
+13. Referencia de archivos de esta serie
+
+[TABLE]
+
+|ROW| Archivo
+ || Contenido
+ || 
+|ROW| SCRIPT-MAESTRO-HU-012-Registro_Compras.sql
+ || Script de datos VIGENTE — 100% aditivo, ya ejecutado en base (2026-08-11).
+ || 
+|ROW| HU-011 — Libro Ventas (Borrador Mejorada).docx
+ || Documento hermano — mismo tenor y estructura, Registro de Ventas.
+ || 
+|ROW| modelo_datos_lumina_actualizado.md / DATOS-MAESTROS-LUMINA.md / REGLAS-NEGOCIO-LUMINA.md
+ || 3 archivos vivos del proyecto — actualizar con los cambios de esta versión y volver a subir manualmente.
+ || 
+[/TABLE]
