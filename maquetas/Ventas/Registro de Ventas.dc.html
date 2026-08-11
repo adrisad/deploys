@@ -228,8 +228,12 @@
             </div>
 
             <div style="margin-bottom: 16px;">
-              <div style="font-size: 12px; color: #8b93a1; margin-bottom: 6px;">🔒 Tipo de Operación</div>
-              <div style="background: #0d0d10; border: 1px solid #2c2c32; border-radius: 8px; padding: 11px 12px; font-size: 14px; color: #7d8390;">{{ tipoOperacionActual.label }}</div>
+              <div style="font-size: 12px; color: #8b93a1; margin-bottom: 6px;">Tipo de Operación *</div>
+              <select value="{{ form.tipoOperacionId }}" onChange="{{ onTipoOperacion }}" style="width: 100%; box-sizing: border-box; background: #0d0d10; border: 1px solid #2c2c32; border-radius: 8px; padding: 11px 12px; font-size: 14px; color: #f4f4f6;">
+                <sc-for list="{{ tiposOperacionDisponibles }}" as="op" hint-placeholder-count="1">
+                  <option value="{{ op.id }}">{{ op.label }}</option>
+                </sc-for>
+              </select>
             </div>
 
             <sc-if value="{{ esNCND }}" hint-placeholder-val="{{ false }}">
@@ -492,14 +496,9 @@
 }">
 class Component extends DCLogic {
   tiposOperacion = [
-    { id: 55, grupo: 'VENTA_NACIONAL', label: '55 - Factura Venta Nacional (Soles)', tipoDocumento: '01 - FACTURA', moneda: 'SOLES', tasa: 1.0, requiereReferencia: false, usaDetraccion: true },
-    { id: 56, grupo: 'VENTA_NACIONAL', label: '56 - Factura Venta Nacional (Dólares)', tipoDocumento: '01 - FACTURA', moneda: 'DÓLARES', tasa: 3.752, requiereReferencia: false, usaDetraccion: true },
-    { id: 57, grupo: 'VENTA_NACIONAL', label: '57 - Boleta Venta Nacional (Soles)', tipoDocumento: '03 - BOLETA', moneda: 'SOLES', tasa: 1.0, requiereReferencia: false, usaDetraccion: false },
-    { id: 58, grupo: 'VENTA_NACIONAL', label: '58 - Boleta Venta Nacional (Dólares)', tipoDocumento: '03 - BOLETA', moneda: 'DÓLARES', tasa: 3.752, requiereReferencia: false, usaDetraccion: false },
-    { id: 80, grupo: 'NOTA_CREDITO', label: '80 - Nota de Crédito Venta Nacional (Soles)', tipoDocumento: '07 - NOTA DE CRÉDITO', moneda: 'SOLES', tasa: 1.0, requiereReferencia: true, usaDetraccion: false, conceptosGrupo: 'VENTA_NACIONAL', catalogoMotivo: 9 },
-    { id: 82, grupo: 'NOTA_CREDITO', label: '82 - Nota de Crédito Venta Nacional (Dólares)', tipoDocumento: '07 - NOTA DE CRÉDITO', moneda: 'DÓLARES', tasa: 3.752, requiereReferencia: true, usaDetraccion: false, conceptosGrupo: 'VENTA_NACIONAL', catalogoMotivo: 9 },
-    { id: 81, grupo: 'NOTA_DEBITO', label: '81 - Nota de Débito Venta Nacional (Soles)', tipoDocumento: '08 - NOTA DE DÉBITO', moneda: 'SOLES', tasa: 1.0, requiereReferencia: true, usaDetraccion: false, conceptosGrupo: 'VENTA_NOTA_DEBITO', catalogoMotivo: 10 },
-    { id: 83, grupo: 'NOTA_DEBITO', label: '83 - Nota de Débito Venta Nacional (Dólares)', tipoDocumento: '08 - NOTA DE DÉBITO', moneda: 'DÓLARES', tasa: 3.752, requiereReferencia: true, usaDetraccion: false, conceptosGrupo: 'VENTA_NOTA_DEBITO', catalogoMotivo: 10 },
+    { id: 55, grupo: 'VENTA_NACIONAL', label: 'Venta Nacional - Factura - Soles', tipoDocumento: '01 - FACTURA', moneda: 'SOLES', tasa: 1.0, requiereReferencia: false, usaDetraccion: true },
+    { id: 80, grupo: 'NOTA_CREDITO', label: 'Nota de Crédito de Venta Nacional - Soles', tipoDocumento: '07 - NOTA DE CRÉDITO', moneda: 'SOLES', tasa: 1.0, requiereReferencia: true, usaDetraccion: false, conceptosGrupo: 'VENTA_NACIONAL', catalogoMotivo: 9 },
+    { id: 81, grupo: 'NOTA_DEBITO', label: 'Nota de Débito de Venta Nacional - Soles', tipoDocumento: '08 - NOTA DE DÉBITO', moneda: 'SOLES', tasa: 1.0, requiereReferencia: true, usaDetraccion: false, conceptosGrupo: 'VENTA_NOTA_DEBITO', catalogoMotivo: 10 },
   ];
   conceptos = [
     { id: 610, label: '610 - Venta de Mercadería Nacional', grupo: 'VENTA_NACIONAL', gravada: true, afectacion: 'Gravada' },
@@ -621,7 +620,7 @@ class Component extends DCLogic {
     const hoy = new Date().toISOString().slice(0, 10);
     this.setState({
       modal: 'nuevo', step: 1,
-      form: { id: null, grupo, tipoOperacionId: this.tiposOperacion.filter(t => t.grupo === grupo)[0].id, terceroId: '', empresaId: 24, sucursalId: 19, serie, numero, fechaEmision: hoy, fechaVencimiento: this.addDays(hoy, 30), fechaRegistro: hoy, motivoId: '', docRefId: '', cantidadBolsas: 0, lineas: [] },
+      form: { id: null, grupo, tipoOperacionId: this.tiposOperacion.filter(t => t.grupo === grupo)[0].id, terceroId: '', empresaId: 24, sucursalId: 19, serie, numero, fechaEmision: hoy, fechaVencimiento: this.addDays(hoy, 30), fechaRegistro: hoy, motivoId: '', docRefId: '', cantidadBolsas: 0, lineas: [] }, // 3 estados: Factura/Boleta/Exportación por grupo
       terceroSearchText: '', terceroDropdownAbierto: false,
       empresaSearchText: '24 - INVERSIONES GLOBALES PERU S.A.', empresaDropdownAbierto: false,
       sucursalSearchText: '19 - SEDE OPERATIVA SUR COSTA', sucursalDropdownAbierto: false,
@@ -795,9 +794,10 @@ class Component extends DCLogic {
     const filtroSucursalOpciones = this.sucursales.filter(s => s.label.toLowerCase().includes((this.state.filtroSucursalSearchText || '').toLowerCase())).map(s => ({ ...s, onSelect: () => this.onFiltroSucursal(s.id) }));
 
     if (form) {
-      esNCND = form.grupo === 'NOTA_CREDITO' || form.grupo === 'NOTA_DEBITO';
-      const tiposOperacionDisponibles = this.tiposOperacion.filter(t => t.grupo === form.grupo);
-      const tipoOp = this.tiposOperacion.find(t => t.id === Number(form.tipoOperacionId)) || tiposOperacionDisponibles[0];
+      const grupoSeleccionado = (this.tiposOperacion.find(t => t.id === Number(form.tipoOperacionId)) || {}).grupo || form.grupo;
+      esNCND = grupoSeleccionado === 'NOTA_CREDITO' || grupoSeleccionado === 'NOTA_DEBITO';
+      const tiposOperacionDisponibles = this.tiposOperacion;
+      const tipoOp = this.tiposOperacion.find(t => t.id === Number(form.tipoOperacionId)) || this.tiposOperacion.find(t => t.grupo === form.grupo);
       tipoOperacionActual = tipoOp || tipoOperacionActual;
       const tercero = this.terceros.find(t => t.id === Number(form.terceroId));
       conceptosDisponibles = tipoOp ? this.conceptos.filter(c => c.grupo === (tipoOp.conceptosGrupo || tipoOp.grupo)) : [];
@@ -882,7 +882,7 @@ class Component extends DCLogic {
       serieNumeroBloqueado: this.state.modal === 'editar',
       tabActivaLabel: activeTab === 'NOTA_CREDITO' ? 'Notas de Crédito' : activeTab === 'NOTA_DEBITO' ? 'Notas de Débito' : 'Venta Nacional',
       wizardModo: this.state.modal === 'editar' ? 'Editar' : 'Nuevo',
-      esNCND, tipoOperacionActual, tiposOperacionDisponibles: form ? this.tiposOperacion.filter(t => t.grupo === form.grupo) : [], onTipoOperacion: (e) => this.onTipoOperacion(e),
+      esNCND, tipoOperacionActual, tiposOperacionDisponibles: this.tiposOperacion, onTipoOperacion: (e) => this.onTipoOperacion(e),
       detraccionTipoLabel: detraccion ? `${detraccion.tipoBienServicio} (${detraccion.porcentaje}%)` : 'No aplica',
       detraccionMontoLabel: detraccion ? `S/ ${detraccion.montoLabel}` : '—',
       detraccionColor: detraccion ? '#f4f4f6' : '#5b6270', detraccionMontoColor: detraccion ? '#eab308' : '#5b6270',
