@@ -16,23 +16,32 @@
 </helmet>
 <div style="min-height: 100vh; background: #0a0a0c; color: #f4f4f6; font-family: -apple-system, 'Helvetica Neue', Helvetica, Arial, sans-serif; padding: 40px 48px;">
 
-  <div style="display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 28px; gap: 24px; flex-wrap: wrap;">
+  <div style="display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 20px; gap: 24px; flex-wrap: wrap;">
     <div>
-      <div style="font-size: 34px; font-weight: 800; color: #ffffff; letter-spacing: -0.02em;">Registro de Ventas e Ingresos</div>
-      <div style="font-size: 15px; color: {{ accent }}; margin-top: 6px;">Libro de Ventas — Fase Borrador · SIRE 140000</div>
+      <div style="font-size: 34px; font-weight: 800; color: #ffffff; letter-spacing: -0.02em;">Registro de Ventas</div>
+      
     </div>
     <button onClick="{{ openNuevo }}" style="display: flex; align-items: center; gap: 8px; background: {{ accent }}; color: #ffffff; border: none; padding: 13px 22px; border-radius: 10px; font-size: 15px; font-weight: 700; cursor: pointer;" style-hover="filter: brightness(1.1);">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14"></path><path d="M5 12h14"></path></svg>
-      Nuevo Registro
+      Nuevo
     </button>
   </div>
 
+  <div style="display: flex; gap: 6px; margin-bottom: 20px; border-bottom: 1px solid #232328;">
+    <sc-for list="{{ tabs }}" as="tab" hint-placeholder-count="3">
+      <button onClick="{{ tab.onSelect }}" style="background: none; border: none; border-bottom: 2px solid {{ tab.borderColor }}; color: {{ tab.textColor }}; padding: 12px 18px; font-size: 14px; font-weight: 700; cursor: pointer; margin-bottom: -1px;">{{ tab.label }}</button>
+    </sc-for>
+    <div title="Requiere an\u00e1lisis legal adicional antes de habilitarse" style="display: flex; align-items: center; gap: 6px; color: #4b5160; padding: 12px 18px; font-size: 14px; font-weight: 700;">
+      🔒 Exportación
+    </div>
+  </div>
+
   <div style="background: #151518; border: 1px solid #28282d; border-radius: 14px; padding: 24px; margin-bottom: 24px;">
-    <div style="font-size: 12px; font-weight: 700; letter-spacing: 0.06em; color: #8b93a1; text-transform: uppercase; margin-bottom: 14px;">Filtros de Búsqueda por Criterios Avanzados</div>
+    <div style="font-size: 12px; font-weight: 700; letter-spacing: 0.06em; color: #8b93a1; text-transform: uppercase; margin-bottom: 14px;">Filtros de Búsqueda por Criterios</div>
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; margin-bottom: 14px;">
       <div style="position: relative;">
         <div style="font-size: 12px; color: #8b93a1; margin-bottom: 6px;">Empresa</div>
-        <input value="{{ filtroEmpresaSearchText }}" onChange="{{ onFiltroEmpresaSearch }}" onFocus="{{ onFiltroEmpresaFocus }}" placeholder="Buscar empresa..." style="width: 100%; box-sizing: border-box; background: #0d0d10; border: 1px solid #2c2c32; border-radius: 8px; padding: 11px 34px 11px 12px; font-size: 14px; color: #f4f4f6;"/>
+        <input value="{{ filtroEmpresaSearchText }}" onChange="{{ onFiltroEmpresaSearch }}" onFocus="{{ onFiltroEmpresaFocus }}" placeholder="Buscar empresa..." style="width: 100%; box-sizing: border-box; background: #0d0d10; border: 1px solid #2c2c32; border-radius: 8px; padding: 11px 34px 11px 12px; font-size: 14px; color: #f4f4f6;">
         <sc-if value="{{ filtroEmpresaId }}" hint-placeholder-val="{{ false }}">
           <button onClick="{{ onFiltroEmpresaClear }}" style="position: absolute; right: 8px; top: 34px; background: none; border: none; color: #8b93a1; cursor: pointer; padding: 4px; display: flex;">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6 6 18"></path><path d="M6 6l12 12"></path></svg>
@@ -50,8 +59,8 @@
         </sc-if>
       </div>
       <div style="position: relative;">
-        <div style="font-size: 12px; color: #8b93a1; margin-bottom: 6px;">Sucursal Operativa</div>
-        <input value="{{ filtroSucursalSearchText }}" onChange="{{ onFiltroSucursalSearch }}" onFocus="{{ onFiltroSucursalFocus }}" placeholder="Buscar sucursal..." style="width: 100%; box-sizing: border-box; background: #0d0d10; border: 1px solid #2c2c32; border-radius: 8px; padding: 11px 34px 11px 12px; font-size: 14px; color: #f4f4f6;"/>
+        <div style="font-size: 12px; color: #8b93a1; margin-bottom: 6px;">Sucursal</div>
+        <input value="{{ filtroSucursalSearchText }}" onChange="{{ onFiltroSucursalSearch }}" onFocus="{{ onFiltroSucursalFocus }}" placeholder="Buscar sucursal..." style="width: 100%; box-sizing: border-box; background: #0d0d10; border: 1px solid #2c2c32; border-radius: 8px; padding: 11px 34px 11px 12px; font-size: 14px; color: #f4f4f6;">
         <sc-if value="{{ filtroSucursalId }}" hint-placeholder-val="{{ false }}">
           <button onClick="{{ onFiltroSucursalClear }}" style="position: absolute; right: 8px; top: 34px; background: none; border: none; color: #8b93a1; cursor: pointer; padding: 4px; display: flex;">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6 6 18"></path><path d="M6 6l12 12"></path></svg>
@@ -69,12 +78,12 @@
         </sc-if>
       </div>
       <div>
-        <div style="font-size: 12px; color: #8b93a1; margin-bottom: 6px;">RUC / Cliente</div>
-        <input value="{{ filtroRuc }}" onChange="{{ onFiltroRuc }}" placeholder="Buscar por RUC o razón social..." style="width: 100%; box-sizing: border-box; background: #0d0d10; border: 1px solid #2c2c32; border-radius: 8px; padding: 11px 12px; font-size: 14px; color: #f4f4f6;"/>
+        <div style="font-size: 12px; color: #8b93a1; margin-bottom: 6px;">Cliente</div>
+        <input value="{{ filtroCliente }}" onChange="{{ onFiltroCliente }}" placeholder="Buscar por RUC o razón social..." style="width: 100%; box-sizing: border-box; background: #0d0d10; border: 1px solid #2c2c32; border-radius: 8px; padding: 11px 12px; font-size: 14px; color: #f4f4f6;">
       </div>
       <div>
-        <div style="font-size: 12px; color: #8b93a1; margin-bottom: 6px;">Correlativo Auxiliar</div>
-        <input value="{{ filtroCorrelativo }}" onChange="{{ onFiltroCorrelativo }}" placeholder="VTA-202607-0000" style="width: 100%; box-sizing: border-box; background: #0d0d10; border: 1px solid #2c2c32; border-radius: 8px; padding: 11px 12px; font-size: 14px; color: #f4f4f6;"/>
+        <div style="font-size: 12px; color: #8b93a1; margin-bottom: 6px;">Serie-Número</div>
+        <input value="{{ filtroSerieNumero }}" onChange="{{ onFiltroSerieNumero }}" placeholder="F001-00001542" style="width: 100%; box-sizing: border-box; background: #0d0d10; border: 1px solid #2c2c32; border-radius: 8px; padding: 11px 12px; font-size: 14px; color: #f4f4f6;">
       </div>
       <div>
         <div style="font-size: 12px; color: #8b93a1; margin-bottom: 6px;">Estado del Documento</div>
@@ -86,12 +95,12 @@
         </select>
       </div>
       <div>
-        <div style="font-size: 12px; color: #8b93a1; margin-bottom: 6px;">Emisión desde</div>
-        <input type="date" value="{{ filtroFechaDesde }}" onChange="{{ onFiltroFechaDesde }}" style="width: 100%; box-sizing: border-box; background: #0d0d10; border: 1px solid #2c2c32; border-radius: 8px; padding: 10px 12px; font-size: 14px; color: #f4f4f6; color-scheme: dark;"/>
+        <div style="font-size: 12px; color: #8b93a1; margin-bottom: 6px;">Fecha Registro desde</div>
+        <input type="date" value="{{ filtroFechaDesde }}" onChange="{{ onFiltroFechaDesde }}" style="width: 100%; box-sizing: border-box; background: #0d0d10; border: 1px solid #2c2c32; border-radius: 8px; padding: 10px 12px; font-size: 14px; color: #f4f4f6; color-scheme: dark;">
       </div>
       <div>
-        <div style="font-size: 12px; color: #8b93a1; margin-bottom: 6px;">Emisión hasta</div>
-        <input type="date" value="{{ filtroFechaHasta }}" onChange="{{ onFiltroFechaHasta }}" style="width: 100%; box-sizing: border-box; background: #0d0d10; border: 1px solid #2c2c32; border-radius: 8px; padding: 10px 12px; font-size: 14px; color: #f4f4f6; color-scheme: dark;"/>
+        <div style="font-size: 12px; color: #8b93a1; margin-bottom: 6px;">Fecha Registro hasta</div>
+        <input type="date" value="{{ filtroFechaHasta }}" onChange="{{ onFiltroFechaHasta }}" style="width: 100%; box-sizing: border-box; background: #0d0d10; border: 1px solid #2c2c32; border-radius: 8px; padding: 10px 12px; font-size: 14px; color: #f4f4f6; color-scheme: dark;">
       </div>
     </div>
     <div style="display: flex; gap: 10px;">
@@ -100,20 +109,22 @@
   </div>
 
   <div style="background: #151518; border: 1px solid #28282d; border-radius: 14px; overflow: hidden;">
-    <div style="display: grid; grid-template-columns: 1.4fr 1.6fr 1fr 1fr 1fr 1fr; padding: 16px 22px; border-bottom: 1px solid #232328;">
-      <div style="font-size: 11px; font-weight: 700; letter-spacing: 0.07em; color: #8b93a1; text-transform: uppercase;">Folio Auxiliar</div>
+    <div style="display: grid; grid-template-columns: 1fr 1.4fr 1.6fr 0.8fr 1fr 1fr 0.9fr; padding: 16px 22px; border-bottom: 1px solid #232328;">
+      <div style="font-size: 11px; font-weight: 700; letter-spacing: 0.07em; color: #8b93a1; text-transform: uppercase;">Fecha Emisión</div>
+      <div style="font-size: 11px; font-weight: 700; letter-spacing: 0.07em; color: #8b93a1; text-transform: uppercase;">Serie-Número</div>
       <div style="font-size: 11px; font-weight: 700; letter-spacing: 0.07em; color: #8b93a1; text-transform: uppercase;">Cliente</div>
-      <div style="font-size: 11px; font-weight: 700; letter-spacing: 0.07em; color: #8b93a1; text-transform: uppercase;">Emisión</div>
+      <div style="font-size: 11px; font-weight: 700; letter-spacing: 0.07em; color: #8b93a1; text-transform: uppercase;">Moneda</div>
       <div style="font-size: 11px; font-weight: 700; letter-spacing: 0.07em; color: #8b93a1; text-transform: uppercase;">Total</div>
       <div style="font-size: 11px; font-weight: 700; letter-spacing: 0.07em; color: #8b93a1; text-transform: uppercase;">Estado</div>
       <div style="font-size: 11px; font-weight: 700; letter-spacing: 0.07em; color: #8b93a1; text-transform: uppercase; text-align: right;">Acciones</div>
     </div>
     <sc-for list="{{ filasTabla }}" as="fila" hint-placeholder-count="2">
-      <div style="display: grid; grid-template-columns: 1.4fr 1.6fr 1fr 1fr 1fr 1fr; align-items: center; padding: 18px 22px; border-bottom: 1px solid #1d1d21;">
-        <div style="font-size: 14px; font-weight: 700; color: {{ accent }};">{{ fila.folio }}</div>
-        <div style="font-size: 14px; color: #eceef1;">{{ fila.clienteLabel }}</div>
+      <div style="display: grid; grid-template-columns: 1fr 1.4fr 1.6fr 0.8fr 1fr 1fr 0.9fr; align-items: center; padding: 18px 22px; border-bottom: 1px solid #1d1d21;">
         <div style="font-size: 14px; color: #b4b9c2;">{{ fila.fechaEmision }}</div>
-        <div style="font-size: 14px; color: #eceef1; font-variant-numeric: tabular-nums;">S/ {{ fila.totalLabel }}</div>
+        <div style="font-size: 14px; font-weight: 700; color: {{ accent }};">{{ fila.serieNumero }}</div>
+        <div style="font-size: 14px; color: #eceef1;">{{ fila.clienteLabel }}</div>
+        <div style="font-size: 13px; color: #8b93a1;">{{ fila.moneda }}</div>
+        <div style="font-size: 14px; color: #eceef1; font-variant-numeric: tabular-nums;">{{ fila.totalLabel }}</div>
         <div>
           <span style="display: inline-flex; align-items: center; gap: 6px; background: {{ fila.estadoBg }}; color: {{ fila.estadoColor }}; padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: 700;">
             <span style="width: 6px; height: 6px; border-radius: 50%; background: {{ fila.estadoColor }};"></span>
@@ -124,16 +135,12 @@
           <button onClick="{{ fila.onVer }}" title="Ver" style="background: none; border: none; color: #d1d5db; cursor: pointer; padding: 4px;">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z"></path><circle cx="12" cy="12" r="3"></circle></svg>
           </button>
-          <sc-if value="{{ fila.puedeEditar }}" hint-placeholder-val="{{ true }}">
-            <button onClick="{{ fila.onEditar }}" title="Editar" style="background: none; border: none; color: #d1d5db; cursor: pointer; padding: 4px;">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"></path></svg>
-            </button>
-          </sc-if>
-          <sc-if value="{{ fila.puedeEditar }}" hint-placeholder-val="{{ true }}">
-            <button onClick="{{ fila.onAnular }}" title="Anular" style="background: none; border: none; color: #ef4444; cursor: pointer; padding: 4px;">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"></path><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"></path></svg>
-            </button>
-          </sc-if>
+          <button onClick="{{ fila.onEditar }}" disabled="{{ fila.accionesDeshabilitadas }}" title="Editar" style="background: none; border: none; color: {{ fila.accionColor }}; cursor: {{ fila.accionCursor }}; padding: 4px;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"></path></svg>
+          </button>
+          <button onClick="{{ fila.onAnular }}" disabled="{{ fila.accionesDeshabilitadas }}" title="Anular" style="background: none; border: none; color: {{ fila.accionAnularColor }}; cursor: {{ fila.accionCursor }}; padding: 4px;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"></path><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"></path></svg>
+          </button>
         </div>
       </div>
     </sc-for>
@@ -144,26 +151,45 @@
 
   <sc-if value="{{ wizardAbierto }}" hint-placeholder-val="{{ false }}">
     <div style="position: fixed; inset: 0; background: rgba(0,0,0,0.65); display: flex; align-items: center; justify-content: center; padding: 24px; z-index: 50; overflow: auto;">
-      <div style="background: #151518; border: 1px solid #28282d; border-radius: 16px; width: 100%; max-width: 980px; max-height: 92vh; overflow: auto; padding: 32px;">
-        <div style="font-size: 20px; font-weight: 800; color: #ffffff; margin-bottom: 4px;">{{ wizardTitulo }}</div>
-        <div style="font-size: 13px; color: #8b93a1; margin-bottom: 24px;">Fase Borrador — Estado: BORRADOR</div>
+      <div style="background: #151518; border: 1px solid #28282d; border-radius: 16px; width: 100%; max-width: 1020px; max-height: 92vh; overflow: auto; padding: 32px;">
 
-        <div style="display: flex; gap: 8px; margin-bottom: 28px;">
-          <sc-for list="{{ pasos }}" as="paso" hint-placeholder-count="3">
-            <div style="flex: 1; display: flex; flex-direction: column; gap: 8px;">
-              <div style="height: 4px; border-radius: 2px; background: {{ paso.barColor }};"></div>
-              <div style="font-size: 12px; font-weight: 700; color: {{ paso.textColor }};">{{ paso.label }}</div>
-            </div>
-          </sc-for>
-        </div>
-
-        <sc-if value="{{ enPaso1 }}" hint-placeholder-val="{{ true }}">
+        <sc-if value="{{ enPasoGuardado }}" hint-placeholder-val="{{ false }}">
           <div>
-            <div style="font-size: 12px; font-weight: 700; letter-spacing: 0.06em; color: #8b93a1; text-transform: uppercase; margin-bottom: 14px;">Cabecera del Documento</div>
+            <div style="display: flex; align-items: center; gap: 12px; background: #0f2e1a; border: 1px solid #1d4a2c; border-radius: 10px; padding: 16px 18px; margin-bottom: 24px;">
+              <span style="font-size: 20px;">✅</span>
+              <div>
+                <div style="font-size: 14px; font-weight: 700; color: #4ade80;">Documento guardado correctamente</div>
+                <div style="font-size: 13px; color: #9aa1ae; margin-top: 2px;">{{ form.serie }}-{{ form.numero }} quedó en estado BORRADOR con su correlativo asignado.</div>
+              </div>
+            </div>
+            <div style="font-size: 12px; font-weight: 700; letter-spacing: 0.06em; color: #8b93a1; text-transform: uppercase; margin-bottom: 14px;">Resumen del Documento (solo lectura)</div>
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 20px; background: #0f0f12; border: 1px solid #232328; border-radius: 10px; padding: 16px;">
+              <div><div style="font-size: 11px; color: #8b93a1;">Cliente</div><div style="font-size: 14px; color: #eceef1; margin-top: 4px;">{{ form.clienteLabel }}</div></div>
+              <div><div style="font-size: 11px; color: #8b93a1;">Comprobante</div><div style="font-size: 14px; color: #eceef1; margin-top: 4px;">{{ form.serie }}-{{ form.numero }}</div></div>
+              <div><div style="font-size: 11px; color: #8b93a1;">Total</div><div style="font-size: 14px; color: {{ accent }}; font-weight: 700; margin-top: 4px;">S/ {{ totalesPreview.total }}</div></div>
+            </div>
+            <div style="display: flex; justify-content: flex-end; gap: 10px;">
+              <button onClick="{{ irAnularDesdeGuardado }}" style="background: none; border: 1px solid #3a1414; color: #f87171; padding: 11px 20px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer;">🚫 Anular</button>
+              <button onClick="{{ irEditarDesdeGuardado }}" style="background: #1c1c21; border: 1px solid #2c2c32; color: #d1d5db; padding: 11px 20px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer;">✏️ Editar</button>
+              <button onClick="{{ cerrarWizard }}" style="background: {{ accent }}; border: none; color: #ffffff; padding: 11px 22px; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer;">Volver</button>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ enPasoGuardado }}" hint-placeholder-val="{{ false }}">
+        </sc-if>
+        <sc-if value="{{ mostrarPasosForm }}" hint-placeholder-val="{{ true }}">
+        <div>
+        <div style="font-size: 13px; color: #8b93a1; margin-bottom: 4px;">Operaciones &gt; Registro de Ventas &gt; {{ tabActivaLabel }} &gt; {{ wizardModo }}</div>
+        <div style="font-size: 20px; font-weight: 800; color: #ffffff; margin-bottom: 24px;">{{ wizardTitulo }}</div>
+
+        <div>
+          <div>
+            <div style="font-size: 12px; font-weight: 700; letter-spacing: 0.06em; color: #8b93a1; text-transform: uppercase; margin-bottom: 14px;">Cabecera</div>
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
               <div style="position: relative;">
-                <div style="font-size: 12px; color: #8b93a1; margin-bottom: 6px;">[Seguridad] Empresa</div>
-                <input value="{{ empresaSearchText }}" onChange="{{ onEmpresaSearch }}" onFocus="{{ onEmpresaFocus }}" placeholder="Buscar empresa..." style="width: 100%; box-sizing: border-box; background: #0d0d10; border: 1px solid #2c2c32; border-radius: 8px; padding: 11px 34px 11px 12px; font-size: 14px; color: #f4f4f6;"/>
+                <div style="font-size: 12px; color: #8b93a1; margin-bottom: 6px;">Empresa</div>
+                <input value="{{ empresaSearchText }}" onChange="{{ onEmpresaSearch }}" onFocus="{{ onEmpresaFocus }}" placeholder="Buscar empresa..." style="width: 100%; box-sizing: border-box; background: #0d0d10; border: 1px solid #2c2c32; border-radius: 8px; padding: 11px 34px 11px 12px; font-size: 14px; color: #f4f4f6;">
                 <sc-if value="{{ form.empresaId }}" hint-placeholder-val="{{ false }}">
                   <button onClick="{{ onEmpresaClear }}" style="position: absolute; right: 8px; top: 34px; background: none; border: none; color: #8b93a1; cursor: pointer; padding: 4px; display: flex;">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6 6 18"></path><path d="M6 6l12 12"></path></svg>
@@ -181,8 +207,8 @@
                 </sc-if>
               </div>
               <div style="position: relative;">
-                <div style="font-size: 12px; color: #8b93a1; margin-bottom: 6px;">[Seguridad] Sucursal</div>
-                <input value="{{ sucursalSearchText }}" onChange="{{ onSucursalSearch }}" onFocus="{{ onSucursalFocus }}" placeholder="Buscar sucursal..." style="width: 100%; box-sizing: border-box; background: #0d0d10; border: 1px solid #2c2c32; border-radius: 8px; padding: 11px 34px 11px 12px; font-size: 14px; color: #f4f4f6;"/>
+                <div style="font-size: 12px; color: #8b93a1; margin-bottom: 6px;">Sucursal</div>
+                <input value="{{ sucursalSearchText }}" onChange="{{ onSucursalSearch }}" onFocus="{{ onSucursalFocus }}" placeholder="Buscar sucursal..." style="width: 100%; box-sizing: border-box; background: #0d0d10; border: 1px solid #2c2c32; border-radius: 8px; padding: 11px 34px 11px 12px; font-size: 14px; color: #f4f4f6;">
                 <sc-if value="{{ form.sucursalId }}" hint-placeholder-val="{{ false }}">
                   <button onClick="{{ onSucursalClear }}" style="position: absolute; right: 8px; top: 34px; background: none; border: none; color: #8b93a1; cursor: pointer; padding: 4px; display: flex;">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6 6 18"></path><path d="M6 6l12 12"></path></svg>
@@ -200,19 +226,60 @@
                 </sc-if>
               </div>
             </div>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px;">
-              <div>
-                <div style="font-size: 12px; color: #8b93a1; margin-bottom: 6px;">Tipo de Operación *</div>
-                <select value="{{ form.tipoOperacionId }}" onChange="{{ onTipoOperacion }}" disabled="{{ tipoOperacionBloqueado }}" style="width: 100%; box-sizing: border-box; background: #0d0d10; border: 1px solid #2c2c32; border-radius: 8px; padding: 11px 12px; font-size: 14px; color: #f4f4f6;">
-                  <option value="">Seleccionar...</option>
-                  <sc-for list="{{ tiposOperacionOpciones }}" as="op" hint-placeholder-count="4">
-                    <option value="{{ op.id }}">{{ op.label }}</option>
-                  </sc-for>
-                </select>
+
+            <div style="margin-bottom: 16px;">
+              <div style="font-size: 12px; color: #8b93a1; margin-bottom: 6px;">🔒 Tipo de Operación</div>
+              <div style="background: #0d0d10; border: 1px solid #2c2c32; border-radius: 8px; padding: 11px 12px; font-size: 14px; color: #7d8390;">{{ tipoOperacionActual.label }}</div>
+            </div>
+
+            <sc-if value="{{ esNCND }}" hint-placeholder-val="{{ false }}">
+              <div style="position: relative; margin-bottom: 16px;">
+                <div style="font-size: 12px; color: #8b93a1; margin-bottom: 6px;">Documento de Referencia * <span style="color: #6b7280; font-weight: 400;">(solo comprobantes CONTABILIZADO)</span></div>
+                <input value="{{ docRefSearchText }}" onChange="{{ onDocRefSearch }}" onFocus="{{ onDocRefFocus }}" placeholder="Buscar por serie-número o cliente..." style="width: 100%; box-sizing: border-box; background: #0d0d10; border: 1px solid #2c2c32; border-radius: 8px; padding: 11px 12px; font-size: 14px; color: #f4f4f6;">
+                <sc-if value="{{ docRefDropdownAbierto }}" hint-placeholder-val="{{ false }}">
+                  <div style="position: absolute; top: calc(100% + 4px); left: 0; right: 0; background: #1c1c21; border: 1px solid #2c2c32; border-radius: 8px; max-height: 220px; overflow: auto; z-index: 10; box-shadow: 0 8px 24px rgba(0,0,0,0.4);">
+                    <sc-for list="{{ docRefOpciones }}" as="d" hint-placeholder-count="2">
+                      <div onClick="{{ d.onSelect }}" style="padding: 10px 12px; font-size: 13px; color: #eceef1; cursor: pointer; border-bottom: 1px solid #232328;" style-hover="background: #26262c;">{{ d.label }}</div>
+                    </sc-for>
+                    <sc-if value="{{ docRefSinResultados }}" hint-placeholder-val="{{ false }}">
+                      <div style="padding: 10px 12px; font-size: 13px; color: #6b7280;">Sin coincidencias (solo CONTABILIZADO).</div>
+                    </sc-if>
+                  </div>
+                </sc-if>
               </div>
-              <div style="position: relative;">
-                <div style="font-size: 12px; color: #8b93a1; margin-bottom: 6px;">Tercero *</div>
-                <input value="{{ terceroSearchText }}" onChange="{{ onTerceroSearch }}" onFocus="{{ onTerceroFocus }}" placeholder="Buscar por RUC o razón social..." style="width: 100%; box-sizing: border-box; background: #0d0d10; border: 1px solid #2c2c32; border-radius: 8px; padding: 11px 12px; font-size: 14px; color: #f4f4f6;"/>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+                <div style="position: relative;">
+                  <div style="font-size: 12px; color: #8b93a1; margin-bottom: 6px;">Cliente</div>
+                  <input value="{{ terceroSearchText }}" onChange="{{ onTerceroSearch }}" onFocus="{{ onTerceroFocus }}" placeholder="Buscar por RUC o razón social..." style="width: 100%; box-sizing: border-box; background: #0d0d10; border: 1px solid #2c2c32; border-radius: 8px; padding: 11px 12px; font-size: 14px; color: #f4f4f6;">
+                  <sc-if value="{{ terceroDropdownAbierto }}" hint-placeholder-val="{{ false }}">
+                    <div style="position: absolute; top: calc(100% + 4px); left: 0; right: 0; background: #1c1c21; border: 1px solid #2c2c32; border-radius: 8px; max-height: 220px; overflow: auto; z-index: 10; box-shadow: 0 8px 24px rgba(0,0,0,0.4);">
+                      <sc-for list="{{ terceroOpciones }}" as="t" hint-placeholder-count="3">
+                        <div onClick="{{ t.onSelect }}" style="padding: 10px 12px; font-size: 13px; color: #eceef1; cursor: pointer; border-bottom: 1px solid #232328;" style-hover="background: #26262c;">{{ t.label }}</div>
+                      </sc-for>
+                      <sc-if value="{{ terceroSinResultados }}" hint-placeholder-val="{{ false }}">
+                        <div style="padding: 10px 12px; font-size: 13px; color: #6b7280;">Sin coincidencias.</div>
+                      </sc-if>
+                    </div>
+                  </sc-if>
+                </div>
+                <div>
+                  <div style="font-size: 12px; color: #8b93a1; margin-bottom: 6px;">Motivo de Ajuste *</div>
+                  <select value="{{ form.motivoId }}" onChange="{{ onMotivo }}" style="width: 100%; box-sizing: border-box; background: #0d0d10; border: 1px solid #2c2c32; border-radius: 8px; padding: 11px 12px; font-size: 14px; color: #f4f4f6;">
+                    <option value="">Seleccionar...</option>
+                    <sc-for list="{{ motivosDisponibles }}" as="m" hint-placeholder-count="3">
+                      <option value="{{ m.id }}">{{ m.label }}</option>
+                    </sc-for>
+                  </select>
+                </div>
+              </div>
+            </sc-if>
+
+            <sc-if value="{{ esNCND }}" hint-placeholder-val="{{ false }}">
+            </sc-if>
+            <sc-if value="{{ !esNCND }}" hint-placeholder-val="{{ true }}">
+              <div style="position: relative; margin-bottom: 16px;">
+                <div style="font-size: 12px; color: #8b93a1; margin-bottom: 6px;">Cliente *</div>
+                <input value="{{ terceroSearchText }}" onChange="{{ onTerceroSearch }}" onFocus="{{ onTerceroFocus }}" placeholder="Buscar por RUC o razón social..." style="width: 100%; box-sizing: border-box; background: #0d0d10; border: 1px solid #2c2c32; border-radius: 8px; padding: 11px 12px; font-size: 14px; color: #f4f4f6;">
                 <sc-if value="{{ terceroDropdownAbierto }}" hint-placeholder-val="{{ false }}">
                   <div style="position: absolute; top: calc(100% + 4px); left: 0; right: 0; background: #1c1c21; border: 1px solid #2c2c32; border-radius: 8px; max-height: 220px; overflow: auto; z-index: 10; box-shadow: 0 8px 24px rgba(0,0,0,0.4);">
                     <sc-for list="{{ terceroOpciones }}" as="t" hint-placeholder-count="3">
@@ -224,159 +291,128 @@
                   </div>
                 </sc-if>
               </div>
+            </sc-if>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
               <div>
                 <div style="font-size: 12px; color: #8b93a1; margin-bottom: 6px;">🔒 Tipo Documento SUNAT</div>
-                <div style="background: #0d0d10; border: 1px solid #2c2c32; border-radius: 8px; padding: 11px 12px; font-size: 14px; color: #7d8390;">{{ form.tipoDocumentoDisplay }}</div>
+                <div style="background: #0d0d10; border: 1px solid #2c2c32; border-radius: 8px; padding: 11px 12px; font-size: 14px; color: #7d8390;">{{ tipoOperacionActual.tipoDocumento }}</div>
               </div>
               <div>
-                <div style="font-size: 12px; color: #8b93a1; margin-bottom: 6px;">🔒 Moneda / T.C. Venta</div>
-                <div style="background: #0d0d10; border: 1px solid #2c2c32; border-radius: 8px; padding: 11px 12px; font-size: 14px; color: #7d8390;">{{ form.monedaDisplay }}</div>
+                <div style="font-size: 12px; color: #8b93a1; margin-bottom: 6px;">🔒 Moneda</div>
+                <div style="background: #0d0d10; border: 1px solid #2c2c32; border-radius: 8px; padding: 11px 12px; font-size: 14px; color: #7d8390;">{{ tipoOperacionActual.moneda }}</div>
               </div>
               <div>
                 <div style="font-size: 12px; color: #8b93a1; margin-bottom: 6px;">Serie *</div>
-                <input value="{{ form.serie }}" onChange="{{ onSerie }}" disabled="{{ serieNumeroBloqueado }}" placeholder="F001" style="width: 100%; box-sizing: border-box; background: #0d0d10; border: 1px solid #2c2c32; border-radius: 8px; padding: 11px 12px; font-size: 14px; color: #f4f4f6;"/>
+                <input value="{{ form.serie }}" onChange="{{ onSerie }}" disabled="{{ serieNumeroBloqueado }}" placeholder="F001" style="width: 100%; box-sizing: border-box; background: #0d0d10; border: 1px solid #2c2c32; border-radius: 8px; padding: 11px 12px; font-size: 14px; color: #f4f4f6;">
               </div>
               <div>
                 <div style="font-size: 12px; color: #8b93a1; margin-bottom: 6px;">Número *</div>
-                <input value="{{ form.numero }}" onChange="{{ onNumero }}" disabled="{{ serieNumeroBloqueado }}" placeholder="00001542" style="width: 100%; box-sizing: border-box; background: #0d0d10; border: 1px solid #2c2c32; border-radius: 8px; padding: 11px 12px; font-size: 14px; color: #f4f4f6;"/>
+                <input value="{{ form.numero }}" onChange="{{ onNumero }}" disabled="{{ serieNumeroBloqueado }}" placeholder="00001542" style="width: 100%; box-sizing: border-box; background: #0d0d10; border: 1px solid #2c2c32; border-radius: 8px; padding: 11px 12px; font-size: 14px; color: #f4f4f6;">
               </div>
               <div>
                 <div style="font-size: 12px; color: #8b93a1; margin-bottom: 6px;">Fecha de Emisión *</div>
-                <input type="date" value="{{ form.fechaEmision }}" onChange="{{ onFechaEmision }}" style="width: 100%; box-sizing: border-box; background: #0d0d10; border: 1px solid #2c2c32; border-radius: 8px; padding: 10px 12px; font-size: 14px; color: #f4f4f6; color-scheme: dark;"/>
+                <input type="date" value="{{ form.fechaEmision }}" onChange="{{ onFechaEmision }}" style="width: 100%; box-sizing: border-box; background: #0d0d10; border: 1px solid #2c2c32; border-radius: 8px; padding: 10px 12px; font-size: 14px; color: #f4f4f6; color-scheme: dark;">
               </div>
               <div>
                 <div style="font-size: 12px; color: #8b93a1; margin-bottom: 6px;">Fecha de Vencimiento</div>
-                <input type="date" value="{{ form.fechaVencimiento }}" onChange="{{ onFechaVencimiento }}" style="width: 100%; box-sizing: border-box; background: #0d0d10; border: 1px solid #2c2c32; border-radius: 8px; padding: 10px 12px; font-size: 14px; color: #f4f4f6; color-scheme: dark;"/>
+                <input type="date" value="{{ form.fechaVencimiento }}" onChange="{{ onFechaVencimiento }}" style="width: 100%; box-sizing: border-box; background: #0d0d10; border: 1px solid #2c2c32; border-radius: 8px; padding: 10px 12px; font-size: 14px; color: #f4f4f6; color-scheme: dark;">
+                <sc-if value="{{ vencimientoInvalido }}" hint-placeholder-val="{{ false }}">
+                  <div style="font-size: 12px; color: #f87171; margin-top: 6px;">La fecha de vencimiento no puede ser menor a la fecha de emisión.</div>
+                </sc-if>
               </div>
             </div>
-            <div style="font-size: 13px; color: #6b7280;">Periodo Contable: <span style="color: #b4b9c2;">{{ form.periodoDisplay }}</span> — {{ form.periodoEstado }}</div>
-          </div>
-        </sc-if>
-
-        <sc-if value="{{ enPaso2 }}" hint-placeholder-val="{{ false }}">
-          <div>
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
-              <div style="font-size: 12px; font-weight: 700; letter-spacing: 0.06em; color: #8b93a1; text-transform: uppercase;">Grilla Multilínea de Detalles Analíticos</div>
-              <button onClick="{{ addLinea }}" style="display: flex; align-items: center; gap: 6px; background: #1c1c21; color: #d1d5db; border: 1px solid #2c2c32; padding: 8px 14px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer;">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14"></path><path d="M5 12h14"></path></svg>
-                Añadir Línea de Venta
-              </button>
-            </div>
-            <div style="border: 1px solid #232328; border-radius: 10px; overflow: hidden; margin-bottom: 18px;">
-              <div style="display: grid; grid-template-columns: 2.2fr 0.8fr 1fr 1fr 1fr 0.5fr; padding: 12px 16px; background: #0f0f12; border-bottom: 1px solid #232328;">
-                <div style="font-size: 11px; font-weight: 700; color: #8b93a1; text-transform: uppercase;">Concepto Comercial</div>
-                <div style="font-size: 11px; font-weight: 700; color: #8b93a1; text-transform: uppercase;">Cant.</div>
-                <div style="font-size: 11px; font-weight: 700; color: #8b93a1; text-transform: uppercase;">P. Unit.</div>
-                <div style="font-size: 11px; font-weight: 700; color: #8b93a1; text-transform: uppercase;">Base</div>
-                <div style="font-size: 11px; font-weight: 700; color: #8b93a1; text-transform: uppercase;">IGV</div>
-                <div></div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+              <div>
+                <div style="font-size: 12px; color: #8b93a1; margin-bottom: 6px;">Fecha de Registro *</div>
+                <input type="date" value="{{ form.fechaRegistro }}" onChange="{{ onFechaRegistro }}" style="width: 100%; box-sizing: border-box; background: #0d0d10; border: 1px solid #2c2c32; border-radius: 8px; padding: 10px 12px; font-size: 14px; color: #f4f4f6; color-scheme: dark;">
+                <div style="font-size: 11px; color: #6b7280; margin-top: 6px;">Periodo: {{ form.periodoDisplay }} — {{ form.periodoEstado }}</div>
               </div>
-              <sc-for list="{{ form.lineas }}" as="linea" hint-placeholder-count="2">
-                <div style="display: grid; grid-template-columns: 2.2fr 0.8fr 1fr 1fr 1fr 0.5fr; align-items: center; padding: 10px 16px; border-bottom: 1px solid #1d1d21; gap: 8px;">
-                  <select value="{{ linea.conceptoId }}" onChange="{{ linea.onConcepto }}" style="width: 100%; box-sizing: border-box; background: #0d0d10; border: 1px solid #2c2c32; border-radius: 6px; padding: 8px 10px; font-size: 13px; color: #f4f4f6;">
-                    <option value="">Seleccionar...</option>
-                    <sc-for list="{{ conceptosDisponibles }}" as="c" hint-placeholder-count="2">
-                      <option value="{{ c.id }}">{{ c.label }}</option>
-                    </sc-for>
-                  </select>
-                  <input type="number" step="0.01" value="{{ linea.cantidad }}" onChange="{{ linea.onCantidad }}" style="width: 100%; box-sizing: border-box; background: #0d0d10; border: 1px solid #2c2c32; border-radius: 6px; padding: 8px 10px; font-size: 13px; color: #f4f4f6;"/>
-                  <input type="number" step="0.01" value="{{ linea.precioUnit }}" onChange="{{ linea.onPrecio }}" style="width: 100%; box-sizing: border-box; background: #0d0d10; border: 1px solid #2c2c32; border-radius: 6px; padding: 8px 10px; font-size: 13px; color: #f4f4f6;"/>
-                  <div style="font-size: 13px; color: #7d8390; font-variant-numeric: tabular-nums;">{{ linea.baseLabel }}</div>
-                  <div style="font-size: 13px; color: #7d8390; font-variant-numeric: tabular-nums;">{{ linea.igvLabel }}</div>
-                  <button onClick="{{ linea.onEliminar }}" style="background: none; border: none; color: #ef4444; cursor: pointer; padding: 4px; justify-self: end;">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"></path><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"></path></svg>
-                  </button>
+            </div>
+            <sc-if value="{{ periodoInvalido }}" hint-placeholder-val="{{ false }}">
+              <div style="font-size: 13px; color: #f87171; background: #2a1414; border: 1px solid #3a1414; border-radius: 8px; padding: 10px 14px; margin-bottom: 16px;">⚠️ {{ periodoMensaje }}</div>
+            </sc-if>
+            <sc-if value="{{ !esNCND }}" hint-placeholder-val="{{ true }}">
+              <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 16px;">
+                <div>
+                  <div style="font-size: 12px; color: #8b93a1; margin-bottom: 6px;">Detracción — Tipo Bien/Servicio</div>
+                  <div style="background: #0d0d10; border: 1px solid #2c2c32; border-radius: 8px; padding: 11px 12px; font-size: 14px; color: {{ detraccionColor }};">{{ detraccionTipoLabel }}</div>
                 </div>
-              </sc-for>
-              <sc-if value="{{ sinLineas }}" hint-placeholder-val="{{ false }}">
-                <div style="padding: 24px 16px; text-align: center; color: #6b7280; font-size: 13px;">Sin líneas. Añade una línea de venta para continuar.</div>
-              </sc-if>
-            </div>
-            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; background: #0f0f12; border: 1px solid #232328; border-radius: 10px; padding: 16px;">
-              <div>
-                <div style="font-size: 11px; color: #8b93a1; margin-bottom: 4px;">Base Gravada</div>
-                <div style="font-size: 15px; font-weight: 700; color: #f4f4f6;">S/ {{ totalesPreview.baseGravada }}</div>
-              </div>
-              <div>
-                <div style="font-size: 11px; color: #8b93a1; margin-bottom: 4px;">Exonerado / Inafecto</div>
-                <div style="font-size: 15px; font-weight: 700; color: #f4f4f6;">S/ {{ totalesPreview.exoneradoInafecto }}</div>
-              </div>
-              <div>
-                <div style="font-size: 11px; color: #8b93a1; margin-bottom: 4px;">IGV ({{ igvRateLabel }}%)</div>
-                <div style="font-size: 15px; font-weight: 700; color: #f4f4f6;">S/ {{ totalesPreview.igv }}</div>
-              </div>
-              <div>
-                <div style="font-size: 11px; color: #8b93a1; margin-bottom: 4px;">Total Comprobante</div>
-                <div style="font-size: 16px; font-weight: 800; color: {{ accent }};">S/ {{ totalesPreview.total }}</div>
-              </div>
-            </div>
-          </div>
-        </sc-if>
-
-        <sc-if value="{{ enPaso3 }}" hint-placeholder-val="{{ false }}">
-          <div>
-            <div style="font-size: 12px; font-weight: 700; letter-spacing: 0.06em; color: #8b93a1; text-transform: uppercase; margin-bottom: 14px;">Confirmación del Registro</div>
-            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 20px; background: #0f0f12; border: 1px solid #232328; border-radius: 10px; padding: 16px;">
-              <div><div style="font-size: 11px; color: #8b93a1;">Tipo de Operación</div><div style="font-size: 14px; color: #eceef1; margin-top: 4px;">{{ form.tipoOperacionLabel }}</div></div>
-              <div><div style="font-size: 11px; color: #8b93a1;">Cliente</div><div style="font-size: 14px; color: #eceef1; margin-top: 4px;">{{ form.terceroLabel }}</div></div>
-              <div><div style="font-size: 11px; color: #8b93a1;">Comprobante</div><div style="font-size: 14px; color: #eceef1; margin-top: 4px;">{{ form.serie }}-{{ form.numero }}</div></div>
-              <div><div style="font-size: 11px; color: #8b93a1;">Emisión</div><div style="font-size: 14px; color: #eceef1; margin-top: 4px;">{{ form.fechaEmision }}</div></div>
-              <div><div style="font-size: 11px; color: #8b93a1;">Vencimiento</div><div style="font-size: 14px; color: #eceef1; margin-top: 4px;">{{ form.fechaVencimiento }}</div></div>
-              <div><div style="font-size: 11px; color: #8b93a1;">Moneda</div><div style="font-size: 14px; color: #eceef1; margin-top: 4px;">{{ form.monedaDisplay }}</div></div>
-            </div>
-            <div style="border: 1px solid #232328; border-radius: 10px; overflow: hidden; margin-bottom: 18px;">
-              <div style="display: grid; grid-template-columns: 2.5fr 1fr 1fr 1fr 1fr; padding: 10px 16px; background: #0f0f12; border-bottom: 1px solid #232328;">
-                <div style="font-size: 11px; font-weight: 700; color: #8b93a1; text-transform: uppercase;">Concepto</div>
-                <div style="font-size: 11px; font-weight: 700; color: #8b93a1; text-transform: uppercase;">Cant.</div>
-                <div style="font-size: 11px; font-weight: 700; color: #8b93a1; text-transform: uppercase;">P. Unit.</div>
-                <div style="font-size: 11px; font-weight: 700; color: #8b93a1; text-transform: uppercase;">Base</div>
-                <div style="font-size: 11px; font-weight: 700; color: #8b93a1; text-transform: uppercase;">IGV</div>
-              </div>
-              <sc-for list="{{ form.lineas }}" as="linea" hint-placeholder-count="2">
-                <div style="display: grid; grid-template-columns: 2.5fr 1fr 1fr 1fr 1fr; padding: 10px 16px; border-bottom: 1px solid #1d1d21;">
-                  <div style="font-size: 13px; color: #eceef1;">{{ linea.conceptoLabel }}</div>
-                  <div style="font-size: 13px; color: #b4b9c2;">{{ linea.cantidad }}</div>
-                  <div style="font-size: 13px; color: #b4b9c2;">{{ linea.precioUnit }}</div>
-                  <div style="font-size: 13px; color: #b4b9c2;">{{ linea.baseLabel }}</div>
-                  <div style="font-size: 13px; color: #b4b9c2;">{{ linea.igvLabel }}</div>
+                <div>
+                  <div style="font-size: 12px; color: #8b93a1; margin-bottom: 6px;">Monto Detracción (calculado)</div>
+                  <div style="background: #0d0d10; border: 1px solid #2c2c32; border-radius: 8px; padding: 11px 12px; font-size: 14px; font-weight: 700; color: {{ detraccionMontoColor }};">{{ detraccionMontoLabel }}</div>
                 </div>
-              </sc-for>
-            </div>
-            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; background: #0f0f12; border: 1px solid #232328; border-radius: 10px; padding: 16px;">
-              <div>
-                <div style="font-size: 11px; color: #8b93a1; margin-bottom: 4px;">🔒 Base Gravada</div>
-                <div style="font-size: 15px; font-weight: 700; color: #f4f4f6;">S/ {{ totalesPreview.baseGravada }}</div>
+                <div>
+                  <div style="font-size: 12px; color: #8b93a1; margin-bottom: 6px;">Cantidad de Bolsas (ICBPER)</div>
+                  <input type="number" step="1" min="0" value="{{ form.cantidadBolsas }}" onChange="{{ onCantidadBolsas }}" style="width: 100%; box-sizing: border-box; background: #0d0d10; border: 1px solid #2c2c32; border-radius: 8px; padding: 11px 12px; font-size: 14px; color: #f4f4f6;">
+                </div>
               </div>
-              <div>
-                <div style="font-size: 11px; color: #8b93a1; margin-bottom: 4px;">🔒 Exon. / Inafecto</div>
-                <div style="font-size: 15px; font-weight: 700; color: #f4f4f6;">S/ {{ totalesPreview.exoneradoInafecto }}</div>
-              </div>
-              <div>
-                <div style="font-size: 11px; color: #8b93a1; margin-bottom: 4px;">🔒 IGV ({{ igvRateLabel }}%)</div>
-                <div style="font-size: 15px; font-weight: 700; color: #f4f4f6;">S/ {{ totalesPreview.igv }}</div>
-              </div>
-              <div>
-                <div style="font-size: 11px; color: #8b93a1; margin-bottom: 4px;">🔒 Total Comprobante</div>
-                <div style="font-size: 16px; font-weight: 800; color: {{ accent }};">S/ {{ totalesPreview.total }}</div>
-              </div>
-            </div>
+            </sc-if>
           </div>
         </sc-if>
 
-        <div style="display: flex; justify-content: space-between; margin-top: 28px; padding-top: 20px; border-top: 1px solid #232328;">
-          <button onClick="{{ cerrarWizard }}" style="background: none; border: 1px solid #2c2c32; color: #d1d5db; padding: 11px 20px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer;">❌ Cancelar</button>
-          <div style="display: flex; gap: 10px;">
-            <sc-if value="{{ mostrarAtras }}" hint-placeholder-val="{{ false }}">
-              <button onClick="{{ pasoAnterior }}" style="background: #1c1c21; border: 1px solid #2c2c32; color: #d1d5db; padding: 11px 20px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer;">Atrás</button>
+        <div style="margin-top: 24px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+            <div style="font-size: 12px; font-weight: 700; letter-spacing: 0.06em; color: #8b93a1; text-transform: uppercase;">Detalle</div>
+            <button onClick="{{ addLinea }}" style="display: flex; align-items: center; gap: 6px; background: #1c1c21; color: #d1d5db; border: 1px solid #2c2c32; padding: 8px 14px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14"></path><path d="M5 12h14"></path></svg>
+              Agregar línea
+            </button>
+          </div>
+          <div style="border: 1px solid #232328; border-radius: 10px; overflow: hidden; margin-bottom: 18px;">
+            <div style="display: grid; grid-template-columns: 1.8fr 0.9fr 0.6fr 0.8fr 0.8fr 0.8fr 0.6fr 0.8fr 0.4fr; padding: 12px 16px; background: #0f0f12; border-bottom: 1px solid #232328;">
+              <div style="font-size: 11px; font-weight: 700; color: #8b93a1; text-transform: uppercase;">Concepto Comercial</div>
+              <div style="font-size: 11px; font-weight: 700; color: #8b93a1; text-transform: uppercase;">Afectación</div>
+              <div style="font-size: 11px; font-weight: 700; color: #8b93a1; text-transform: uppercase;">Cant.</div>
+              <div style="font-size: 11px; font-weight: 700; color: #8b93a1; text-transform: uppercase;">P. Unit.</div>
+              <div style="font-size: 11px; font-weight: 700; color: #8b93a1; text-transform: uppercase;">Descuento</div>
+              <div style="font-size: 11px; font-weight: 700; color: #8b93a1; text-transform: uppercase;">Base</div>
+              <div style="font-size: 11px; font-weight: 700; color: #8b93a1; text-transform: uppercase;">IGV</div>
+              <div style="font-size: 11px; font-weight: 700; color: #8b93a1; text-transform: uppercase;">Gratuita</div>
+              <div></div>
+            </div>
+            <sc-for list="{{ form.lineas }}" as="linea" hint-placeholder-count="2">
+              <div style="display: grid; grid-template-columns: 1.8fr 0.9fr 0.6fr 0.8fr 0.8fr 0.8fr 0.6fr 0.8fr 0.4fr; align-items: center; padding: 10px 16px; border-bottom: 1px solid #1d1d21; gap: 8px;">
+                <select value="{{ linea.conceptoId }}" onChange="{{ linea.onConcepto }}" style="width: 100%; box-sizing: border-box; background: #0d0d10; border: 1px solid #2c2c32; border-radius: 6px; padding: 8px 10px; font-size: 13px; color: #f4f4f6;">
+                  <option value="">Seleccionar...</option>
+                  <sc-for list="{{ conceptosDisponibles }}" as="c" hint-placeholder-count="2">
+                    <option value="{{ c.id }}">{{ c.label }}</option>
+                  </sc-for>
+                </select>
+                <div style="font-size: 12px; color: #8b93a1;">{{ linea.afectacionLabel }}</div>
+                <input type="number" step="0.01" value="{{ linea.cantidad }}" onChange="{{ linea.onCantidad }}" style="width: 100%; box-sizing: border-box; background: #0d0d10; border: 1px solid #2c2c32; border-radius: 6px; padding: 8px 10px; font-size: 13px; color: #f4f4f6;">
+                <input type="number" step="0.01" value="{{ linea.precioUnit }}" onChange="{{ linea.onPrecio }}" style="width: 100%; box-sizing: border-box; background: #0d0d10; border: 1px solid #2c2c32; border-radius: 6px; padding: 8px 10px; font-size: 13px; color: #f4f4f6;">
+                <input type="number" step="0.01" value="{{ linea.descuento }}" onChange="{{ linea.onDescuento }}" style="width: 100%; box-sizing: border-box; background: #0d0d10; border: 1px solid #2c2c32; border-radius: 6px; padding: 8px 10px; font-size: 13px; color: #f4f4f6;">
+                <div style="font-size: 13px; color: #7d8390; font-variant-numeric: tabular-nums;">{{ linea.baseLabel }}</div>
+                <div style="font-size: 13px; color: #7d8390; font-variant-numeric: tabular-nums;">{{ linea.igvLabel }}</div>
+                <input type="checkbox" checked="{{ linea.esGratuita }}" onChange="{{ linea.onGratuita }}" style="width: 18px; height: 18px; justify-self: start;">
+                <button onClick="{{ linea.onEliminar }}" style="background: none; border: none; color: #ef4444; cursor: pointer; padding: 4px; justify-self: end;">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"></path><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"></path></svg>
+                </button>
+              </div>
+            </sc-for>
+            <sc-if value="{{ sinLineas }}" hint-placeholder-val="{{ false }}">
+              <div style="padding: 24px 16px; text-align: center; color: #6b7280; font-size: 13px;">Sin líneas. Añade una línea para continuar.</div>
             </sc-if>
-            <sc-if value="{{ mostrarSiguiente }}" hint-placeholder-val="{{ true }}">
-              <button onClick="{{ pasoSiguiente }}" disabled="{{ siguienteBloqueado }}" style="background: {{ accent }}; border: none; color: #ffffff; padding: 11px 22px; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; opacity: {{ siguienteOpacity }};">Siguiente</button>
-            </sc-if>
-            <sc-if value="{{ mostrarGuardar }}" hint-placeholder-val="{{ false }}">
-              <button onClick="{{ guardar }}" style="background: {{ accent }}; border: none; color: #ffffff; padding: 11px 22px; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer;">💾 Guardar Borrador</button>
-            </sc-if>
+          </div>
+          <div style="display: flex; justify-content: flex-end;">
+            <div style="display: grid; grid-template-columns: auto auto; gap: 6px 20px; background: #0f0f12; border: 1px solid #232328; border-radius: 10px; padding: 16px 20px; min-width: 280px;">
+              <div style="font-size: 13px; color: #8b93a1;">Base Gravada</div><div style="font-size: 13px; color: #f4f4f6; text-align: right; font-variant-numeric: tabular-nums;">S/ {{ totalesPreview.baseGravada }}</div>
+              <div style="font-size: 13px; color: #8b93a1;">Exonerada / Inafecta</div><div style="font-size: 13px; color: #f4f4f6; text-align: right; font-variant-numeric: tabular-nums;">S/ {{ totalesPreview.exoneradoInafecto }}</div>
+              <div style="font-size: 13px; color: #8b93a1;">IGV ({{ igvRateLabel }}%)</div><div style="font-size: 13px; color: #f4f4f6; text-align: right; font-variant-numeric: tabular-nums;">S/ {{ totalesPreview.igv }}</div>
+              <div style="font-size: 13px; color: #8b93a1;">ICBPER</div><div style="font-size: 13px; color: #f4f4f6; text-align: right; font-variant-numeric: tabular-nums;">S/ {{ totalesPreview.icbper }}</div>
+              <div style="font-size: 14px; font-weight: 700; color: #ffffff; border-top: 1px solid #232328; padding-top: 8px; margin-top: 4px;">Total</div>
+              <div style="font-size: 15px; font-weight: 800; color: {{ accent }}; text-align: right; border-top: 1px solid #232328; padding-top: 8px; margin-top: 4px;">S/ {{ totalesPreview.total }}</div>
+            </div>
           </div>
         </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 28px; padding-top: 20px; border-top: 1px solid #232328;">
+          <button onClick="{{ cerrarWizard }}" style="background: none; border: 1px solid #2c2c32; color: #d1d5db; padding: 11px 20px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer;">Cancelar</button>
+          <button onClick="{{ guardar }}" disabled="{{ guardarBloqueado }}" style="background: {{ accent }}; border: none; color: #ffffff; padding: 11px 22px; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; opacity: {{ guardarOpacity }};">Guardar</button>
+        </div>
+        </div>
+        </sc-if>
       </div>
     </div>
   </sc-if>
@@ -384,31 +420,33 @@
   <sc-if value="{{ verAbierto }}" hint-placeholder-val="{{ false }}">
     <div style="position: fixed; inset: 0; background: rgba(0,0,0,0.65); display: flex; align-items: center; justify-content: center; padding: 24px; z-index: 50;">
       <div style="background: #151518; border: 1px solid #28282d; border-radius: 16px; width: 100%; max-width: 780px; max-height: 90vh; overflow: auto; padding: 32px;">
-        <div style="font-size: 20px; font-weight: 800; color: #ffffff; margin-bottom: 4px;">Comprobante {{ verRegistro.folio }}</div>
+        <div style="font-size: 20px; font-weight: 800; color: #ffffff; margin-bottom: 4px;">Comprobante {{ verRegistro.serieNumero }}</div>
         <div style="font-size: 13px; color: #8b93a1; margin-bottom: 24px;">Detalle de solo lectura</div>
         <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 20px; background: #0f0f12; border: 1px solid #232328; border-radius: 10px; padding: 16px;">
-          <div><div style="font-size: 11px; color: #8b93a1;">Cliente</div><div style="font-size: 14px; color: #eceef1; margin-top: 4px;">{{ verRegistro.terceroLabel }}</div></div>
-          <div><div style="font-size: 11px; color: #8b93a1;">Comprobante</div><div style="font-size: 14px; color: #eceef1; margin-top: 4px;">{{ verRegistro.numeroCompleto }}</div></div>
+          <div><div style="font-size: 11px; color: #8b93a1;">Cliente</div><div style="font-size: 14px; color: #eceef1; margin-top: 4px;">{{ verRegistro.clienteLabel }}</div></div>
           <div><div style="font-size: 11px; color: #8b93a1;">Estado</div><div style="font-size: 14px; color: #eceef1; margin-top: 4px;">{{ verRegistro.estado }}</div></div>
+          <div><div style="font-size: 11px; color: #8b93a1;">Moneda</div><div style="font-size: 14px; color: #eceef1; margin-top: 4px;">{{ verRegistro.moneda }}</div></div>
           <div><div style="font-size: 11px; color: #8b93a1;">Emisión</div><div style="font-size: 14px; color: #eceef1; margin-top: 4px;">{{ verRegistro.fechaEmision }}</div></div>
           <div><div style="font-size: 11px; color: #8b93a1;">Vencimiento</div><div style="font-size: 14px; color: #eceef1; margin-top: 4px;">{{ verRegistro.fechaVencimiento }}</div></div>
-          <div><div style="font-size: 11px; color: #8b93a1;">Moneda</div><div style="font-size: 14px; color: #eceef1; margin-top: 4px;">{{ verRegistro.monedaDisplay }}</div></div>
+          <div><div style="font-size: 11px; color: #8b93a1;">Fecha de Registro</div><div style="font-size: 14px; color: #eceef1; margin-top: 4px;">{{ verRegistro.fechaRegistro }}</div></div>
         </div>
         <div style="border: 1px solid #232328; border-radius: 10px; overflow: hidden; margin-bottom: 20px;">
-          <div style="display: grid; grid-template-columns: 2.5fr 1fr 1fr 1fr 1fr; padding: 10px 16px; background: #0f0f12; border-bottom: 1px solid #232328;">
+          <div style="display: grid; grid-template-columns: 2.2fr 0.8fr 0.8fr 0.8fr 0.8fr 0.8fr; padding: 10px 16px; background: #0f0f12; border-bottom: 1px solid #232328;">
             <div style="font-size: 11px; font-weight: 700; color: #8b93a1; text-transform: uppercase;">Concepto</div>
             <div style="font-size: 11px; font-weight: 700; color: #8b93a1; text-transform: uppercase;">Cant.</div>
             <div style="font-size: 11px; font-weight: 700; color: #8b93a1; text-transform: uppercase;">P. Unit.</div>
             <div style="font-size: 11px; font-weight: 700; color: #8b93a1; text-transform: uppercase;">Base</div>
             <div style="font-size: 11px; font-weight: 700; color: #8b93a1; text-transform: uppercase;">IGV</div>
+            <div style="font-size: 11px; font-weight: 700; color: #8b93a1; text-transform: uppercase;">Gratuita</div>
           </div>
           <sc-for list="{{ verRegistro.lineas }}" as="linea" hint-placeholder-count="2">
-            <div style="display: grid; grid-template-columns: 2.5fr 1fr 1fr 1fr 1fr; padding: 10px 16px; border-bottom: 1px solid #1d1d21;">
+            <div style="display: grid; grid-template-columns: 2.2fr 0.8fr 0.8fr 0.8fr 0.8fr 0.8fr; padding: 10px 16px; border-bottom: 1px solid #1d1d21;">
               <div style="font-size: 13px; color: #eceef1;">{{ linea.conceptoLabel }}</div>
               <div style="font-size: 13px; color: #b4b9c2;">{{ linea.cantidad }}</div>
               <div style="font-size: 13px; color: #b4b9c2;">{{ linea.precioUnit }}</div>
               <div style="font-size: 13px; color: #b4b9c2;">{{ linea.baseLabel }}</div>
               <div style="font-size: 13px; color: #b4b9c2;">{{ linea.igvLabel }}</div>
+              <div style="font-size: 13px; color: #b4b9c2;">{{ linea.gratuitaLabel }}</div>
             </div>
           </sc-for>
         </div>
@@ -428,12 +466,13 @@
   <sc-if value="{{ anularAbierto }}" hint-placeholder-val="{{ false }}">
     <div style="position: fixed; inset: 0; background: rgba(0,0,0,0.65); display: flex; align-items: center; justify-content: center; padding: 24px; z-index: 50;">
       <div style="background: #151518; border: 1px solid #3a1414; border-radius: 16px; width: 100%; max-width: 560px; padding: 30px;">
-        <div style="font-size: 17px; font-weight: 800; color: #f87171; margin-bottom: 20px;">⚠️ Confirmación de Anulación Lógica de Comprobante Borrador</div>
-        <div style="font-size: 14px; color: #d1d5db; margin-bottom: 18px; line-height: 1.6;">¿Está seguro que desea dar de baja la venta <span style="color: #ffffff; font-weight: 700;">{{ anularRegistro.folio }}</span>?</div>
+        <div style="font-size: 17px; font-weight: 800; color: #f87171; margin-bottom: 20px;">⚠️ Confirmación de Anulación</div>
+        <div style="font-size: 14px; color: #d1d5db; margin-bottom: 18px; line-height: 1.6;">¿Está seguro que desea anular el comprobante <span style="color: #ffffff; font-weight: 700;">{{ anularRegistro.serieNumero }}</span>?</div>
         <div style="font-size: 13px; color: #9aa1ae; margin-bottom: 18px; line-height: 1.6;">El sistema ejecutará una actualización de estado en cascada:</div>
         <div style="background: #0f0f12; border: 1px solid #232328; border-radius: 10px; padding: 16px; margin-bottom: 20px; font-size: 13px; color: #b4b9c2; line-height: 1.9;">
-          — Estado en Sublibro → ANULADO (se preservan importes históricos)<br/>
-          — Estado en Cta. Cte. → ANULADO (se actualiza el hito de la CxC)
+          — Estado en Sublibro → ANULADO (se preservan importes históricos)<br>
+          — Estado en Cta. Cte. → ANULADO (se actualiza el hito de la CxC)<br>
+          — Una detracción ya depositada NO se revierte por esta acción
         </div>
         <div style="display: flex; justify-content: flex-end; gap: 10px;">
           <button onClick="{{ cerrarAnular }}" style="background: none; border: 1px solid #2c2c32; color: #d1d5db; padding: 11px 20px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer;">❌ Cancelar</button>
@@ -453,23 +492,41 @@
 }">
 class Component extends DCLogic {
   tiposOperacion = [
-    { id: 55, label: '55 - Factura/Boleta Venta Nacional', grupo: 'VENTA_NACIONAL', tipoDocumento: '01 - FACTURA', moneda: 'SOLES', tasa: 1.0 },
-    { id: 60, label: '60 - Factura Exportación de Bienes', grupo: 'EXPORTACION', tipoDocumento: '01 - FACTURA', moneda: 'DÓLARES', tasa: 3.752 },
-    { id: 80, label: '80 - Nota de Crédito Venta Nacional', grupo: 'NOTA_CREDITO', tipoDocumento: '07 - NOTA DE CRÉDITO', moneda: 'SOLES', tasa: 1.0 },
-    { id: 81, label: '81 - Nota de Débito Venta Nacional', grupo: 'NOTA_DEBITO', tipoDocumento: '08 - NOTA DE DÉBITO', moneda: 'SOLES', tasa: 1.0 },
+    { id: 55, grupo: 'VENTA_NACIONAL', label: '55 - Factura Venta Nacional (Soles)', tipoDocumento: '01 - FACTURA', moneda: 'SOLES', tasa: 1.0, requiereReferencia: false, usaDetraccion: true },
+    { id: 56, grupo: 'VENTA_NACIONAL', label: '56 - Factura Venta Nacional (Dólares)', tipoDocumento: '01 - FACTURA', moneda: 'DÓLARES', tasa: 3.752, requiereReferencia: false, usaDetraccion: true },
+    { id: 57, grupo: 'VENTA_NACIONAL', label: '57 - Boleta Venta Nacional (Soles)', tipoDocumento: '03 - BOLETA', moneda: 'SOLES', tasa: 1.0, requiereReferencia: false, usaDetraccion: false },
+    { id: 58, grupo: 'VENTA_NACIONAL', label: '58 - Boleta Venta Nacional (Dólares)', tipoDocumento: '03 - BOLETA', moneda: 'DÓLARES', tasa: 3.752, requiereReferencia: false, usaDetraccion: false },
+    { id: 80, grupo: 'NOTA_CREDITO', label: '80 - Nota de Crédito Venta Nacional (Soles)', tipoDocumento: '07 - NOTA DE CRÉDITO', moneda: 'SOLES', tasa: 1.0, requiereReferencia: true, usaDetraccion: false, conceptosGrupo: 'VENTA_NACIONAL', catalogoMotivo: 9 },
+    { id: 82, grupo: 'NOTA_CREDITO', label: '82 - Nota de Crédito Venta Nacional (Dólares)', tipoDocumento: '07 - NOTA DE CRÉDITO', moneda: 'DÓLARES', tasa: 3.752, requiereReferencia: true, usaDetraccion: false, conceptosGrupo: 'VENTA_NACIONAL', catalogoMotivo: 9 },
+    { id: 81, grupo: 'NOTA_DEBITO', label: '81 - Nota de Débito Venta Nacional (Soles)', tipoDocumento: '08 - NOTA DE DÉBITO', moneda: 'SOLES', tasa: 1.0, requiereReferencia: true, usaDetraccion: false, conceptosGrupo: 'VENTA_NOTA_DEBITO', catalogoMotivo: 10 },
+    { id: 83, grupo: 'NOTA_DEBITO', label: '83 - Nota de Débito Venta Nacional (Dólares)', tipoDocumento: '08 - NOTA DE DÉBITO', moneda: 'DÓLARES', tasa: 3.752, requiereReferencia: true, usaDetraccion: false, conceptosGrupo: 'VENTA_NOTA_DEBITO', catalogoMotivo: 10 },
   ];
   conceptos = [
-    { id: 610, label: '610 - Venta de Mercadería Nacional', grupo: 'VENTA_NACIONAL', gravada: true },
-    { id: 615, label: '615 - Venta Exonerada (Apéndice I/II)', grupo: 'VENTA_NACIONAL', gravada: false },
-    { id: 620, label: '620 - Venta Inafecta', grupo: 'VENTA_NACIONAL', gravada: false },
-    { id: 710, label: '710 - Exportación de Bienes', grupo: 'EXPORTACION', gravada: false },
-    { id: 810, label: '810 - Nota de Crédito por Anulación', grupo: 'NOTA_CREDITO', gravada: false },
-    { id: 910, label: '910 - Nota de Débito por Intereses', grupo: 'NOTA_DEBITO', gravada: true },
+    { id: 610, label: '610 - Venta de Mercadería Nacional', grupo: 'VENTA_NACIONAL', gravada: true, afectacion: 'Gravada' },
+    { id: 615, label: '615 - Venta Exonerada (Apéndice I/II)', grupo: 'VENTA_NACIONAL', gravada: false, afectacion: 'Exonerada' },
+    { id: 620, label: '620 - Venta Inafecta', grupo: 'VENTA_NACIONAL', gravada: false, afectacion: 'Inafecta' },
+    { id: 901, label: '901 - Interés Moratorio (ND)', grupo: 'VENTA_NOTA_DEBITO', gravada: false, afectacion: 'Inafecta' },
+    { id: 902, label: '902 - Aumento de Valor (ND)', grupo: 'VENTA_NOTA_DEBITO', gravada: true, afectacion: 'Gravada' },
+    { id: 903, label: '903 - Penalidad (ND)', grupo: 'VENTA_NOTA_DEBITO', gravada: true, afectacion: 'Gravada' },
+  ];
+  motivosNC = [
+    { id: 1, label: '01 - Anulación de la operación' }, { id: 2, label: '02 - Anulación por error en el RUC' },
+    { id: 3, label: '03 - Corrección por error en la descripción' }, { id: 4, label: '04 - Descuento global' },
+    { id: 5, label: '05 - Descuento por ítem' }, { id: 6, label: '06 - Devolución total' },
+    { id: 7, label: '07 - Devolución por ítem' }, { id: 8, label: '08 - Bonificación' },
+    { id: 9, label: '09 - Disminución en el valor' }, { id: 10, label: '10 - Otros conceptos' },
+    { id: 11, label: '11 - Ajustes de operaciones de exportación' }, { id: 12, label: '12 - Ajustes de montos o fechas de pago en exportación' },
+    { id: 13, label: '13 - Ajustes afectos al IVAP' },
+  ];
+  motivosND = [
+    { id: 1, label: '01 - Intereses por mora' }, { id: 2, label: '02 - Aumento en el valor' },
+    { id: 3, label: '03 - Penalidades / otros conceptos' }, { id: 4, label: '04 - Ajustes de operaciones de exportación' },
+    { id: 5, label: '05 - Ajustes afectos al IVAP' },
   ];
   terceros = [
-    { id: 1830, label: '20712345678 - Comercial ABC S.A.' },
-    { id: 1831, label: '20456789012 - Distribuidora XYZ E.I.R.L.' },
-    { id: 1845, label: '10456123789 - Cliente Grupo 7 S.A.C.' },
+    { id: 1830, label: '20712345678 - Comercial ABC S.A.', detraccion: { tipoBienServicio: 'Servicios Empresariales (Anexo 3)', porcentaje: 12, montoMinimo: 700 } },
+    { id: 1831, label: '20456789012 - Distribuidora XYZ E.I.R.L.', detraccion: null },
+    { id: 1845, label: '10456123789 - Cliente Grupo 7 S.A.C.', detraccion: null },
   ];
   sucursales = [
     { id: 19, label: '19 - SEDE OPERATIVA SUR COSTA' },
@@ -480,15 +537,23 @@ class Component extends DCLogic {
     { id: 24, label: '24 - INVERSIONES GLOBALES PERU S.A.' },
     { id: 31, label: '31 - CORPORACION ANDINA DEL SUR S.A.C.' },
   ];
+  documentosReferencia = [
+    { id: 501, folio: 'F001-00001500', terceroId: 1830, moneda: 'SOLES', total: 826.40, estado: 'CONTABILIZADO' },
+    { id: 502, folio: 'F001-00001510', terceroId: 1831, moneda: 'SOLES', total: 1180.00, estado: 'CONTABILIZADO' },
+  ];
+  ejercicioRango = { inicio: '2026-01-01', fin: '2026-12-31' };
 
   state = {
     registros: [
-      { id: 9021, folio: 'VTA-202607-0128', tipoOperacionId: 55, terceroId: 1830, serie: 'F001', numero: '00001542', fechaEmision: '2026-07-28', fechaVencimiento: '2026-08-27', estado: 'BORRADOR',
-        lineas: [ { id: 40001, conceptoId: 610, cantidad: 2, precioUnit: 150 }, { id: 40002, conceptoId: 615, cantidad: 1, precioUnit: 120 } ] },
-      { id: 9022, folio: 'VTA-202607-0129', tipoOperacionId: 55, terceroId: 1831, serie: 'F001', numero: '00001543', fechaEmision: '2026-07-29', fechaVencimiento: '2026-08-28', estado: 'BORRADOR',
-        lineas: [ { id: 40003, conceptoId: 610, cantidad: 2, precioUnit: 500 } ] },
+      { id: 9021, grupo: 'VENTA_NACIONAL', tipoOperacionId: 55, terceroId: 1830, serie: 'F001', numero: '00001542', fechaEmision: '2026-07-28', fechaVencimiento: '2026-08-27', fechaRegistro: '2026-07-28', estado: 'BORRADOR', motivoId: '', docRefId: '', cantidadBolsas: 0,
+        lineas: [ { id: 40001, conceptoId: 610, cantidad: 2, precioUnit: 150, descuento: 0, esGratuita: false }, { id: 40002, conceptoId: 615, cantidad: 1, precioUnit: 120, descuento: 0, esGratuita: false } ] },
+      { id: 9022, grupo: 'VENTA_NACIONAL', tipoOperacionId: 55, terceroId: 1831, serie: 'F001', numero: '00001543', fechaEmision: '2026-07-29', fechaVencimiento: '2026-08-28', fechaRegistro: '2026-07-29', estado: 'CONTABILIZADO', motivoId: '', docRefId: '', cantidadBolsas: 0,
+        lineas: [ { id: 40003, conceptoId: 610, cantidad: 2, precioUnit: 500, descuento: 0, esGratuita: false } ] },
+      { id: 9023, grupo: 'NOTA_CREDITO', tipoOperacionId: 80, terceroId: 1830, serie: 'FC01', numero: '00000045', fechaEmision: '2026-07-30', fechaVencimiento: '', fechaRegistro: '2026-07-30', estado: 'BORRADOR', motivoId: 6, docRefId: 501, cantidadBolsas: 0,
+        lineas: [ { id: 40004, conceptoId: 610, cantidad: 1, precioUnit: 150, descuento: 0, esGratuita: false } ] },
     ],
-    filtroRuc: '', filtroCorrelativo: '', filtroEstado: 'Todos', filtroFechaDesde: '2026-07-01', filtroFechaHasta: '2026-07-31',
+    activeTab: 'VENTA_NACIONAL',
+    filtroCliente: '', filtroSerieNumero: '', filtroEstado: 'Todos', filtroFechaDesde: '2026-07-01', filtroFechaHasta: '2026-07-31',
     filtroEmpresaId: 24, filtroEmpresaSearchText: '24 - INVERSIONES GLOBALES PERU S.A.', filtroEmpresaDropdownAbierto: false,
     filtroSucursalId: 19, filtroSucursalSearchText: '19 - SEDE OPERATIVA SUR COSTA', filtroSucursalDropdownAbierto: false,
     modal: null, step: 1, form: null,
@@ -496,59 +561,71 @@ class Component extends DCLogic {
     terceroSearchText: '', terceroDropdownAbierto: false,
     empresaSearchText: '24 - INVERSIONES GLOBALES PERU S.A.', empresaDropdownAbierto: false,
     sucursalSearchText: '19 - SEDE OPERATIVA SUR COSTA', sucursalDropdownAbierto: false,
+    docRefSearchText: '', docRefDropdownAbierto: false,
   };
 
   money(n) { return (Math.round((n + Number.EPSILON) * 100) / 100).toFixed(2); }
-
-  addDays(iso, days) {
-    if (!iso) return '';
-    const d = new Date(iso + 'T00:00:00');
-    d.setDate(d.getDate() + days);
-    return d.toISOString().slice(0, 10);
-  }
-
+  addDays(iso, days) { if (!iso) return ''; const d = new Date(iso + 'T00:00:00'); d.setDate(d.getDate() + days); return d.toISOString().slice(0, 10); }
   periodoDe(iso) {
     if (!iso) return { label: '', estado: '' };
     const meses = ['ENERO','FEBRERO','MARZO','ABRIL','MAYO','JUNIO','JULIO','AGOSTO','SEPTIEMBRE','OCTUBRE','NOVIEMBRE','DICIEMBRE'];
     const [y, m] = iso.split('-');
-    return { label: `${y}${m} - ${meses[parseInt(m, 10) - 1]} ${y}`, estado: 'ABIERTO' };
+    const estado = y === '2026' ? 'ABIERTO' : 'CERRADO';
+    return { label: `${y}${m} - ${meses[parseInt(m, 10) - 1]} ${y}`, estado };
   }
-
   igvRate() { return this.props.igvRateOverride ?? this.props.igvRate ?? 18; }
 
   computeLinea(linea) {
     const concepto = this.conceptos.find(c => c.id === Number(linea.conceptoId));
     const cantidad = Number(linea.cantidad) || 0;
     const precioUnit = Number(linea.precioUnit) || 0;
-    const base = cantidad * precioUnit;
+    const descuento = Number(linea.descuento) || 0;
+    const base = Math.max(0, cantidad * precioUnit - descuento);
     const igv = concepto && concepto.gravada ? base * (this.igvRate() / 100) : 0;
-    return { base, igv, gravada: !!(concepto && concepto.gravada) };
+    return { base, igv, gravada: !!(concepto && concepto.gravada), esGratuita: !!linea.esGratuita };
   }
 
-  computeTotales(lineas) {
-    let baseGravada = 0, exoneradoInafecto = 0, igv = 0;
+  computeTotales(lineas, cantidadBolsas) {
+    let baseGravada = 0, exoneradoInafecto = 0, igv = 0, total = 0;
     lineas.forEach(l => {
       const c = this.computeLinea(l);
       if (c.gravada) baseGravada += c.base; else exoneradoInafecto += c.base;
       igv += c.igv;
+      if (!c.esGratuita) total += c.base + c.igv;
     });
-    const total = baseGravada + exoneradoInafecto + igv;
-    return { baseGravada: this.money(baseGravada), exoneradoInafecto: this.money(exoneradoInafecto), igv: this.money(igv), total: this.money(total), totalRaw: total };
+    const icbper = (Number(cantidadBolsas) || 0) * 0.50;
+    total += icbper;
+    return { baseGravada: this.money(baseGravada), exoneradoInafecto: this.money(exoneradoInafecto), igv: this.money(igv), icbper: this.money(icbper), total: this.money(total), totalRaw: total };
   }
 
-  generateFolio() {
-    const nums = this.state.registros.map(r => parseInt(r.folio.split('-').pop(), 10)).filter(n => !isNaN(n));
-    const next = (nums.length ? Math.max(...nums) : 127) + 1;
-    return `VTA-202607-${String(next).padStart(4, '0')}`;
+  computeDetraccion(tercero, tipoOperacion, totalRaw) {
+    if (!tipoOperacion || !tipoOperacion.usaDetraccion) return null;
+    if (!tercero || !tercero.detraccion) return null;
+    if (totalRaw < tercero.detraccion.montoMinimo) return null;
+    const monto = Math.trunc(totalRaw * tercero.detraccion.porcentaje / 100 * 100) / 100;
+    return { tipoBienServicio: tercero.detraccion.tipoBienServicio, porcentaje: tercero.detraccion.porcentaje, montoLabel: this.money(monto) };
   }
+
+  generateSerieNumero(grupo) {
+    const prefijo = grupo === 'NOTA_CREDITO' ? 'FC01' : grupo === 'NOTA_DEBITO' ? 'FD01' : 'F001';
+    const nums = this.state.registros.filter(r => r.grupo === grupo).map(r => parseInt(r.numero, 10)).filter(n => !isNaN(n));
+    const next = (nums.length ? Math.max(...nums) : 1500) + 1;
+    return { serie: prefijo, numero: String(next).padStart(8, '0') };
+  }
+
+  setActiveTab(grupo) { this.setState({ activeTab: grupo }); }
 
   openNuevo() {
+    const grupo = this.state.activeTab;
+    const { serie, numero } = this.generateSerieNumero(grupo);
+    const hoy = new Date().toISOString().slice(0, 10);
     this.setState({
       modal: 'nuevo', step: 1,
-      form: { id: null, tipoOperacionId: '', terceroId: '', empresaId: 24, sucursalId: 19, serie: 'F001', numero: '', fechaEmision: '', fechaVencimiento: '', lineas: [] },
+      form: { id: null, grupo, tipoOperacionId: this.tiposOperacion.filter(t => t.grupo === grupo)[0].id, terceroId: '', empresaId: 24, sucursalId: 19, serie, numero, fechaEmision: hoy, fechaVencimiento: this.addDays(hoy, 30), fechaRegistro: hoy, motivoId: '', docRefId: '', cantidadBolsas: 0, lineas: [] },
       terceroSearchText: '', terceroDropdownAbierto: false,
       empresaSearchText: '24 - INVERSIONES GLOBALES PERU S.A.', empresaDropdownAbierto: false,
       sucursalSearchText: '19 - SEDE OPERATIVA SUR COSTA', sucursalDropdownAbierto: false,
+      docRefSearchText: '', docRefDropdownAbierto: false,
     });
   }
 
@@ -556,82 +633,70 @@ class Component extends DCLogic {
     const reg = this.state.registros.find(r => r.id === id);
     if (!reg) return;
     const t = this.terceros.find(x => x.id === reg.terceroId);
-    this.setState({ modal: 'editar', step: 1, form: JSON.parse(JSON.stringify(reg)), terceroSearchText: t ? t.label : '', terceroDropdownAbierto: false });
+    const doc = this.documentosReferencia.find(d => d.id === reg.docRefId);
+    this.setState({
+      modal: 'editar', step: 1, form: JSON.parse(JSON.stringify(reg)),
+      terceroSearchText: t ? t.label : '', terceroDropdownAbierto: false,
+      docRefSearchText: doc ? `${doc.folio} — ${this.terceros.find(x => x.id === doc.terceroId)?.label ?? ''}` : '', docRefDropdownAbierto: false,
+    });
   }
 
   cerrarWizard() { this.setState({ modal: null, step: 1, form: null }); }
   pasoSiguiente() { this.setState(s => ({ step: Math.min(3, s.step + 1) })); }
   pasoAnterior() { this.setState(s => ({ step: Math.max(1, s.step - 1) })); }
+  irEditarDesdeGuardado() { this.setState({ step: 1 }); }
+  irAnularDesdeGuardado() { this.setState(s => ({ modal: null, step: 1, anularRegistro: s.form.id })); }
 
-  onTipoOperacion(e) {
-    const id = Number(e.target.value);
-    this.setState(s => ({ form: { ...s.form, tipoOperacionId: id, lineas: s.form.id ? s.form.lineas : [] } }));
-  }
-  onTercero(id) {
-    const t = this.terceros.find(x => x.id === id);
-    this.setState(s => ({ form: { ...s.form, terceroId: id }, terceroSearchText: t ? t.label : '', terceroDropdownAbierto: false }));
-  }
-  onTerceroSearch(e) {
-    const v = e.target.value;
-    this.setState({ terceroSearchText: v, terceroDropdownAbierto: true, form: { ...this.state.form, terceroId: '' } });
-  }
+  onTercero(id) { const t = this.terceros.find(x => x.id === id); this.setState(s => ({ form: { ...s.form, terceroId: id }, terceroSearchText: t ? t.label : '', terceroDropdownAbierto: false })); }
+  onTerceroSearch(e) { this.setState({ terceroSearchText: e.target.value, terceroDropdownAbierto: true, form: { ...this.state.form, terceroId: '' } }); }
   onTerceroFocus() { this.setState({ terceroDropdownAbierto: true }); }
-  onEmpresa(id) {
-    const e = this.empresas.find(x => x.id === id);
-    this.setState(s => ({ form: { ...s.form, empresaId: id }, empresaSearchText: e ? e.label : '', empresaDropdownAbierto: false }));
-  }
+  onEmpresa(id) { const e = this.empresas.find(x => x.id === id); this.setState(s => ({ form: { ...s.form, empresaId: id }, empresaSearchText: e ? e.label : '', empresaDropdownAbierto: false })); }
   onEmpresaSearch(e) { this.setState({ empresaSearchText: e.target.value, empresaDropdownAbierto: true, form: { ...this.state.form, empresaId: '' } }); }
   onEmpresaFocus() { this.setState({ empresaDropdownAbierto: true }); }
-  onSucursal(id) {
-    const s = this.sucursales.find(x => x.id === id);
-    this.setState(st => ({ form: { ...st.form, sucursalId: id }, sucursalSearchText: s ? s.label : '', sucursalDropdownAbierto: false }));
-  }
+  onSucursal(id) { const s = this.sucursales.find(x => x.id === id); this.setState(st => ({ form: { ...st.form, sucursalId: id }, sucursalSearchText: s ? s.label : '', sucursalDropdownAbierto: false })); }
   onSucursalSearch(e) { this.setState({ sucursalSearchText: e.target.value, sucursalDropdownAbierto: true, form: { ...this.state.form, sucursalId: '' } }); }
   onSucursalFocus() { this.setState({ sucursalDropdownAbierto: true }); }
   onEmpresaClear() { this.setState(s => ({ form: { ...s.form, empresaId: '' }, empresaSearchText: '', empresaDropdownAbierto: false })); }
   onSucursalClear() { this.setState(s => ({ form: { ...s.form, sucursalId: '' }, sucursalSearchText: '', sucursalDropdownAbierto: false })); }
 
-  onFiltroEmpresa(id) {
-    const e = this.empresas.find(x => x.id === id);
-    this.setState({ filtroEmpresaId: id, filtroEmpresaSearchText: e ? e.label : '', filtroEmpresaDropdownAbierto: false });
+  onDocRefSearch(e) { this.setState({ docRefSearchText: e.target.value, docRefDropdownAbierto: true, form: { ...this.state.form, docRefId: '', terceroId: '' } }); }
+  onDocRefFocus() { this.setState({ docRefDropdownAbierto: true }); }
+  onDocRef(id) {
+    const doc = this.documentosReferencia.find(d => d.id === id);
+    const t = doc ? this.terceros.find(x => x.id === doc.terceroId) : null;
+    this.setState(s => ({ form: { ...s.form, docRefId: id, terceroId: doc ? doc.terceroId : '' }, docRefSearchText: doc ? `${doc.folio} — ${t ? t.label : ''}` : '', docRefDropdownAbierto: false }));
   }
+  onMotivo(e) { const v = Number(e.target.value); this.setState(s => ({ form: { ...s.form, motivoId: v } })); }
+  onTipoOperacion(e) { const v = Number(e.target.value); this.setState(s => ({ form: { ...s.form, tipoOperacionId: v } })); }
+
+  onFiltroEmpresa(id) { const e = this.empresas.find(x => x.id === id); this.setState({ filtroEmpresaId: id, filtroEmpresaSearchText: e ? e.label : '', filtroEmpresaDropdownAbierto: false }); }
   onFiltroEmpresaSearch(e) { this.setState({ filtroEmpresaSearchText: e.target.value, filtroEmpresaDropdownAbierto: true, filtroEmpresaId: '' }); }
   onFiltroEmpresaFocus() { this.setState({ filtroEmpresaDropdownAbierto: true }); }
   onFiltroEmpresaClear() { this.setState({ filtroEmpresaId: '', filtroEmpresaSearchText: '', filtroEmpresaDropdownAbierto: false }); }
-  onFiltroSucursal(id) {
-    const s = this.sucursales.find(x => x.id === id);
-    this.setState({ filtroSucursalId: id, filtroSucursalSearchText: s ? s.label : '', filtroSucursalDropdownAbierto: false });
-  }
+  onFiltroSucursal(id) { const s = this.sucursales.find(x => x.id === id); this.setState({ filtroSucursalId: id, filtroSucursalSearchText: s ? s.label : '', filtroSucursalDropdownAbierto: false }); }
   onFiltroSucursalSearch(e) { this.setState({ filtroSucursalSearchText: e.target.value, filtroSucursalDropdownAbierto: true, filtroSucursalId: '' }); }
   onFiltroSucursalFocus() { this.setState({ filtroSucursalDropdownAbierto: true }); }
   onFiltroSucursalClear() { this.setState({ filtroSucursalId: '', filtroSucursalSearchText: '', filtroSucursalDropdownAbierto: false }); }
   onSerie(e) { const v = e.target.value; this.setState(s => ({ form: { ...s.form, serie: v } })); }
   onNumero(e) { const v = e.target.value; this.setState(s => ({ form: { ...s.form, numero: v } })); }
-  onFechaEmision(e) {
-    const v = e.target.value;
-    this.setState(s => ({ form: { ...s.form, fechaEmision: v, fechaVencimiento: this.addDays(v, 30) } }));
-  }
+  onFechaEmision(e) { const v = e.target.value; this.setState(s => ({ form: { ...s.form, fechaEmision: v, fechaVencimiento: this.addDays(v, 30) } })); }
   onFechaVencimiento(e) { const v = e.target.value; this.setState(s => ({ form: { ...s.form, fechaVencimiento: v } })); }
+  onFechaRegistro(e) { const v = e.target.value; this.setState(s => ({ form: { ...s.form, fechaRegistro: v } })); }
+  onCantidadBolsas(e) { const v = e.target.value; this.setState(s => ({ form: { ...s.form, cantidadBolsas: v } })); }
 
-  addLinea() {
-    this.setState(s => ({ form: { ...s.form, lineas: [...s.form.lineas, { id: Date.now(), conceptoId: '', cantidad: 1, precioUnit: 0 }] } }));
-  }
-  removeLinea(id) {
-    this.setState(s => ({ form: { ...s.form, lineas: s.form.lineas.filter(l => l.id !== id) } }));
-  }
-  updateLineaField(id, field, value) {
-    this.setState(s => ({ form: { ...s.form, lineas: s.form.lineas.map(l => l.id === id ? { ...l, [field]: value } : l) } }));
-  }
+  addLinea() { this.setState(s => ({ form: { ...s.form, lineas: [...s.form.lineas, { id: Date.now(), conceptoId: '', cantidad: 1, precioUnit: 0, descuento: 0, esGratuita: false }] } })); }
+  removeLinea(id) { this.setState(s => ({ form: { ...s.form, lineas: s.form.lineas.filter(l => l.id !== id) } })); }
+  updateLineaField(id, field, value) { this.setState(s => ({ form: { ...s.form, lineas: s.form.lineas.map(l => l.id === id ? { ...l, [field]: value } : l) } })); }
 
   guardar() {
     const f = this.state.form;
     if (!f) return;
+    const tipoOp = this.tiposOperacion.find(t => t.grupo === f.grupo);
     if (f.id) {
-      this.setState(s => ({ registros: s.registros.map(r => r.id === f.id ? { ...f } : r), modal: null, form: null, step: 1 }));
+      this.setState(s => ({ registros: s.registros.map(r => r.id === f.id ? { ...f, tipoOperacionId: tipoOp.id } : r), step: 'guardado' }));
     } else {
-      const folio = this.generateFolio();
-      const nuevo = { ...f, id: Date.now(), folio, estado: 'BORRADOR' };
-      this.setState(s => ({ registros: [...s.registros, nuevo], modal: null, form: null, step: 1 }));
+      const nuevo = { ...f, id: Date.now(), tipoOperacionId: tipoOp.id, estado: 'BORRADOR' };
+      this.setState(s => ({ registros: [...s.registros, nuevo], form: nuevo, step: 'guardado' }));
     }
   }
 
@@ -639,19 +704,16 @@ class Component extends DCLogic {
   cerrarVer() { this.setState({ verRegistro: null }); }
   openAnular(id) { this.setState({ anularRegistro: id }); }
   cerrarAnular() { this.setState({ anularRegistro: null }); }
-  confirmarAnular() {
-    const id = this.state.anularRegistro;
-    this.setState(s => ({ registros: s.registros.map(r => r.id === id ? { ...r, estado: 'ANULADO' } : r), anularRegistro: null }));
-  }
+  confirmarAnular() { const id = this.state.anularRegistro; this.setState(s => ({ registros: s.registros.map(r => r.id === id ? { ...r, estado: 'ANULADO' } : r), anularRegistro: null })); }
 
-  onFiltroRuc(e) { this.setState({ filtroRuc: e.target.value }); }
-  onFiltroCorrelativo(e) { this.setState({ filtroCorrelativo: e.target.value }); }
+  onFiltroCliente(e) { this.setState({ filtroCliente: e.target.value }); }
+  onFiltroSerieNumero(e) { this.setState({ filtroSerieNumero: e.target.value }); }
   onFiltroEstado(e) { this.setState({ filtroEstado: e.target.value }); }
   onFiltroFechaDesde(e) { this.setState({ filtroFechaDesde: e.target.value }); }
   onFiltroFechaHasta(e) { this.setState({ filtroFechaHasta: e.target.value }); }
   limpiarFiltros() {
     this.setState({
-      filtroRuc: '', filtroCorrelativo: '', filtroEstado: 'Todos', filtroFechaDesde: '2026-07-01', filtroFechaHasta: '2026-07-31',
+      filtroCliente: '', filtroSerieNumero: '', filtroEstado: 'Todos', filtroFechaDesde: '2026-07-01', filtroFechaHasta: '2026-07-31',
       filtroEmpresaId: 24, filtroEmpresaSearchText: '24 - INVERSIONES GLOBALES PERU S.A.', filtroEmpresaDropdownAbierto: false,
       filtroSucursalId: 19, filtroSucursalSearchText: '19 - SEDE OPERATIVA SUR COSTA', filtroSucursalDropdownAbierto: false,
     });
@@ -663,11 +725,15 @@ class Component extends DCLogic {
     return {
       ...linea,
       conceptoLabel: concepto ? concepto.label : '—',
+      afectacionLabel: concepto ? concepto.afectacion : '—',
       baseLabel: this.money(computed.base),
       igvLabel: this.money(computed.igv),
+      gratuitaLabel: linea.esGratuita ? 'Sí' : 'No',
       onConcepto: (e) => this.updateLineaField(linea.id, 'conceptoId', e.target.value),
       onCantidad: (e) => this.updateLineaField(linea.id, 'cantidad', e.target.value),
       onPrecio: (e) => this.updateLineaField(linea.id, 'precioUnit', e.target.value),
+      onDescuento: (e) => this.updateLineaField(linea.id, 'descuento', e.target.value),
+      onGratuita: (e) => this.updateLineaField(linea.id, 'esGratuita', e.target.checked),
       onEliminar: () => this.removeLinea(linea.id),
     };
   }
@@ -676,66 +742,93 @@ class Component extends DCLogic {
     const accent = this.props.accentColor ?? '#3b82f6';
     const igvRateLabel = this.igvRate();
     const mostrarAnulados = this.props.mostrarAnulados ?? true;
+    const activeTab = this.state.activeTab;
+
+    const tabDefs = [
+      { grupo: 'VENTA_NACIONAL', label: 'Venta Nacional' },
+      { grupo: 'NOTA_CREDITO', label: 'Notas de Crédito' },
+      { grupo: 'NOTA_DEBITO', label: 'Notas de Débito' },
+    ];
+    const tabs = tabDefs.map(t => ({
+      ...t, onSelect: () => this.setActiveTab(t.grupo),
+      borderColor: activeTab === t.grupo ? accent : 'transparent',
+      textColor: activeTab === t.grupo ? '#ffffff' : '#8b93a1',
+    }));
 
     const filasTabla = this.state.registros
+      .filter(r => r.grupo === activeTab)
       .filter(r => mostrarAnulados || r.estado !== 'ANULADO')
       .filter(r => this.state.filtroEstado === 'Todos' || r.estado === this.state.filtroEstado)
-      .filter(r => !this.state.filtroCorrelativo || r.folio.toLowerCase().includes(this.state.filtroCorrelativo.toLowerCase()))
-      .filter(r => {
-        if (!this.state.filtroRuc) return true;
-        const t = this.terceros.find(x => x.id === r.terceroId);
-        return t && t.label.toLowerCase().includes(this.state.filtroRuc.toLowerCase());
-      })
-      .filter(r => (!this.state.filtroFechaDesde || r.fechaEmision >= this.state.filtroFechaDesde) && (!this.state.filtroFechaHasta || r.fechaEmision <= this.state.filtroFechaHasta))
+      .filter(r => !this.state.filtroSerieNumero || `${r.serie}-${r.numero}`.toLowerCase().includes(this.state.filtroSerieNumero.toLowerCase()))
+      .filter(r => { if (!this.state.filtroCliente) return true; const t = this.terceros.find(x => x.id === r.terceroId); return t && t.label.toLowerCase().includes(this.state.filtroCliente.toLowerCase()); })
+      .filter(r => (!this.state.filtroFechaDesde || r.fechaRegistro >= this.state.filtroFechaDesde) && (!this.state.filtroFechaHasta || r.fechaRegistro <= this.state.filtroFechaHasta))
       .map(r => {
         const tercero = this.terceros.find(t => t.id === r.terceroId);
+        const tipoOp = this.tiposOperacion.find(t => t.id === r.tipoOperacionId);
         const totales = this.computeTotales(r.lineas);
         const isAnulado = r.estado === 'ANULADO';
+        const puedeEditar = r.estado === 'BORRADOR';
         return {
-          ...r,
+          ...r, serieNumero: `${r.serie}-${r.numero}`,
           clienteLabel: tercero ? tercero.label.split(' - ')[1] : '—',
-          totalLabel: totales.total,
-          estadoBg: isAnulado ? '#3a1414' : '#123a22',
-          estadoColor: isAnulado ? '#f87171' : '#4ade80',
-          puedeEditar: !isAnulado,
+          moneda: tipoOp ? tipoOp.moneda : '—',
+          totalLabel: `S/ ${totales.total}`,
+          estadoBg: isAnulado ? '#3a1414' : r.estado === 'CONTABILIZADO' ? '#1c2a3a' : '#123a22',
+          estadoColor: isAnulado ? '#f87171' : r.estado === 'CONTABILIZADO' ? '#60a5fa' : '#4ade80',
+          accionesDeshabilitadas: !puedeEditar,
+          accionColor: puedeEditar ? '#d1d5db' : '#3a3a40',
+          accionAnularColor: puedeEditar ? '#ef4444' : '#3a3a40',
+          accionCursor: puedeEditar ? 'pointer' : 'not-allowed',
           onVer: () => this.openVer(r.id),
-          onEditar: () => this.openEditar(r.id),
-          onAnular: () => this.openAnular(r.id),
+          onEditar: () => puedeEditar && this.openEditar(r.id),
+          onAnular: () => puedeEditar && this.openAnular(r.id),
         };
       });
 
     const form = this.state.form;
-    let formVals = null, conceptosDisponibles = [], totalesPreview = { baseGravada: '0.00', exoneradoInafecto: '0.00', igv: '0.00', total: '0.00' };
-    let terceroOpciones = [], empresaOpciones = [], sucursalOpciones = [];
-    const filtroEmpresaOpciones = this.empresas
-      .filter(e => e.label.toLowerCase().includes((this.state.filtroEmpresaSearchText || '').toLowerCase()))
-      .map(e => ({ ...e, onSelect: () => this.onFiltroEmpresa(e.id) }));
-    const filtroSucursalOpciones = this.sucursales
-      .filter(s => s.label.toLowerCase().includes((this.state.filtroSucursalSearchText || '').toLowerCase()))
-      .map(s => ({ ...s, onSelect: () => this.onFiltroSucursal(s.id) }));
+    let formVals = null, conceptosDisponibles = [], totalesPreview = { baseGravada: '0.00', exoneradoInafecto: '0.00', igv: '0.00', total: '0.00', totalRaw: 0 };
+    let terceroOpciones = [], empresaOpciones = [], sucursalOpciones = [], docRefOpciones = [], motivosDisponibles = [];
+    let tipoOperacionActual = { label: '—', tipoDocumento: '—', moneda: '—' };
+    let esNCND = false, vencimientoInvalido = false, periodoInvalido = false, periodoMensaje = '', mostrarDetraccion = false, detraccion = null;
+
+    const filtroEmpresaOpciones = this.empresas.filter(e => e.label.toLowerCase().includes((this.state.filtroEmpresaSearchText || '').toLowerCase())).map(e => ({ ...e, onSelect: () => this.onFiltroEmpresa(e.id) }));
+    const filtroSucursalOpciones = this.sucursales.filter(s => s.label.toLowerCase().includes((this.state.filtroSucursalSearchText || '').toLowerCase())).map(s => ({ ...s, onSelect: () => this.onFiltroSucursal(s.id) }));
+
     if (form) {
-      const tipoOp = this.tiposOperacion.find(t => t.id === Number(form.tipoOperacionId));
+      esNCND = form.grupo === 'NOTA_CREDITO' || form.grupo === 'NOTA_DEBITO';
+      const tiposOperacionDisponibles = this.tiposOperacion.filter(t => t.grupo === form.grupo);
+      const tipoOp = this.tiposOperacion.find(t => t.id === Number(form.tipoOperacionId)) || tiposOperacionDisponibles[0];
+      tipoOperacionActual = tipoOp || tipoOperacionActual;
       const tercero = this.terceros.find(t => t.id === Number(form.terceroId));
-      conceptosDisponibles = tipoOp ? this.conceptos.filter(c => c.grupo === tipoOp.grupo) : [];
-      terceroOpciones = this.terceros
-        .filter(t => t.label.toLowerCase().includes((this.state.terceroSearchText || '').toLowerCase()))
-        .map(t => ({ ...t, onSelect: () => this.onTercero(t.id) }));
-      empresaOpciones = this.empresas
-        .filter(e => e.label.toLowerCase().includes((this.state.empresaSearchText || '').toLowerCase()))
-        .map(e => ({ ...e, onSelect: () => this.onEmpresa(e.id) }));
-      sucursalOpciones = this.sucursales
-        .filter(s => s.label.toLowerCase().includes((this.state.sucursalSearchText || '').toLowerCase()))
-        .map(s => ({ ...s, onSelect: () => this.onSucursal(s.id) }));
-      const periodo = this.periodoDe(form.fechaEmision);
-      totalesPreview = this.computeTotales(form.lineas);
+      conceptosDisponibles = tipoOp ? this.conceptos.filter(c => c.grupo === (tipoOp.conceptosGrupo || tipoOp.grupo)) : [];
+      terceroOpciones = this.terceros.filter(t => t.label.toLowerCase().includes((this.state.terceroSearchText || '').toLowerCase())).map(t => ({ ...t, onSelect: () => this.onTercero(t.id) }));
+      empresaOpciones = this.empresas.filter(e => e.label.toLowerCase().includes((this.state.empresaSearchText || '').toLowerCase())).map(e => ({ ...e, onSelect: () => this.onEmpresa(e.id) }));
+      sucursalOpciones = this.sucursales.filter(s => s.label.toLowerCase().includes((this.state.sucursalSearchText || '').toLowerCase())).map(s => ({ ...s, onSelect: () => this.onSucursal(s.id) }));
+      docRefOpciones = this.documentosReferencia
+        .filter(d => d.estado === 'CONTABILIZADO')
+        .filter(d => `${d.folio}`.toLowerCase().includes((this.state.docRefSearchText || '').toLowerCase()) || (this.terceros.find(t => t.id === d.terceroId)?.label || '').toLowerCase().includes((this.state.docRefSearchText || '').toLowerCase()))
+        .map(d => { const t = this.terceros.find(x => x.id === d.terceroId); return { ...d, label: `${d.folio} — ${t ? t.label : ''}`, onSelect: () => this.onDocRef(d.id) }; });
+      motivosDisponibles = tipoOp && tipoOp.catalogoMotivo === 9 ? this.motivosNC : tipoOp && tipoOp.catalogoMotivo === 10 ? this.motivosND : [];
+
+      const periodo = this.periodoDe(form.fechaRegistro);
+      if (form.fechaRegistro && (form.fechaRegistro < this.ejercicioRango.inicio || form.fechaRegistro > this.ejercicioRango.fin)) {
+        periodoInvalido = true; periodoMensaje = 'La Fecha de Registro está fuera del rango configurado para el ejercicio contable.';
+      } else if (periodo.estado === 'CERRADO') {
+        periodoInvalido = true; periodoMensaje = 'El ejercicio resuelto está CERRADO. No se permite el registro.';
+      }
+      vencimientoInvalido = !!(form.fechaVencimiento && form.fechaEmision && form.fechaVencimiento < form.fechaEmision);
+
+      totalesPreview = this.computeTotales(form.lineas, form.cantidadBolsas);
+      detraccion = this.computeDetraccion(tercero, tipoOp, totalesPreview.totalRaw);
+      mostrarDetraccion = !!detraccion;
+
+      const doc = this.documentosReferencia.find(d => d.id === Number(form.docRefId));
       formVals = {
         ...form,
-        tipoOperacionLabel: tipoOp ? tipoOp.label : '—',
-        terceroLabel: tercero ? tercero.label : '—',
-        tipoDocumentoDisplay: tipoOp ? tipoOp.tipoDocumento : 'Seleccione tipo de operación',
-        monedaDisplay: tipoOp ? `${tipoOp.moneda} · T.C. ${tipoOp.tasa.toFixed(6)}` : '—',
-        periodoDisplay: periodo.label,
-        periodoEstado: periodo.estado,
+        clienteLabel: tercero ? tercero.label : '—',
+        docRefLabel: doc ? `${doc.folio} — ${this.terceros.find(t => t.id === doc.terceroId)?.label ?? ''}` : '—',
+        motivoLabel: (motivosDisponibles.find(m => m.id === Number(form.motivoId)) || {}).label || '—',
+        periodoDisplay: periodo.label, periodoEstado: periodo.estado,
         lineas: form.lineas.map(l => this.buildLineaVals(l)),
       };
     }
@@ -746,37 +839,32 @@ class Component extends DCLogic {
       if (r) {
         const tipoOp = this.tiposOperacion.find(t => t.id === r.tipoOperacionId);
         const tercero = this.terceros.find(t => t.id === r.terceroId);
-        verRegistro = {
-          ...r,
-          terceroLabel: tercero ? tercero.label : '—',
-          numeroCompleto: `${r.serie}-${r.numero}`,
-          monedaDisplay: tipoOp ? tipoOp.moneda : '—',
-          lineas: r.lineas.map(l => this.buildLineaVals(l)),
-          totales: this.computeTotales(r.lineas),
-        };
+        verRegistro = { ...r, serieNumero: `${r.serie}-${r.numero}`, clienteLabel: tercero ? tercero.label : '—', moneda: tipoOp ? tipoOp.moneda : '—', lineas: r.lineas.map(l => this.buildLineaVals(l)), totales: this.computeTotales(r.lineas) };
       }
     }
-
     let anularRegistro = null;
     if (this.state.anularRegistro != null) {
-      anularRegistro = this.state.registros.find(x => x.id === this.state.anularRegistro);
+      const r = this.state.registros.find(x => x.id === this.state.anularRegistro);
+      if (r) anularRegistro = { ...r, serieNumero: `${r.serie}-${r.numero}` };
     }
 
     const step = this.state.step;
     const pasos = ['Cabecera', 'Detalle', 'Confirmar'].map((label, i) => {
       const n = i + 1;
-      const active = n === step, done = n < step;
+      const active = n === step, done = typeof step === 'number' ? n < step : true;
       return { label: `${n}. ${label}`, barColor: active || done ? accent : '#232328', textColor: active ? '#ffffff' : done ? '#8b93a1' : '#5b6270' };
     });
 
-    const canSaveStep1 = form && form.tipoOperacionId && form.terceroId && form.serie && form.numero && form.fechaEmision;
-    const canSaveStep2 = form && form.lineas.length > 0 && form.lineas.every(l => l.conceptoId);
+    const canSaveCabecera = form && form.empresaId && form.sucursalId && form.terceroId && form.serie && form.numero && form.fechaEmision && form.fechaRegistro
+      && !vencimientoInvalido && !periodoInvalido && (!esNCND || (form.docRefId && form.motivoId));
+    const canSaveDetalle = form && form.lineas.length > 0 && form.lineas.every(l => l.conceptoId);
+    const guardarBloqueado = !(canSaveCabecera && canSaveDetalle);
 
     return {
-      accent, igvRateLabel,
-      filtroRuc: this.state.filtroRuc, filtroCorrelativo: this.state.filtroCorrelativo, filtroEstado: this.state.filtroEstado,
+      accent, igvRateLabel, tabs,
+      filtroCliente: this.state.filtroCliente, filtroSerieNumero: this.state.filtroSerieNumero, filtroEstado: this.state.filtroEstado,
       filtroFechaDesde: this.state.filtroFechaDesde, filtroFechaHasta: this.state.filtroFechaHasta,
-      onFiltroRuc: (e) => this.onFiltroRuc(e), onFiltroCorrelativo: (e) => this.onFiltroCorrelativo(e), onFiltroEstado: (e) => this.onFiltroEstado(e),
+      onFiltroCliente: (e) => this.onFiltroCliente(e), onFiltroSerieNumero: (e) => this.onFiltroSerieNumero(e), onFiltroEstado: (e) => this.onFiltroEstado(e),
       onFiltroFechaDesde: (e) => this.onFiltroFechaDesde(e), onFiltroFechaHasta: (e) => this.onFiltroFechaHasta(e),
       limpiarFiltros: () => this.limpiarFiltros(),
       filtroEmpresaId: this.state.filtroEmpresaId, filtroEmpresaSearchText: this.state.filtroEmpresaSearchText, filtroEmpresaDropdownAbierto: this.state.filtroEmpresaDropdownAbierto,
@@ -788,14 +876,23 @@ class Component extends DCLogic {
       filasTabla, tablaVacia: filasTabla.length === 0,
       openNuevo: () => this.openNuevo(),
       wizardAbierto: this.state.modal !== null,
-      wizardTitulo: this.state.modal === 'editar' ? 'Editar Registro de Venta Nacional' : 'Registro de Venta Nacional',
-      pasos, enPaso1: step === 1, enPaso2: step === 2, enPaso3: step === 3,
-      mostrarAtras: step > 1, mostrarSiguiente: step < 3, mostrarGuardar: step === 3,
-      siguienteBloqueado: step === 1 ? !canSaveStep1 : !canSaveStep2,
-      siguienteOpacity: (step === 1 ? !canSaveStep1 : !canSaveStep2) ? 0.5 : 1,
-      tipoOperacionBloqueado: this.state.modal === 'editar',
+      wizardTitulo: (this.state.modal === 'editar' ? 'Editar ' : 'Nuevo ') + (form && form.grupo === 'NOTA_CREDITO' ? 'Nota de Crédito' : form && form.grupo === 'NOTA_DEBITO' ? 'Nota de Débito' : 'Venta Nacional'),
+      enPasoGuardado: step === 'guardado', mostrarPasosForm: step !== 'guardado',
+      enPaso1: true, guardarBloqueado, guardarOpacity: guardarBloqueado ? 0.5 : 1,
       serieNumeroBloqueado: this.state.modal === 'editar',
-      form: formVals, tiposOperacionOpciones: this.tiposOperacion, terceros: this.terceros, conceptosDisponibles,
+      tabActivaLabel: activeTab === 'NOTA_CREDITO' ? 'Notas de Crédito' : activeTab === 'NOTA_DEBITO' ? 'Notas de Débito' : 'Venta Nacional',
+      wizardModo: this.state.modal === 'editar' ? 'Editar' : 'Nuevo',
+      esNCND, tipoOperacionActual, tiposOperacionDisponibles: form ? this.tiposOperacion.filter(t => t.grupo === form.grupo) : [], onTipoOperacion: (e) => this.onTipoOperacion(e),
+      detraccionTipoLabel: detraccion ? `${detraccion.tipoBienServicio} (${detraccion.porcentaje}%)` : 'No aplica',
+      detraccionMontoLabel: detraccion ? `S/ ${detraccion.montoLabel}` : '—',
+      detraccionColor: detraccion ? '#f4f4f6' : '#5b6270', detraccionMontoColor: detraccion ? '#eab308' : '#5b6270',
+      motivosDisponibles, onMotivo: (e) => this.onMotivo(e),
+      vencimientoInvalido, periodoInvalido, periodoMensaje, mostrarDetraccion, detraccion,
+      docRefSearchText: this.state.docRefSearchText, docRefDropdownAbierto: this.state.docRefDropdownAbierto,
+      docRefOpciones, docRefSinResultados: docRefOpciones.length === 0,
+      onDocRefSearch: (e) => this.onDocRefSearch(e), onDocRefFocus: () => this.onDocRefFocus(),
+      irEditarDesdeGuardado: () => this.irEditarDesdeGuardado(), irAnularDesdeGuardado: () => this.irAnularDesdeGuardado(),
+      form: formVals, conceptosDisponibles,
       empresaSearchText: this.state.empresaSearchText, empresaDropdownAbierto: this.state.empresaDropdownAbierto,
       empresaOpciones, empresaSinResultados: empresaOpciones.length === 0,
       onEmpresaSearch: (e) => this.onEmpresaSearch(e), onEmpresaFocus: () => this.onEmpresaFocus(),
@@ -808,8 +905,8 @@ class Component extends DCLogic {
       onTerceroSearch: (e) => this.onTerceroSearch(e), onTerceroFocus: () => this.onTerceroFocus(),
       sinLineas: form ? form.lineas.length === 0 : false,
       totalesPreview,
-      onTipoOperacion: (e) => this.onTipoOperacion(e), onTercero: (e) => this.onTercero(e), onSerie: (e) => this.onSerie(e), onNumero: (e) => this.onNumero(e),
-      onFechaEmision: (e) => this.onFechaEmision(e), onFechaVencimiento: (e) => this.onFechaVencimiento(e),
+      onSerie: (e) => this.onSerie(e), onNumero: (e) => this.onNumero(e),
+      onFechaEmision: (e) => this.onFechaEmision(e), onFechaVencimiento: (e) => this.onFechaVencimiento(e), onFechaRegistro: (e) => this.onFechaRegistro(e),
       addLinea: () => this.addLinea(),
       pasoSiguiente: () => this.pasoSiguiente(), pasoAnterior: () => this.pasoAnterior(), cerrarWizard: () => this.cerrarWizard(), guardar: () => this.guardar(),
       verAbierto: verRegistro !== null, verRegistro, cerrarVer: () => this.cerrarVer(),
