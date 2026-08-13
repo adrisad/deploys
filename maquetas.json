@@ -25,6 +25,11 @@
       "id": "Ventas/Registro de Ventas",
       "name": "Registro De Ventas",
       "path": "maquetas/Ventas/Registro de Ventas.dc.html"
+    },
+    {
+      "id": "Tasas_convenios/HU-014 Tasas y Convenios",
+      "name": "HU-014 Tasas Y Convenios",
+      "path": "maquetas/Tasas_convenios/HU-014 Tasas y Convenios.dc.html"
     }
   ]
 }

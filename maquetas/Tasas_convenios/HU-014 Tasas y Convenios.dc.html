@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#0a0a0a;}
+*{box-sizing:border-box;}
+a{color:#3b82f6;text-decoration:none;}
+a:hover{color:#60a5fa;}
+input,select,button{font-family:inherit;}
+input::placeholder{color:#5a5a5a;}
+</style>
+</helmet>
+<div style="min-height:100vh;background:#0a0a0a;color:#e8e8e8;font-family:'Inter Tight',Helvetica,sans-serif;padding:36px 44px 80px;">
+
+  <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:24px;margin-bottom:26px;">
+    <div>
+      
+      <h1 style="margin:0;font-size:34px;font-weight:700;letter-spacing:-.02em;">{{ tituloPantalla }}</h1>
+      <p style="margin:8px 0 0;color:#9ca3af;font-size:15px;">{{ subtituloPantalla }}</p>
+    </div>
+    <div style="display:flex;gap:8px;background:#141414;border:1px solid #262626;border-radius:10px;padding:5px;">
+      <button onClick="{{ irTasas }}" style="{{ tabTasasStyle }}">Tasas y Convenios</button>
+      <button onClick="{{ irFactor }}" style="{{ tabFactorStyle }}">Factor MEF</button>
+    </div>
+  </div>
+
+  <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:#9ca3af;background:#111;border:1px solid #232323;border-radius:10px;padding:10px 14px;margin-bottom:26px;">
+    <span style="width:7px;height:7px;border-radius:50%;background:#22c55e;display:inline-block;"></span>
+    Empresa activa: <strong style="color:#e8e8e8;font-weight:600;">Tottotecnia S.A.C.</strong>
+    
+  </div>
+
+  <sc-if value="{{ enTasas }}" hint-placeholder-val="{{ true }}">
+  <div>
+    <div style="background:#111111;border:1px solid #262626;border-radius:14px;overflow:hidden;margin-bottom:28px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:16px;padding:18px 22px;border-bottom:1px solid #262626;">
+        <div>
+          <div style="font-size:16px;font-weight:600;">Tasas normales por tipo de renta</div>
+          <div style="font-size:13px;color:#6b7280;margin-top:3px;">44 códigos fijos SUNAT (Tabla 19) · edición inline por fila</div>
+        </div>
+        <input value="{{ buscoTasa }}" onChange="{{ onBuscarTasa }}" placeholder="Buscar código o descripción…" style="width:290px;background:#0a0a0a;border:1px solid #2e2e2e;border-radius:9px;padding:10px 14px;color:#e8e8e8;font-size:14px;outline:none;">
+      </div>
+      <table style="width:100%;border-collapse:collapse;">
+        <thead>
+          <tr style="background:#0d0d0d;">
+            <th style="text-align:left;padding:13px 22px;font-size:11px;letter-spacing:.09em;color:#6b7280;font-weight:600;">CÓDIGO</th>
+            <th style="text-align:left;padding:13px 22px;font-size:11px;letter-spacing:.09em;color:#6b7280;font-weight:600;">DESCRIPCIÓN</th>
+            <th style="text-align:left;padding:13px 22px;font-size:11px;letter-spacing:.09em;color:#6b7280;font-weight:600;">ART. REGLAMENTO</th>
+            <th style="text-align:left;padding:13px 22px;font-size:11px;letter-spacing:.09em;color:#6b7280;font-weight:600;">TASA NORMAL PERÚ</th>
+            <th style="text-align:right;padding:13px 22px;font-size:11px;letter-spacing:.09em;color:#6b7280;font-weight:600;">ACCIONES</th>
+          </tr>
+        </thead>
+        <tbody>
+          <sc-for list="{{ tasas }}" as="t" hint-placeholder-count="5">
+            <tr style="border-top:1px solid #1f1f1f;">
+              <td style="padding:15px 22px;font-family:'JetBrains Mono',monospace;font-size:14px;color:#3b82f6;font-weight:500;">{{ t.codigo }}</td>
+              <td style="padding:15px 22px;font-size:14px;">{{ t.descripcion }}</td>
+              <td style="padding:15px 22px;font-size:13px;color:#6b7280;font-family:'JetBrains Mono',monospace;">{{ t.articulo }}</td>
+              <td style="padding:15px 22px;">
+                <div style="display:flex;align-items:center;gap:10px;">
+                  <input value="{{ t.valor }}" onChange="{{ t.onChange }}" placeholder="0.0000%" style="{{ t.inputStyle }}">
+                  <sc-if value="{{ t.pendiente }}" hint-placeholder-val="{{ false }}">
+                    <span style="background:rgba(245,158,11,.14);color:#f59e0b;font-size:11px;font-weight:600;letter-spacing:.04em;padding:5px 10px;border-radius:20px;">Pendiente</span>
+                  </sc-if>
+                  <sc-if value="{{ t.error }}" hint-placeholder-val="{{ false }}">
+                    <span style="color:#ef4444;font-size:12px;">Tasa fuera de rango (0–100%)</span>
+                  </sc-if>
+                  <sc-if value="{{ t.guardado }}" hint-placeholder-val="{{ false }}">
+                    <span style="color:#22c55e;font-size:12px;">Guardado</span>
+                  </sc-if>
+                </div>
+              </td>
+              <td style="padding:15px 22px;text-align:right;">
+                <button onClick="{{ t.onGuardar }}" style="{{ t.btnStyle }}">Guardar</button>
+              </td>
+            </tr>
+          </sc-for>
+        </tbody>
+      </table>
+    </div>
+
+    <div style="background:#111111;border:1px solid #262626;border-radius:14px;overflow:hidden;">
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:18px 22px;border-bottom:1px solid #262626;">
+        <div>
+          <div style="font-size:16px;font-weight:600;">Excepciones por convenio</div>
+          <div style="font-size:13px;color:#6b7280;margin-top:3px;">Tasa tope por tratado · se aplica MIN(tasa normal, tasa tope)</div>
+        </div>
+        <button onClick="{{ abrirNueva }}" style="background:#2563eb;color:#fff;border:none;border-radius:9px;padding:11px 20px;font-size:14px;font-weight:600;cursor:pointer;" style-hover="background:#3b82f6;">+ Nueva excepción</button>
+      </div>
+      <table style="width:100%;border-collapse:collapse;">
+        <thead>
+          <tr style="background:#0d0d0d;">
+            <th style="text-align:left;padding:13px 22px;font-size:11px;letter-spacing:.09em;color:#6b7280;font-weight:600;">CONVENIO</th>
+            <th style="text-align:left;padding:13px 22px;font-size:11px;letter-spacing:.09em;color:#6b7280;font-weight:600;">TIPO DE RENTA</th>
+            <th style="text-align:left;padding:13px 22px;font-size:11px;letter-spacing:.09em;color:#6b7280;font-weight:600;">TASA TOPE</th>
+            <th style="text-align:left;padding:13px 22px;font-size:11px;letter-spacing:.09em;color:#6b7280;font-weight:600;">ESTADO</th>
+            <th style="text-align:right;padding:13px 22px;font-size:11px;letter-spacing:.09em;color:#6b7280;font-weight:600;">ACCIONES</th>
+          </tr>
+        </thead>
+        <tbody>
+          <sc-for list="{{ excepciones }}" as="e" hint-placeholder-count="3">
+            <tr style="border-top:1px solid #1f1f1f;">
+              <td style="padding:16px 22px;font-size:14px;">{{ e.convenio }}</td>
+              <td style="padding:16px 22px;font-size:14px;color:#c9c9c9;">{{ e.renta }}</td>
+              <td style="padding:16px 22px;font-family:'JetBrains Mono',monospace;font-size:14px;">{{ e.tasa }}</td>
+              <td style="padding:16px 22px;"><span style="{{ e.badgeStyle }}">{{ e.estadoLabel }}</span></td>
+              <td style="padding:16px 22px;text-align:right;">
+                <div style="display:flex;gap:18px;justify-content:flex-end;">
+                  <button onClick="{{ e.onEditar }}" style="background:none;border:none;color:#9ca3af;font-size:13px;cursor:pointer;padding:0;" style-hover="color:#e8e8e8;">Editar</button>
+                  <button onClick="{{ e.onToggle }}" style="background:none;border:none;color:#ef4444;font-size:13px;cursor:pointer;padding:0;" style-hover="color:#f87171;">{{ e.toggleLabel }}</button>
+                </div>
+              </td>
+            </tr>
+          </sc-for>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  </sc-if>
+
+  <sc-if value="{{ enFactor }}" hint-placeholder-val="{{ false }}">
+  <div style="background:#111111;border:1px solid #262626;border-radius:14px;overflow:hidden;max-width:1000px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:18px 22px;border-bottom:1px solid #262626;">
+      <div>
+        <div style="font-size:16px;font-weight:600;">Factores mensuales</div>
+        <div style="font-size:13px;color:#6b7280;margin-top:3px;">Art. 21° LIR · factor publicado por el MEF, usado en el reajuste de costo de inmuebles</div>
+      </div>
+      <button onClick="{{ sugerirMes }}" style="background:#2563eb;color:#fff;border:none;border-radius:9px;padding:11px 20px;font-size:14px;font-weight:600;cursor:pointer;" style-hover="background:#3b82f6;">+ Agregar mes siguiente</button>
+    </div>
+    <table style="width:100%;border-collapse:collapse;">
+      <thead>
+        <tr style="background:#0d0d0d;">
+          <th style="text-align:left;padding:13px 22px;font-size:11px;letter-spacing:.09em;color:#6b7280;font-weight:600;">AÑO</th>
+          <th style="text-align:left;padding:13px 22px;font-size:11px;letter-spacing:.09em;color:#6b7280;font-weight:600;">MES</th>
+          <th style="text-align:left;padding:13px 22px;font-size:11px;letter-spacing:.09em;color:#6b7280;font-weight:600;">FACTOR</th>
+          <th style="text-align:right;padding:13px 22px;font-size:11px;letter-spacing:.09em;color:#6b7280;font-weight:600;">ACCIONES</th>
+        </tr>
+      </thead>
+      <tbody>
+        <sc-for list="{{ factores }}" as="f" hint-placeholder-count="3">
+          <tr style="border-top:1px solid #1f1f1f;">
+            <td style="padding:16px 22px;font-family:'JetBrains Mono',monospace;font-size:14px;">{{ f.anio }}</td>
+            <td style="padding:16px 22px;font-size:14px;">{{ f.mesNombre }}</td>
+            <td style="padding:16px 22px;font-family:'JetBrains Mono',monospace;font-size:14px;">{{ f.factor }}</td>
+            <td style="padding:16px 22px;text-align:right;">
+              <div style="display:flex;gap:18px;justify-content:flex-end;">
+                <button onClick="{{ f.onEditar }}" style="background:none;border:none;color:#9ca3af;font-size:13px;cursor:pointer;padding:0;" style-hover="color:#e8e8e8;">Editar</button>
+                <button onClick="{{ f.onEliminar }}" style="background:none;border:none;color:#ef4444;font-size:13px;cursor:pointer;padding:0;" style-hover="color:#f87171;">Eliminar</button>
+              </div>
+            </td>
+          </tr>
+        </sc-for>
+      </tbody>
+    </table>
+    <div style="border-top:1px solid #262626;padding:20px 22px;background:#0d0d0d;">
+      <div style="display:flex;align-items:flex-end;gap:14px;flex-wrap:wrap;">
+        <div style="display:flex;flex-direction:column;gap:7px;">
+          <label style="font-size:12px;color:#9ca3af;">Año</label>
+          <input value="{{ nuevoAnio }}" onChange="{{ onAnio }}" style="width:110px;background:#0a0a0a;border:1px solid #2e2e2e;border-radius:9px;padding:10px 13px;color:#e8e8e8;font-size:14px;outline:none;font-family:'JetBrains Mono',monospace;">
+        </div>
+        <div style="display:flex;flex-direction:column;gap:7px;">
+          <label style="font-size:12px;color:#9ca3af;">Mes</label>
+          <select value="{{ nuevoMes }}" onChange="{{ onMes }}" style="width:150px;background:#0a0a0a;border:1px solid #2e2e2e;border-radius:9px;padding:10px 13px;color:#e8e8e8;font-size:14px;outline:none;">
+            <sc-for list="{{ meses }}" as="m" hint-placeholder-count="12">
+              <option value="{{ m.valor }}">{{ m.nombre }}</option>
+            </sc-for>
+          </select>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:7px;">
+          <label style="font-size:12px;color:#9ca3af;">Factor</label>
+          <input value="{{ nuevoFactor }}" onChange="{{ onFactor }}" placeholder="1.000000" style="width:170px;background:#0a0a0a;border:1px solid #2e2e2e;border-radius:9px;padding:10px 13px;color:#e8e8e8;font-size:14px;outline:none;font-family:'JetBrains Mono',monospace;">
+        </div>
+        <button onClick="{{ guardarFactor }}" style="background:#2563eb;color:#fff;border:none;border-radius:9px;padding:11px 24px;font-size:14px;font-weight:600;cursor:pointer;" style-hover="background:#3b82f6;">Guardar</button>
+      </div>
+      <sc-if value="{{ errorFactor }}" hint-placeholder-val="{{ false }}">
+        <div style="margin-top:14px;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);color:#f87171;border-radius:9px;padding:11px 14px;font-size:13px;">{{ errorFactor }}</div>
+      </sc-if>
+    </div>
+  </div>
+  </sc-if>
+
+  <sc-if value="{{ modalAbierto }}" hint-placeholder-val="{{ false }}">
+  <div style="position:fixed;inset:0;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;z-index:50;">
+    <div style="width:480px;background:#141414;border:1px solid #2e2e2e;border-radius:16px;padding:28px;">
+      <div style="font-size:19px;font-weight:600;margin-bottom:22px;">{{ modalTitulo }}</div>
+      <div style="display:flex;flex-direction:column;gap:18px;">
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <label style="font-size:13px;color:#9ca3af;">Convenio</label>
+          <select value="{{ mConvenio }}" onChange="{{ onConvenio }}" style="background:#0a0a0a;border:1px solid #2e2e2e;border-radius:9px;padding:11px 13px;color:#e8e8e8;font-size:14px;outline:none;">
+            <sc-for list="{{ convenios }}" as="c" hint-placeholder-count="5">
+              <option value="{{ c }}">{{ c }}</option>
+            </sc-for>
+          </select>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <label style="font-size:13px;color:#9ca3af;">Tipo de renta</label>
+          <select value="{{ mRenta }}" onChange="{{ onRenta }}" style="background:#0a0a0a;border:1px solid #2e2e2e;border-radius:9px;padding:11px 13px;color:#e8e8e8;font-size:14px;outline:none;">
+            <sc-for list="{{ rentas }}" as="r" hint-placeholder-count="5">
+              <option value="{{ r }}">{{ r }}</option>
+            </sc-for>
+          </select>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <label style="font-size:13px;color:#9ca3af;">Tasa tope convenio</label>
+          <input value="{{ mTasa }}" onChange="{{ onTasa }}" placeholder="15.0000%" style="background:#0a0a0a;border:1px solid #2e2e2e;border-radius:9px;padding:11px 13px;color:#e8e8e8;font-size:14px;outline:none;font-family:'JetBrains Mono',monospace;">
+        </div>
+        <sc-if value="{{ modalError }}" hint-placeholder-val="{{ false }}">
+          <div style="background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);color:#f87171;border-radius:9px;padding:12px 14px;font-size:13px;line-height:1.5;">{{ modalError }}</div>
+        </sc-if>
+      </div>
+      <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:26px;">
+        <button onClick="{{ cerrarModal }}" style="background:transparent;color:#c9c9c9;border:1px solid #333;border-radius:9px;padding:11px 20px;font-size:14px;font-weight:500;cursor:pointer;" style-hover="border-color:#4a4a4a;">Cancelar</button>
+        <button onClick="{{ guardarModal }}" style="{{ modalGuardarStyle }}">Guardar</button>
+      </div>
+    </div>
+  </div>
+  </sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:980}}">
+const MESES = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
+const CONVENIOS = ["Chile","Canadá","Brasil","México","Corea del Sur","Suiza","Portugal","Comunidad Andina"];
+const RENTAS = ["02 · Enajenación de inmuebles","04 · Regalías","09 · Asistencia técnica","18 · Servicios digitales","06 · Intereses de créditos externos","11 · Dividendos"];
+
+const pct = v => (v === null || v === "" ? "" : v);
+
+class Component extends DCLogic {
+  state = {
+    pantalla: "tasas",
+    buscoTasa: "",
+    tasas: [
+      {codigo:"02", descripcion:"Enajenación de inmuebles y derechos sobre inmuebles", articulo:"Art. 9 a)", valor:"5.0000%"},
+      {codigo:"04", descripcion:"Regalías: bienes o derechos usados en el país", articulo:"Art. 9 b)", valor:"30.0000%"},
+      {codigo:"06", descripcion:"Intereses de créditos externos", articulo:"Art. 56 a)", valor:"4.9900%"},
+      {codigo:"09", descripcion:"Asistencia técnica", articulo:"Art. 56 f)", valor:"15.0000%"},
+      {codigo:"11", descripcion:"Enajenación de valores mobiliarios", articulo:"Art. 56 LIR", valor:"5.0000%"},
+      {codigo:"15", descripcion:"Espectáculos en vivo", articulo:"Art. 56 LIR", valor:"15.0000%"},
+      {codigo:"18", descripcion:"Servicios digitales prestados desde el exterior", articulo:"Art. 9 i)", valor:""},
+      {codigo:"21", descripcion:"Alquiler de inmuebles", articulo:"Art. 54 e)", valor:""}
+    ].map(t => ({...t, error:false, guardado:false})),
+    excepciones: [
+      {id:1, convenio:"Chile", renta:"04 · Regalías", tasa:"15.0000%", activo:true},
+      {id:2, convenio:"Canadá", renta:"02 · Enajenación de inmuebles", tasa:"10.0000%", activo:true},
+      {id:3, convenio:"Brasil", renta:"09 · Asistencia técnica", tasa:"15.0000%", activo:false}
+    ],
+    factores: [
+      {id:1, anio:2026, mes:6, factor:"1.380000"},
+      {id:2, anio:2026, mes:5, factor:"1.365000"},
+      {id:3, anio:2026, mes:4, factor:"1.350000"}
+    ],
+    nuevoAnio:"2026", nuevoMes:7, nuevoFactor:"", errorFactor:"",
+    modalAbierto:false, editandoId:null, mConvenio:"Chile", mRenta:"04 · Regalías", mTasa:"", modalError:""
+  };
+
+  tab(activo){
+    return "background:" + (activo ? "#2563eb" : "transparent") + ";color:" + (activo ? "#fff" : "#9ca3af") +
+      ";border:none;border-radius:7px;padding:9px 18px;font-size:14px;font-weight:600;cursor:pointer;";
+  }
+
+  parsePct(v){
+    const n = parseFloat(String(v).replace("%","").trim());
+    return isNaN(n) ? null : n;
+  }
+
+  editarTasa(i, v){
+    this.setState(s => {
+      const tasas = s.tasas.slice();
+      tasas[i] = {...tasas[i], valor:v, guardado:false, error:false};
+      return {tasas};
+    });
+  }
+
+  guardarTasa(i){
+    this.setState(s => {
+      const tasas = s.tasas.slice();
+      const t = {...tasas[i]};
+      const n = this.parsePct(t.valor);
+      if (t.valor.trim() === "") { t.valor=""; t.error=false; t.guardado=true; }
+      else if (n === null || n < 0 || n > 100) { t.error = true; t.guardado=false; }
+      else { t.valor = n.toFixed(4) + "%"; t.error=false; t.guardado=true; }
+      tasas[i] = t;
+      return {tasas};
+    });
+  }
+
+  duplicado(conv, renta, ignorarId){
+    return this.state.excepciones.some(e => e.convenio===conv && e.renta===renta && e.id!==ignorarId);
+  }
+
+  guardarModal(){
+    const {mConvenio, mRenta, mTasa, editandoId} = this.state;
+    if (this.duplicado(mConvenio, mRenta, editandoId)) {
+      this.setState({modalError:"Ya existe una excepción para este convenio y tipo de renta en su empresa. Edite la excepción existente en vez de crear una nueva."});
+      return;
+    }
+    const n = this.parsePct(mTasa);
+    if (n === null || n < 0 || n > 100) { this.setState({modalError:"La tasa tope debe estar entre 0% y 100%."}); return; }
+    this.setState(s => {
+      const tasa = n.toFixed(4) + "%";
+      if (editandoId) {
+        return {excepciones: s.excepciones.map(e => e.id===editandoId ? {...e, convenio:mConvenio, renta:mRenta, tasa} : e), modalAbierto:false, modalError:""};
+      }
+      return {excepciones:[...s.excepciones, {id:Date.now(), convenio:mConvenio, renta:mRenta, tasa, activo:true}], modalAbierto:false, modalError:""};
+    });
+  }
+
+  guardarFactor(){
+    const {nuevoAnio, nuevoMes, nuevoFactor, factores} = this.state;
+    const mes = Number(nuevoMes);
+    if (factores.some(f => f.anio===Number(nuevoAnio) && f.mes===mes)) {
+      this.setState({errorFactor:"Ya existe un factor para " + MESES[mes-1] + " " + nuevoAnio + " en su empresa. Edite el registro existente."});
+      return;
+    }
+    const f = parseFloat(nuevoFactor);
+    if (isNaN(f) || f <= 0) { this.setState({errorFactor:"El factor debe ser un número mayor a 0."}); return; }
+    this.setState(s => ({
+      factores: [{id:Date.now(), anio:Number(nuevoAnio), mes, factor:f.toFixed(6)}, ...s.factores],
+      nuevoFactor:"", errorFactor:""
+    }));
+  }
+
+  sugerirMes(){
+    const orden = this.state.factores.slice().sort((a,b) => b.anio-a.anio || b.mes-a.mes)[0];
+    let anio = orden ? orden.anio : 2026, mes = orden ? orden.mes + 1 : 1;
+    if (mes > 12) { mes = 1; anio += 1; }
+    this.setState({nuevoAnio:String(anio), nuevoMes:mes, nuevoFactor:"", errorFactor:""});
+  }
+
+  renderVals(){
+    const s = this.state;
+    const q = s.buscoTasa.toLowerCase();
+    const enTasas = s.pantalla === "tasas";
+
+    return {
+      enTasas, enFactor: !enTasas,
+      tituloPantalla: enTasas ? "Tasas de Retención y Excepciones por Convenio" : "Factor de Reajuste MEF",
+      subtituloPantalla: enTasas
+        ? "Mantenimiento de tasas normales por tipo de renta y tasas tope por convenio de doble imposición."
+        : "Factor mensual publicado por el MEF para el reajuste de costo de inmuebles.",
+      tabTasasStyle: this.tab(enTasas),
+      tabFactorStyle: this.tab(!enTasas),
+      irTasas: () => this.setState({pantalla:"tasas"}),
+      irFactor: () => this.setState({pantalla:"factor"}),
+
+      buscoTasa: s.buscoTasa,
+      onBuscarTasa: e => this.setState({buscoTasa:e.target.value}),
+      tasas: s.tasas.map((t, i) => ({
+        ...t,
+        pendiente: t.valor.trim() === "" && !t.error,
+        inputStyle: "width:130px;background:#0a0a0a;border:1px solid " + (t.error ? "#ef4444" : "#2e2e2e") +
+          ";border-radius:8px;padding:9px 12px;color:#e8e8e8;font-size:14px;outline:none;font-family:'JetBrains Mono',monospace;",
+        btnStyle: "background:#1c1c1c;border:1px solid #333;color:#c9c9c9;border-radius:8px;padding:8px 16px;font-size:13px;font-weight:500;cursor:pointer;",
+        onChange: e => this.editarTasa(i, e.target.value),
+        onGuardar: () => this.guardarTasa(i)
+      })).filter(t => !q || t.codigo.includes(q) || t.descripcion.toLowerCase().includes(q)),
+
+      excepciones: s.excepciones.map(e => ({
+        ...e,
+        estadoLabel: e.activo ? "Activo" : "Inactivo",
+        toggleLabel: e.activo ? "Deshabilitar" : "Habilitar",
+        badgeStyle: "font-size:12px;font-weight:600;padding:5px 12px;border-radius:20px;background:" +
+          (e.activo ? "rgba(34,197,94,.14);color:#22c55e;" : "rgba(156,163,175,.14);color:#9ca3af;"),
+        onEditar: () => this.setState({modalAbierto:true, editandoId:e.id, mConvenio:e.convenio, mRenta:e.renta, mTasa:e.tasa, modalError:""}),
+        onToggle: () => this.setState(st => ({excepciones: st.excepciones.map(x => x.id===e.id ? {...x, activo:!x.activo} : x)}))
+      })),
+      abrirNueva: () => this.setState({modalAbierto:true, editandoId:null, mConvenio:"Chile", mRenta:"04 · Regalías", mTasa:"", modalError:""}),
+
+      factores: s.factores.map(f => ({
+        ...f, mesNombre: MESES[f.mes-1],
+        onEditar: () => this.setState({nuevoAnio:String(f.anio), nuevoMes:f.mes, nuevoFactor:f.factor, errorFactor:"", factores: this.state.factores.filter(x => x.id!==f.id)}),
+        onEliminar: () => this.setState(st => ({factores: st.factores.filter(x => x.id!==f.id)}))
+      })),
+      meses: MESES.map((n, i) => ({nombre:n, valor:i+1})),
+      nuevoAnio: s.nuevoAnio, nuevoMes: s.nuevoMes, nuevoFactor: s.nuevoFactor, errorFactor: s.errorFactor,
+      onAnio: e => this.setState({nuevoAnio:e.target.value, errorFactor:""}),
+      onMes: e => this.setState({nuevoMes:Number(e.target.value), errorFactor:""}),
+      onFactor: e => this.setState({nuevoFactor:e.target.value, errorFactor:""}),
+      guardarFactor: () => this.guardarFactor(),
+      sugerirMes: () => this.sugerirMes(),
+
+      modalAbierto: s.modalAbierto,
+      modalTitulo: s.editandoId ? "Editar excepción por convenio" : "Nueva excepción por convenio",
+      convenios: CONVENIOS, rentas: RENTAS,
+      mConvenio: s.mConvenio, mRenta: s.mRenta, mTasa: pct(s.mTasa), modalError: s.modalError,
+      onConvenio: e => { const v = e.target.value; this.setState({mConvenio:v, modalError: this.duplicado(v, this.state.mRenta, this.state.editandoId) ? "Ya existe una excepción para este convenio y tipo de renta en su empresa." : ""}); },
+      onRenta: e => { const v = e.target.value; this.setState({mRenta:v, modalError: this.duplicado(this.state.mConvenio, v, this.state.editandoId) ? "Ya existe una excepción para este convenio y tipo de renta en su empresa." : ""}); },
+      onTasa: e => this.setState({mTasa:e.target.value}),
+      cerrarModal: () => this.setState({modalAbierto:false, modalError:""}),
+      guardarModal: () => this.guardarModal(),
+      modalGuardarStyle: "background:" + (s.modalError ? "#1e3a8a" : "#2563eb") + ";color:" + (s.modalError ? "#93a5c8" : "#fff") +
+        ";border:none;border-radius:9px;padding:11px 22px;font-size:14px;font-weight:600;cursor:" + (s.modalError ? "not-allowed" : "pointer") + ";"
+    };
+  }
+}
+</script>
+</body>
+</html>
