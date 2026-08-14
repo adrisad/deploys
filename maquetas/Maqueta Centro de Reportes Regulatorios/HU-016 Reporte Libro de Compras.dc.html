@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;700&amp;display=swap" rel="stylesheet">
+<style>
+  body { margin:0; background:#0b0b0d; font-family:'Barlow',system-ui,sans-serif; }
+  * { box-sizing:border-box; }
+  a { color:#5b7cfa; }
+  a:hover { color:#8ba3ff; }
+  select, input, button { font-family:inherit; }
+  ::placeholder { color:#5a5a63; }
+</style>
+</helmet>
+
+<div style="min-height:100vh;background:#0b0b0d;color:#e8e8ec;padding:32px 40px 80px;font-size:15px">
+  <div style="max-width:1420px;margin:0 auto;display:flex;flex-direction:column;gap:24px">
+
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:24px">
+      <div style="display:flex;flex-direction:column;gap:6px">
+        
+        <div style="font-size:32px;font-weight:600;letter-spacing:-.02em">{{ screenTitle }}</div>
+        <div style="color:#8a8a94;font-size:14px">{{ screenSub }}</div>
+      </div>
+      <div style="display:flex;gap:10px;align-items:center">
+        <sc-if value="{{ showBack }}" hint-placeholder-val="{{ true }}">
+          <button onClick="{{ goBack }}" style="background:#17171b;border:1px solid #2a2a31;color:#c9c9d2;padding:11px 18px;border-radius:10px;font-size:14px;font-weight:500;cursor:pointer" style-hover="background:#1f1f25;color:#fff">← Volver</button>
+        </sc-if>
+      </div>
+    </div>
+
+    
+
+    <!-- ============ PASO 0 · Centro de Reportes ============ -->
+    <sc-if value="{{ isP0 }}" hint-placeholder-val="{{ true }}">
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:18px">
+        <sc-for list="{{ libros }}" as="lb" hint-placeholder-count="4">
+          <div style="background:#131317;border:1px solid #23232a;border-radius:16px;padding:22px;display:flex;flex-direction:column;gap:16px" style-hover="border-color:#33333d">
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px">
+              <div style="display:flex;flex-direction:column;gap:6px">
+                <div style="font-size:18px;font-weight:600">{{ lb.nombre }}</div>
+                <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#6e6e78;letter-spacing:.08em">SIRE {{ lb.codigo_sire }}</div>
+              </div>
+              <div style="{{ lb.badgeStyle }}">{{ lb.badge }}</div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:4px;padding:14px;background:#0f0f12;border:1px solid #1f1f26;border-radius:11px">
+              <div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.14em;color:#6e6e78;text-transform:uppercase">Último periodo generado</div>
+              <div style="{{ lb.ultimoStyle }}">{{ lb.ultimo }}</div>
+            </div>
+            <button onClick="{{ lb.open }}" style="{{ lb.btnStyle }}">{{ lb.btnLabel }}</button>
+          </div>
+        </sc-for>
+      </div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#5a5a63;line-height:1.7">MAX(reporte_generado.registrado_en) · filtrado por libro_legal_id y activo=true<br>Tarjetas "Próximamente" no consultan la base (Opción B — hardcodeado en frontend)</div>
+    </sc-if>
+
+    <!-- ============ PASO 1 · Filtros ============ -->
+    <sc-if value="{{ isP1 }}" hint-placeholder-val="{{ true }}">
+      <div style="background:#131317;border:1px solid #23232a;border-radius:16px;padding:26px;display:flex;flex-direction:column;gap:24px">
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:18px">
+          <label style="display:flex;flex-direction:column;gap:8px">
+            <span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.14em;color:#8a8a94;text-transform:uppercase">Empresa *</span>
+            <select value="{{ f.empresa }}" onChange="{{ setEmpresa }}" style="background:#0f0f12;border:1px solid #2a2a31;color:#e8e8ec;padding:12px 14px;border-radius:10px;font-size:15px">
+              <option>TOTTOTECNIA S.A.C. — RUC 20601234567</option>
+              <option>DISTRIBUIDORA ANDINA S.A. — RUC 20512345678</option>
+            </select>
+          </label>
+          <label style="display:flex;flex-direction:column;gap:8px">
+            <span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.14em;color:#8a8a94;text-transform:uppercase">Periodo contable *</span>
+            <select value="{{ f.periodo }}" onChange="{{ setPeriodo }}" style="{{ periodoStyle }}">
+              <option>Agosto 2026</option>
+              <option>Julio 2026</option>
+              <option>Junio 2026</option>
+              <option>— Seleccionar —</option>
+            </select>
+          </label>
+          <sc-if value="{{ usaSucursal }}" hint-placeholder-val="{{ true }}">
+            <label style="display:flex;flex-direction:column;gap:8px">
+              <span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.14em;color:#8a8a94;text-transform:uppercase">Sucursal operativa</span>
+              <select value="{{ f.sucursal }}" onChange="{{ setSucursal }}" style="background:#0f0f12;border:1px solid #2a2a31;color:#e8e8ec;padding:12px 14px;border-radius:10px;font-size:15px">
+                <option>Todas</option>
+                <option>Lima Norte</option>
+                <option>Arequipa</option>
+              </select>
+            </label>
+          </sc-if>
+          <label style="display:flex;flex-direction:column;gap:8px">
+            <span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.14em;color:#8a8a94;text-transform:uppercase">Emisión desde</span>
+            <input type="date" value="{{ f.desde }}" min="{{ minDate }}" max="{{ maxDate }}" onChange="{{ setDesde }}" style="background:#0f0f12;border:1px solid #2a2a31;color:#e8e8ec;padding:12px 14px;border-radius:10px;font-size:15px;font-family:'JetBrains Mono',monospace">
+          </label>
+          <label style="display:flex;flex-direction:column;gap:8px">
+            <span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.14em;color:#8a8a94;text-transform:uppercase">Emisión hasta</span>
+            <input type="date" value="{{ f.hasta }}" min="{{ minDate }}" max="{{ maxDate }}" onChange="{{ setHasta }}" style="background:#0f0f12;border:1px solid #2a2a31;color:#e8e8ec;padding:12px 14px;border-radius:10px;font-size:15px;font-family:'JetBrains Mono',monospace">
+          </label>
+          <label style="display:flex;flex-direction:column;gap:8px">
+            <span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.14em;color:#8a8a94;text-transform:uppercase">Estado documento</span>
+            <input value="CONTABILIZADO" disabled="{{ true }}" style="background:#0f0f12;border:1px dashed #2a2a31;color:#6e6e78;padding:12px 14px;border-radius:10px;font-size:15px;font-family:'JetBrains Mono',monospace">
+          </label>
+        </div>
+
+        <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;padding-top:4px">
+          <span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.14em;color:#8a8a94;text-transform:uppercase;margin-right:6px">Formatos</span>
+          <sc-for list="{{ formatos }}" as="fm" hint-placeholder-count="4">
+            <button onClick="{{ fm.toggle }}" style="{{ fm.style }}">{{ fm.label }}</button>
+          </sc-for>
+        </div>
+
+        <sc-if value="{{ rangoAvisoVisible }}" hint-placeholder-val="{{ true }}">
+          <div style="display:flex;gap:10px;align-items:flex-start;padding:13px 16px;background:#1a1509;border:1px solid #4a3a12;border-radius:11px;color:#e0c07a;font-size:13.5px;line-height:1.6">{{ rangoAviso }}</div>
+        </sc-if>
+
+        <div style="display:flex;gap:12px;align-items:center;border-top:1px solid #23232a;padding-top:22px">
+          <button onClick="{{ generar }}" style="background:#3b62f0;border:none;color:#fff;padding:13px 26px;border-radius:11px;font-size:15px;font-weight:600;cursor:pointer;box-shadow:0 0 24px rgba(59,98,240,.35)" style-hover="background:#4a70ff">Generar</button>
+          <button onClick="{{ limpiar }}" style="background:#17171b;border:1px solid #2a2a31;color:#c9c9d2;padding:13px 22px;border-radius:11px;font-size:15px;font-weight:500;cursor:pointer" style-hover="background:#1f1f25">Limpiar</button>
+          <span style="color:#6e6e78;font-size:13px;margin-left:6px">La vista previa no genera registro de auditoría.</span>
+        </div>
+      </div>
+
+      <div style="background:#131317;border:1px solid #23232a;border-radius:16px;overflow:hidden">
+        <div style="padding:18px 24px;border-bottom:1px solid #23232a;display:flex;flex-direction:column;gap:4px">
+          <span style="font-size:17px;font-weight:600">Historial de reportes generados</span>
+          <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#6e6e78">tabla reporte_generado · solo exportaciones reales, nunca vistas previas</span>
+        </div>
+        <div style="display:grid;grid-template-columns:150px 110px 120px 1fr 110px;padding:12px 24px;background:#101014;border-bottom:1px solid #23232a;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.12em;color:#8a8a94;text-transform:uppercase">
+          <div>Fecha/hora</div><div>Formato</div><div>Periodo</div><div>Nombre de archivo</div><div style="text-align:right">Registros</div>
+        </div>
+        <sc-for list="{{ historial }}" as="h" hint-placeholder-count="2">
+          <div style="display:grid;grid-template-columns:150px 110px 120px 1fr 110px;padding:13px 24px;border-bottom:1px solid #1c1c22;font-family:'JetBrains Mono',monospace;font-size:12.5px;align-items:center">
+            <div>{{ h.stamp }}</div>
+            <div style="color:#5b7cfa">{{ h.formato }}</div>
+            <div>{{ h.periodo }}</div>
+            <div style="word-break:break-all;color:#c9c9d2">{{ h.nombre }}</div>
+            <div style="text-align:right">{{ h.registros }}</div>
+          </div>
+        </sc-for>
+        <sc-if value="{{ historialVacio }}" hint-placeholder-val="{{ true }}">
+          <div style="padding:34px;text-align:center;color:#6e6e78;font-size:14px">Sin generar aún</div>
+        </sc-if>
+      </div>
+    </sc-if>
+
+    <!-- ============ PASO 2 · Vista previa ============ -->
+    <sc-if value="{{ isP2 }}" hint-placeholder-val="{{ true }}">
+      <div style="display:flex;flex-direction:column;gap:20px">
+
+        <div style="background:#131317;border:1px solid #23232a;border-radius:16px;padding:20px 24px;display:flex;flex-wrap:wrap;gap:28px;align-items:center;justify-content:space-between">
+          <div style="display:flex;flex-wrap:wrap;gap:28px">
+            <div style="display:flex;flex-direction:column;gap:3px">
+              <span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.14em;color:#6e6e78;text-transform:uppercase">Empresa</span>
+              <span style="font-size:14.5px;font-weight:500">{{ f.empresa }}</span>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:3px">
+              <span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.14em;color:#6e6e78;text-transform:uppercase">Periodo</span>
+              <span style="font-size:14.5px;font-weight:500">{{ f.periodo }}</span>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:3px">
+              <span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.14em;color:#6e6e78;text-transform:uppercase">Rango emisión</span>
+              <span style="font-size:14.5px;font-weight:500;font-family:'JetBrains Mono',monospace">{{ rangoTexto }}</span>
+            </div>
+          </div>
+          <div style="display:flex;gap:12px;align-items:center">
+            <div style="display:flex;gap:4px;background:#0f0f12;border:1px solid #23232a;padding:4px;border-radius:11px">
+              <button onClick="{{ setMonedaPais }}" style="{{ tabPaisStyle }}">Moneda País</button>
+              <button onClick="{{ setMonedaOrigen }}" style="{{ tabOrigenStyle }}">Moneda Origen</button>
+            </div>
+            <sc-if value="{{ esOrigen }}" hint-placeholder-val="{{ true }}">
+              <select value="{{ monedaOrigen }}" onChange="{{ setMonedaSel }}" style="{{ selMonedaStyle }}">
+                <option>— Moneda obligatoria —</option>
+                <option>Soles</option>
+                <option>Dólares</option>
+                <option>Euros</option>
+              </select>
+            </sc-if>
+          </div>
+        </div>
+
+        <sc-if value="{{ bloqueado }}" hint-placeholder-val="{{ true }}">
+          <div style="background:#131317;border:1px dashed #33333d;border-radius:16px;padding:64px;text-align:center;color:#8a8a94;font-size:16px">Selecciona una moneda de origen para ver el detalle</div>
+        </sc-if>
+
+        <sc-if value="{{ tablaVisible }}" hint-placeholder-val="{{ true }}">
+          <div style="background:#131317;border:1px solid #23232a;border-radius:16px;overflow:hidden">
+            <div style="display:grid;grid-template-columns:124px 80px 130px 1fr 110px 132px 92px 40px;gap:0;padding:14px 20px;background:#101014;border-bottom:1px solid #23232a;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.12em;color:#8a8a94;text-transform:uppercase">
+              <div>Fecha Emis. / Vcto.</div><div>Tipo Doc</div><div>Serie-Núm</div><div>Proveedor</div><div style="text-align:right">{{ colIgv }}</div><div style="text-align:right">{{ colTotal }}</div><div style="text-align:center">SIRE</div><div></div>
+            </div>
+            <sc-for list="{{ filas }}" as="d" hint-placeholder-count="6">
+              <div style="border-bottom:1px solid #1c1c22">
+                <div style="display:grid;grid-template-columns:124px 80px 130px 1fr 110px 132px 92px 40px;gap:0;padding:15px 20px;align-items:center">
+                  <div style="display:flex;flex-direction:column;gap:3px;font-family:'JetBrains Mono',monospace;font-size:12.5px">
+                    <span>{{ d.fecha_emision }}</span>
+                    <span style="color:#6e6e78;font-size:11.5px">Vcto: {{ d.fecha_vencimiento }}</span>
+                  </div>
+                  <div style="font-family:'JetBrains Mono',monospace;font-size:13px;color:#5b7cfa;font-weight:500">{{ d.tipoDoc }}</div>
+                  <div style="font-family:'JetBrains Mono',monospace;font-size:12.5px">{{ d.numero }}</div>
+                  <div style="display:flex;flex-direction:column;gap:3px;padding-right:16px">
+                    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+                      <span style="font-family:'JetBrains Mono',monospace;font-size:13px">{{ d.docIdentidad }}</span>
+                      <sc-if value="{{ d.tieneRef }}" hint-placeholder-val="{{ true }}">
+                        <span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.06em;background:#1b1b33;border:1px solid #2f2f56;color:#9aa6f5;padding:2px 7px;border-radius:5px">REF {{ d.referencia }}</span>
+                      </sc-if>
+                      <sc-if value="{{ d.tieneDam }}" hint-placeholder-val="{{ true }}">
+                        <span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.06em;background:#0f2019;border:1px solid #1f4436;color:#71c9a3;padding:2px 7px;border-radius:5px">DAM {{ d.dam }}</span>
+                      </sc-if>
+                    </div>
+                    <span style="font-size:13.5px;color:#8a8a94">{{ d.proveedor }}</span>
+                  </div>
+                  <div style="text-align:right;font-family:'JetBrains Mono',monospace;font-size:13.5px;color:#c9c9d2">{{ d.igvPlano }}</div>
+                  <div style="text-align:right;font-family:'JetBrains Mono',monospace;font-size:14.5px;font-weight:600">{{ d.totalPlano }}</div>
+                  <div style="display:flex;justify-content:center;align-items:center">
+                    <button onClick="{{ d.toggleSire }}" style="{{ d.switchStyle }}"><span style="{{ d.knobStyle }}"></span></button>
+                  </div>
+                  <div style="display:flex;justify-content:flex-end">
+                    <button onClick="{{ d.toggleExp }}" style="{{ d.arrowStyle }}">{{ d.arrow }}</button>
+                  </div>
+                </div>
+
+                <sc-if value="{{ d.motivoAbierto }}" hint-placeholder-val="{{ true }}">
+                  <div style="padding:0 20px 18px 56px;display:flex;flex-direction:column;gap:9px">
+                    <div style="display:flex;gap:10px;align-items:center">
+                      <input value="{{ d.motivo }}" onChange="{{ d.setMotivo }}" placeholder="Motivo de exclusión de SIRE (obligatorio)" style="{{ d.motivoInputStyle }}">
+                      <button onClick="{{ d.guardarMotivo }}" style="background:#3b62f0;border:none;color:#fff;padding:11px 20px;border-radius:9px;font-size:14px;font-weight:600;cursor:pointer" style-hover="background:#4a70ff">Guardar</button>
+                      <button onClick="{{ d.cancelarMotivo }}" style="background:#17171b;border:1px solid #2a2a31;color:#c9c9d2;padding:11px 18px;border-radius:9px;font-size:14px;cursor:pointer">Cancelar</button>
+                    </div>
+                    <sc-if value="{{ d.motivoError }}" hint-placeholder-val="{{ true }}">
+                      <span style="color:#f08a8a;font-size:13px">El motivo es obligatorio — no se guarda el cambio sin él.</span>
+                    </sc-if>
+                  </div>
+                </sc-if>
+
+                <sc-if value="{{ d.motivoGuardado }}" hint-placeholder-val="{{ true }}">
+                  <div style="padding:0 20px 16px 56px;display:flex;gap:9px;align-items:center;font-size:13px;color:#e0c07a">
+                    <span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.1em;background:#1a1509;border:1px solid #4a3a12;padding:3px 8px;border-radius:5px">EXCLUIDO DE SIRE</span>
+                    <span>{{ d.motivo }}</span>
+                  </div>
+                </sc-if>
+
+                <sc-if value="{{ d.expandido }}" hint-placeholder-val="{{ true }}">
+                  <div style="margin:0 16px 18px;padding:18px 20px;background:#0e0e11;border:1px solid #1f1f26;border-radius:14px;display:flex;flex-direction:column;gap:10px">
+                    <span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.14em;color:#8a8a94;text-transform:uppercase">Desglose por balde</span>
+                    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px">
+                      <sc-for list="{{ d.baldes }}" as="b" hint-placeholder-count="4">
+                        <div style="background:#131317;border:1px solid #24242c;border-radius:11px;padding:13px 15px;display:flex;flex-direction:column;gap:5px">
+                          <span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.12em;color:#7a7a84;text-transform:uppercase">{{ b.label }}</span>
+                          <span style="font-family:'JetBrains Mono',monospace;font-size:13.5px">Base {{ b.base }}</span>
+                          <span style="font-family:'JetBrains Mono',monospace;font-size:12.5px;color:#8a8a94">IGV {{ b.igv }}</span>
+                        </div>
+                      </sc-for>
+                    </div>
+
+                    <div style="display:flex;gap:18px;align-items:center;background:#111731;border:1px solid #2b3a6b;border-radius:11px;padding:13px 18px;font-family:'JetBrains Mono',monospace;font-size:13.5px;color:#a8b8ff;font-weight:600">
+                      <span>IGV Total del Documento: {{ d.igvTotal }}</span>
+                      <span style="color:#3a4a80">|</span>
+                      <span>Total del Documento: {{ d.total }}</span>
+                    </div>
+
+                    <sc-if value="{{ d.tieneBadges }}" hint-placeholder-val="{{ true }}">
+                      <span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.14em;color:#8a8a94;text-transform:uppercase;margin-top:4px">Otros impuestos y conceptos</span>
+                    </sc-if>
+                    <sc-if value="{{ d.tieneBadges }}" hint-placeholder-val="{{ true }}">
+                      <div style="display:flex;flex-wrap:wrap;gap:9px">
+                        <sc-for list="{{ d.badges }}" as="bg" hint-placeholder-count="2">
+                          <div style="display:flex;gap:8px;align-items:center;background:#0f0f12;border:1px solid #24242c;border-radius:8px;padding:8px 12px;font-family:'JetBrains Mono',monospace;font-size:12px">
+                            <span style="color:#8a8a94;letter-spacing:.08em">{{ bg.label }}</span><span>{{ bg.valor }}</span>
+                          </div>
+                        </sc-for>
+                      </div>
+                    </sc-if>
+
+                    <sc-if value="{{ d.tieneDetraccion }}" hint-placeholder-val="{{ true }}">
+                      <div style="display:flex;flex-direction:column;gap:9px;margin-top:4px">
+                        <span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.14em;color:#8a8a94;text-transform:uppercase">Detracción</span>
+                        <div style="{{ d.detrBoxStyle }}">
+                          <span style="font-size:13.5px;font-weight:600;color:#e0c07a">{{ d.detrLinea }}</span>
+                          <sc-if value="{{ d.alertaConstancia }}" hint-placeholder-val="{{ true }}">
+                            <span style="font-size:13px;color:#f0a0a0">(!) Sin Constancia de Depósito registrada — riesgo de pérdida del crédito fiscal</span>
+                          </sc-if>
+                        </div>
+                      </div>
+                    </sc-if>
+
+                    <div style="display:flex;flex-wrap:wrap;gap:22px;font-size:13.5px;color:#8a8a94">
+                      <span>Clasificación B/S (campo 33): <span style="color:#e8e8ec;font-family:'JetBrains Mono',monospace">{{ d.clasificacion }}</span></span>
+                      <span>Tipo de cambio: <span style="color:#e8e8ec;font-family:'JetBrains Mono',monospace">{{ d.tipoCambio }}</span></span>
+                      <span>Adq. No Gravada: <span style="color:#e8e8ec;font-family:'JetBrains Mono',monospace">{{ d.noGravada }}</span></span>
+                    </div>
+                  </div>
+                </sc-if>
+              </div>
+            </sc-for>
+          </div>
+
+          <div style="display:flex;flex-wrap:wrap;gap:18px;justify-content:space-between;align-items:flex-end">
+            <div style="display:flex;gap:14px;flex-wrap:wrap">
+              <div style="background:#131317;border:1px solid #23232a;border-radius:14px;padding:18px 24px;display:flex;flex-direction:column;gap:6px;min-width:230px">
+                <span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.14em;color:#8a8a94;text-transform:uppercase">Total del Libro</span>
+                <span style="font-family:'JetBrains Mono',monospace;font-size:24px;font-weight:700">{{ totalLibro }}</span>
+                <span style="font-size:12.5px;color:#6e6e78">{{ countLibro }} documentos CONTABILIZADO</span>
+              </div>
+              <div style="background:#131317;border:1px solid #2b3a6b;border-radius:14px;padding:18px 24px;display:flex;flex-direction:column;gap:6px;min-width:230px">
+                <span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.14em;color:#8ea0f5;text-transform:uppercase">Total SIRE</span>
+                <span style="font-family:'JetBrains Mono',monospace;font-size:24px;font-weight:700;color:#a8b8ff">{{ totalSire }}</span>
+                <span style="font-size:12.5px;color:#6e6e78">{{ countSire }} documentos enviar_a_sire=true</span>
+              </div>
+            </div>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+              <span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.14em;color:#8a8a94;text-transform:uppercase;margin-right:4px">Exportar</span>
+              <sc-for list="{{ exportBtns }}" as="e" hint-placeholder-count="4">
+                <button onClick="{{ e.click }}" style="{{ e.style }}">{{ e.label }}</button>
+              </sc-for>
+            </div>
+          </div>
+        </sc-if>
+      </div>
+    </sc-if>
+
+    <!-- ============ PASO 2c · Reporte exportado ============ -->
+    <sc-if value="{{ isP2c }}" hint-placeholder-val="{{ true }}">
+      <div style="background:#f6f6f4;color:#16161a;border-radius:14px;padding:40px 44px;display:flex;flex-direction:column;gap:22px;font-size:12.5px;box-shadow:0 20px 60px rgba(0,0,0,.5)">
+        <div style="display:flex;justify-content:space-between;gap:40px;border-bottom:2px solid #16161a;padding-bottom:18px">
+          <div style="display:flex;flex-direction:column;gap:3px">
+            <span style="font-size:16px;font-weight:700">TOTTOTECNIA S.A.C.</span>
+            <span>RUC 20601234567</span>
+            <span style="color:#55555c">Av. Javier Prado Este 4200, Surco — Lima</span>
+          </div>
+          <div style="text-align:center;display:flex;flex-direction:column;gap:4px;justify-content:center">
+            <span style="font-size:17px;font-weight:700;letter-spacing:.02em">REGISTRO DE COMPRAS NACIONALES</span>
+            <span style="font-family:'JetBrains Mono',monospace;color:#55555c">Libro SIRE 080400 · Periodo {{ f.periodo }}</span>
+          </div>
+          <div style="text-align:right;display:flex;flex-direction:column;gap:3px;font-family:'JetBrains Mono',monospace;font-size:11px">
+            <span>Generado por: e.ramirez</span>
+            <span>{{ nowStamp }}</span>
+            <span style="color:#55555c">SHA-256 {{ hashCorto }}</span>
+          </div>
+        </div>
+        <div style="background:#eaeae6;border:1px solid #d5d5cf;border-radius:8px;padding:11px 14px;font-family:'JetBrains Mono',monospace;font-size:11.5px;line-height:1.6"><b>Criterios de generación:</b> {{ criterios }}</div>
+        <div style="overflow-x:auto">
+          <div style="min-width:1500px;display:flex;flex-direction:column">
+            <div style="{{ pdfHeadStyle }}">
+              <sc-for list="{{ pdfCols }}" as="c" hint-placeholder-count="12">
+                <div style="{{ c.style }}">{{ c.label }}</div>
+              </sc-for>
+            </div>
+            <sc-for list="{{ pdfRows }}" as="r" hint-placeholder-count="6">
+              <div style="{{ r.rowStyle }}">
+                <sc-for list="{{ r.cells }}" as="c" hint-placeholder-count="12">
+                  <div style="{{ c.style }}">{{ c.v }}</div>
+                </sc-for>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+        <div style="display:flex;justify-content:flex-end;gap:40px;border-top:2px solid #16161a;padding-top:14px;font-family:'JetBrains Mono',monospace;font-size:13px">
+          <span>TOTAL DEL LIBRO: <b>{{ totalLibro }}</b></span>
+          <span>TOTAL SIRE: <b>{{ totalSire }}</b></span>
+        </div>
+        <div style="text-align:center;color:#55555c;font-size:11px;font-style:italic">Documento generado por Lumina ERP — no reemplaza la declaración jurada ante SUNAT</div>
+      </div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#5a5a63;line-height:1.7">Orientación HORIZONTAL (landscape) obligatoria · sin toggles ni filas expandibles · carátula estándar sección 5.5<br>Excel: hoja "Datos" (plana, autofiltro, fila congelada) + hoja "Información del Reporte" (carátula) — nunca combinadas</div>
+    </sc-if>
+
+    <!-- ============ Éxito de exportación ============ -->
+    <sc-if value="{{ exitoAbierto }}" hint-placeholder-val="{{ true }}">
+      <div style="position:fixed;inset:0;background:rgba(4,4,6,.82);display:flex;align-items:center;justify-content:center;padding:32px;z-index:55">
+        <div style="background:#131317;border:1px solid #2a2a31;border-radius:18px;padding:36px 40px 32px;width:100%;max-width:560px;display:flex;flex-direction:column;gap:22px;align-items:center">
+          <div style="width:78px;height:78px;border-radius:50%;background:#146b45;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:700;color:#fff;letter-spacing:.04em;box-shadow:0 0 30px rgba(20,107,69,.5)">OK</div>
+          <div style="display:flex;flex-direction:column;gap:7px;align-items:center;text-align:center">
+            <span style="font-size:22px;font-weight:600">Archivo generado correctamente</span>
+            <span style="font-family:'JetBrains Mono',monospace;font-size:12.5px;color:#8a8a94;word-break:break-all">{{ exito.nombre }}</span>
+          </div>
+          <div style="width:100%;display:flex;flex-direction:column;gap:10px;padding:0 8px">
+            <sc-for list="{{ exito.filas }}" as="x" hint-placeholder-count="4">
+              <div style="display:flex;justify-content:space-between;gap:20px;align-items:baseline">
+                <span style="font-size:13.5px;color:#8a8a94">{{ x.k }}</span>
+                <span style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:600;text-align:right">{{ x.v }}</span>
+              </div>
+            </sc-for>
+          </div>
+          <div style="display:flex;gap:12px;width:100%;padding-top:4px">
+            <button onClick="{{ descargar }}" style="flex:1;background:#3b62f0;border:none;color:#fff;padding:13px;border-radius:11px;font-size:14.5px;font-weight:600;cursor:pointer;box-shadow:0 0 22px rgba(59,98,240,.35)" style-hover="background:#4a70ff">Descargar archivo</button>
+            <button onClick="{{ cerrarExito }}" style="flex:1;background:#17171b;border:1px solid #2a2a31;color:#c9c9d2;padding:13px;border-radius:11px;font-size:14.5px;font-weight:500;cursor:pointer" style-hover="background:#1f1f25">Cerrar</button>
+          </div>
+          <span style="font-size:12.5px;color:#6e6e78;text-align:center;line-height:1.6">Este evento quedó registrado en el historial de reportes generados (tabla reporte_generado), visible en la parte inferior de la pantalla de filtros.</span>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- ============ Modal Paso 3 ============ -->
+    <sc-if value="{{ modalAbierto }}" hint-placeholder-val="{{ true }}">
+      <div style="position:fixed;inset:0;background:rgba(4,4,6,.78);display:flex;align-items:center;justify-content:center;padding:32px;z-index:50">
+        <div style="background:#131317;border:1px solid #2a2a31;border-radius:18px;padding:30px;width:100%;max-width:620px;display:flex;flex-direction:column;gap:20px">
+          <div style="display:flex;flex-direction:column;gap:6px">
+            <span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.14em;color:#8a8a94;text-transform:uppercase">Paso 3 · Confirmación de exportación</span>
+            <span style="font-size:22px;font-weight:600">{{ modalTitulo }}</span>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:1px;background:#1c1c22;border:1px solid #24242c;border-radius:12px;overflow:hidden">
+            <sc-for list="{{ modalFilas }}" as="m" hint-placeholder-count="7">
+              <div style="display:flex;justify-content:space-between;gap:20px;padding:12px 16px;background:#0f0f12">
+                <span style="font-family:'JetBrains Mono',monospace;font-size:11.5px;color:#8a8a94">{{ m.k }}</span>
+                <span style="font-family:'JetBrains Mono',monospace;font-size:12px;text-align:right;word-break:break-all">{{ m.v }}</span>
+              </div>
+            </sc-for>
+          </div>
+          <div style="font-size:13.5px;color:#8a8a94;line-height:1.6">Al confirmar se crea la fila en <span style="font-family:'JetBrains Mono',monospace;color:#c9c9d2">reporte_generado</span> con formato, hash SHA-256, filtros aplicados y usuario.</div>
+          <div style="display:flex;gap:10px;justify-content:flex-end">
+            <button onClick="{{ cerrarModal }}" style="background:#17171b;border:1px solid #2a2a31;color:#c9c9d2;padding:12px 20px;border-radius:10px;font-size:14.5px;cursor:pointer">Cancelar</button>
+            <button onClick="{{ confirmarExport }}" style="background:#3b62f0;border:none;color:#fff;padding:12px 24px;border-radius:10px;font-size:14.5px;font-weight:600;cursor:pointer;box-shadow:0 0 22px rgba(59,98,240,.35)" style-hover="background:#4a70ff">Confirmar y generar</button>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ toast }}" hint-placeholder-val="{{ true }}">
+      <div style="position:fixed;bottom:28px;right:28px;background:#0f1a12;border:1px solid #23492e;color:#8fdca8;padding:15px 20px;border-radius:12px;font-size:14px;z-index:40;max-width:420px;line-height:1.55">{{ toast }}</div>
+    </sc-if>
+
+  </div>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1480,&quot;height&quot;:1000}}">
+const DOCS = [
+  { id:1, tipo:'01 FAC', numero:'F001-0004512', emision:'2026-08-03', vcto:'2026-09-02', proveedor:'IMPORTACIONES DEL SUR S.A.C.', ident:'RUC 20548712345', signo:1,
+    dg:{b:12500.00,i:2250.00}, dgng:{b:0,i:0}, dng:{b:0,i:0}, ng:0, isc:0, icbper:0, otros:0, imb:0, ret:0, total:14750.00, tc:'3.712', clasif:'1 — Bienes', sire:true },
+  { id:2, tipo:'01 FAC', numero:'F002-0000897', emision:'2026-08-07', vcto:'2026-08-22', proveedor:'SERVICIOS LOGÍSTICOS ANDINOS E.I.R.L.', ident:'RUC 20601998877', signo:1,
+    dg:{b:8400.00,i:1512.00}, dgng:{b:1200.00,i:216.00}, dng:{b:0,i:0}, ng:0, isc:0, icbper:1.50, otros:0, imb:0, ret:96.25, total:11328.00, tc:'3.712', clasif:'2 — Servicios', sire:true,
+    detr:{ tipo:'027 — Servicio de transporte de carga', pct:'4%', monto:453.12, constancia:'', fecha:'' } },
+  { id:3, tipo:'07 NCR', numero:'F001-0000133', emision:'2026-08-11', vcto:'2026-08-11', proveedor:'IMPORTACIONES DEL SUR S.A.C.', ident:'RUC 20548712345', signo:-1, ref:'F001-0004512',
+    dg:{b:1500.00,i:270.00}, dgng:{b:0,i:0}, dng:{b:0,i:0}, ng:0, isc:0, icbper:0, otros:0, imb:0, ret:0, total:1770.00, tc:'3.712', clasif:'1 — Bienes', sire:true },
+  { id:4, tipo:'50 DAM', numero:'118-2026-000451', emision:'2026-08-14', vcto:'2026-08-29', proveedor:'GLOBAL PARTS TRADING LTD.', ident:'DNI 45678912', signo:1, dam:'118 · 2026 · 000451',
+    dg:{b:32800.00,i:5904.00}, dgng:{b:0,i:0}, dng:{b:0,i:0}, ng:2400.00, isc:410.00, icbper:0, otros:180.00, imb:0, ret:0, total:41694.00, tc:'3.718', clasif:'1 — Bienes', sire:false, motivo:'' },
+  { id:5, tipo:'01 FAC', numero:'F003-0001204', emision:'2026-08-19', vcto:'2026-09-18', proveedor:'CONSULTORA TRIBUTARIA MERIDIAN S.A.C.', ident:'RUC 20512004411', signo:1,
+    dg:{b:6000.00,i:1080.00}, dgng:{b:0,i:0}, dng:{b:2500.00,i:450.00}, ng:0, isc:0, icbper:0, otros:0, imb:35.00, ret:70.80, total:10065.00, tc:'3.705', clasif:'2 — Servicios', sire:true,
+    detr:{ tipo:'022 — Otros servicios empresariales', pct:'12%', monto:1207.80, constancia:'0072-4581923', fecha:'2026-08-21' } },
+  { id:6, tipo:'08 NDB', numero:'F002-0000041', emision:'2026-08-26', vcto:'2026-09-10', proveedor:'SERVICIOS LOGÍSTICOS ANDINOS E.I.R.L.', ident:'RUC 20601998877', signo:1, ref:'F002-0000897',
+    dg:{b:900.00,i:162.00}, dgng:{b:0,i:0}, dng:{b:0,i:0}, ng:0, isc:0, icbper:0, otros:0, imb:0, ret:0, total:1062.00, tc:'3.702', clasif:'2 — Servicios', sire:true },
+  { id:7, tipo:'01 FAC', numero:'F004-0000318', emision:'2026-08-06', vcto:'2026-09-05', proveedor:'MASCHINENBAU HOFFMANN GMBH', ident:'RUC 20609887744', signo:1,
+    dg:{b:4200.00,i:756.00}, dgng:{b:0,i:0}, dng:{b:0,i:0}, ng:0, isc:0, icbper:0, otros:0, imb:0, ret:0, total:4956.00, tc:'4.086', clasif:'1 — Bienes', sire:true },
+  { id:9, tipo:'01 FAC', numero:'F001-0004201', emision:'2026-07-09', vcto:'2026-08-08', proveedor:'FERRETERÍA INDUSTRIAL DEL PACÍFICO S.A.C.', ident:'RUC 20551122334', signo:1,
+    dg:{b:5600.00,i:1008.00}, dgng:{b:0,i:0}, dng:{b:0,i:0}, ng:0, isc:0, icbper:0, otros:0, imb:0, ret:0, total:6608.00, tc:'3.690', clasif:'1 — Bienes', sire:true },
+  { id:10, tipo:'07 NCR', numero:'F001-0000121', emision:'2026-07-24', vcto:'2026-07-24', proveedor:'FERRETERÍA INDUSTRIAL DEL PACÍFICO S.A.C.', ident:'RUC 20551122334', signo:-1, ref:'F001-0004201',
+    dg:{b:600.00,i:108.00}, dgng:{b:0,i:0}, dng:{b:0,i:0}, ng:0, isc:0, icbper:0, otros:0, imb:0, ret:0, total:708.00, tc:'3.694', clasif:'1 — Bienes', sire:true },
+  { id:11, tipo:'01 FAC', numero:'F002-0000751', emision:'2026-06-12', vcto:'2026-07-12', proveedor:'TRANSPORTES UNIDOS DEL CENTRO S.A.', ident:'RUC 20533445566', signo:1,
+    dg:{b:9800.00,i:1764.00}, dgng:{b:0,i:0}, dng:{b:0,i:0}, ng:0, isc:0, icbper:2.40, otros:0, imb:0, ret:115.82, total:11564.00, tc:'3.681', clasif:'2 — Servicios', sire:true,
+    detr:{ tipo:'027 — Servicio de transporte de carga', pct:'4%', monto:462.56, constancia:'0072-4390118', fecha:'2026-06-15' } },
+  { id:12, tipo:'01 FAC', numero:'F005-0000064', emision:'2026-06-27', vcto:'2026-07-27', proveedor:'SUMINISTROS ELÉCTRICOS QUILCA E.I.R.L.', ident:'RUC 20567788990', signo:1,
+    dg:{b:3100.00,i:558.00}, dgng:{b:0,i:0}, dng:{b:450.00,i:81.00}, ng:0, isc:0, icbper:0, otros:26.00, imb:0, ret:0, total:4215.00, tc:'3.688', clasif:'1 — Bienes', sire:false, motivo:'' },
+  { id:8, tipo:'01 FAC', numero:'F004-0000322', emision:'2026-08-21', vcto:'2026-09-20', proveedor:'EUROTECH SERVICES B.V.', ident:'RUC 20604455121', signo:1,
+    dg:{b:1850.00,i:333.00}, dgng:{b:0,i:0}, dng:{b:0,i:0}, ng:0, isc:0, icbper:0, otros:0, imb:0, ret:23.10, total:2183.00, tc:'4.091', clasif:'2 — Servicios', sire:true }
+];
+
+const PERIODOS = { 'Agosto 2026':['2026-08-01','2026-08-31'], 'Julio 2026':['2026-07-01','2026-07-31'], 'Junio 2026':['2026-06-01','2026-06-30'] };
+const MON = { 'Soles':'S/', 'Dólares':'US$', 'Euros':'€' };
+
+class Component extends DCLogic {
+  state = {
+    paso: 0,
+    empresa: 'TOTTOTECNIA S.A.C. — RUC 20601234567',
+    periodo: 'Agosto 2026',
+    sucursal: 'Todas',
+    desde: '2026-08-01', hasta: '2026-08-31',
+    usaSucursal: true,
+    formatos: { PDF:false, Word:false, Excel:false, 'TXT SIRE':true },
+    moneda: 'PAIS', monedaOrigen: '— Moneda obligatoria —',
+    docs: DOCS.map(d => ({ ...d, motivo: d.motivo || '' })),
+    exp: {}, motivoUI: {}, motivoErr: {},
+    aviso: '', modal: null, toast: '', hash: '9f2a3c8e1b74d05f',
+    exito: null,
+    historial: [
+      { stamp:'31/07/2026 18:04', formato:'SIRE_TXT', periodo:'Julio 2026', nombre:'LE2060123456720260700080400021012.TXT', registros:'19' },
+      { stamp:'30/06/2026 17:21', formato:'PDF', periodo:'Junio 2026', nombre:'LibroCompras_20601234567_202606.pdf', registros:'16' }
+    ]
+  };
+
+  money(v) {
+    const p = this.state.moneda === 'PAIS' ? 'S/' : (MON[this.state.monedaOrigen] || 'S/');
+    return p + ' ' + Math.abs(v).toLocaleString('es-PE', { minimumFractionDigits:2, maximumFractionDigits:2 });
+  }
+  setState(...args) {
+    super.setState(...args);
+    clearTimeout(this._t);
+    this._t = setTimeout(() => { if (this.state.toast) super.setState({ toast: '' }); }, 4000);
+  }
+  componentWillUnmount() { clearTimeout(this._t); }
+  plain(v) { return Math.abs(v).toLocaleString('es-PE', { minimumFractionDigits:2, maximumFractionDigits:2 }); }
+  fecha(s) { if (!s) return '—'; const [y,m,d] = s.split('-'); return d + '/' + m + '/' + y; }
+  igvTotal(d) { return d.dg.i + d.dgng.i + d.dng.i; }
+  visibles() {
+    const { desde, hasta } = this.state;
+    return this.state.docs.filter(d => d.emision >= desde && d.emision <= hasta);
+  }
+  setPeriodo = e => {
+    const p = e.target.value, r = PERIODOS[p];
+    if (!r) { this.setState({ periodo: p }); return; }
+    this.setState({ periodo: p, desde: r[0], hasta: r[1], aviso: 'El Periodo cambió a ' + p + ' — el rango de fechas se reseteó al mes completo (' + this.fecha(r[0]) + ' – ' + this.fecha(r[1]) + ').' });
+  };
+  clampFecha(v) {
+    const r = PERIODOS[this.state.periodo]; if (!r || !v) return v;
+    if (v < r[0]) return r[0];
+    if (v > r[1]) return r[1];
+    return v;
+  }
+  setFecha(key, v) {
+    const c = this.clampFecha(v);
+    const aviso = c !== v ? 'La fecha se limitó al mes calendario del Periodo ' + this.state.periodo + ' (máx. ' + this.fecha(PERIODOS[this.state.periodo][1]) + ').' : '';
+    this.setState({ [key]: c, aviso });
+  }
+  tab(active) {
+    return 'border:none;cursor:pointer;padding:10px 20px;border-radius:10px;font-size:14.5px;font-weight:' + (active?'600':'500') +
+      ';background:' + (active?'#3b62f0':'transparent') + ';color:' + (active?'#fff':'#8a8a94') +
+      (active ? ';box-shadow:0 0 20px rgba(59,98,240,.4)' : '');
+  }
+  smallTab(active) {
+    return 'border:none;cursor:pointer;padding:9px 16px;border-radius:9px;font-size:13.5px;font-weight:' + (active?'600':'500') +
+      ';background:' + (active?'#3b62f0':'transparent') + ';color:' + (active?'#fff':'#8a8a94');
+  }
+  nombreArchivo(fmt) {
+    if (fmt !== 'TXT SIRE') return 'LibroCompras_20601234567_202608.' + (fmt === 'Word' ? 'docx' : fmt === 'Excel' ? 'xlsx' : 'pdf');
+    const ind = this.visibles().some(d => d.sire) ? '1' : '0';
+    return 'LE20601234567202608000804000' + '2' + '1' + ind + '2.TXT';
+  }
+  criteriosTexto() {
+    const s = this.state;
+    const mon = s.moneda === 'PAIS' ? 'Moneda País (PEN)' : 'Moneda Origen — ' + s.monedaOrigen;
+    return 'Periodo: ' + s.periodo + ' · Sucursal: ' + s.sucursal + ' · Emisión: ' + this.fecha(s.desde) + ' a ' + this.fecha(s.hasta) + ' · ' + mon + ' · Estado: CONTABILIZADO';
+  }
+
+  renderVals() {
+    const s = this.state, p = s.paso;
+    const esOrigen = s.moneda === 'ORIGEN';
+    const monedaElegida = esOrigen && MON[s.monedaOrigen];
+    const bloqueado = esOrigen && !monedaElegida;
+
+    let docs = this.visibles();
+    if (monedaElegida) {
+      const monMap = { 'Soles': [1,3,5,6,9,10,11,12], 'Dólares': [2,4], 'Euros': [7,8] };
+      docs = docs.filter(d => (monMap[s.monedaOrigen] || []).includes(d.id));
+    }
+
+    const totalLibro = docs.reduce((a,d) => a + d.total * d.signo, 0);
+    const sireDocs = docs.filter(d => d.sire);
+    const totalSire = sireDocs.reduce((a,d) => a + d.total * d.signo, 0);
+
+    const titles = [
+      ['Centro de Reportes Regulatorios', 'Punto de entrada común a los 4 libros legales'],
+      ['Reporte de Libro de Compras', 'Paso 1 — Filtros de generación'],
+      ['Reporte de Libro de Compras', 'Tottotecnia S.A.C. · ' + s.periodo + ' · ' + docs.length + ' documentos · ' + docs.filter(d => !d.sire).length + ' excluido(s) de SIRE'],
+      ['Reporte exportado', 'Paso 2c — Carátula horizontal (PDF / Word / Excel)']
+    ];
+
+    const filas = docs.map(d => {
+      const badges = [];
+      if (d.isc > 0) badges.push({ label:'ISC', valor: this.money(d.isc) });
+      if (d.icbper > 0) badges.push({ label:'ICBPER', valor: this.money(d.icbper) });
+      if (d.otros > 0) badges.push({ label:'OTROS TRIB./CARGOS', valor: this.money(d.otros) });
+      if (d.imb > 0) badges.push({ label:'IMB (LEY 31053)', valor: this.money(d.imb) });
+      if (d.ret > 0) badges.push({ label:'RETENCIÓN IGV', valor: this.money(d.ret) });
+      const sinConst = d.detr && !d.detr.constancia;
+      const motivoAbierto = !!s.motivoUI[d.id];
+      return {
+        ...d,
+        fecha_emision: this.fecha(d.emision), fecha_vencimiento: this.fecha(d.vcto),
+        proveedor: d.proveedor, docIdentidad: d.ident,
+        tieneRef: !!d.ref, referencia: d.ref || '', tieneDam: !!d.dam, dam: d.dam || '',
+        signoLabel: d.signo === 1 ? '+ (cargo)' : '− (abono)',
+        tipoDoc: d.tipo.split(' ')[0],
+        igvTotal: this.money(this.igvTotal(d)), total: (d.signo === -1 ? '− ' : '') + this.money(d.total),
+        igvPlano: this.plain(this.igvTotal(d)),
+        totalPlano: (d.signo === -1 ? '− ' : '') + this.plain(d.total),
+        detrLinea: d.detr ? (d.detr.tipo.split(' — ')[1] || d.detr.tipo) + ' (' + d.detr.pct + ')  |  Monto: ' + this.money(d.detr.monto) + '  |  Fecha Depósito: ' + (d.detr.fecha ? this.fecha(d.detr.fecha) : '—') + (d.detr.constancia ? '  |  Constancia: ' + d.detr.constancia : '') : '',
+        detrBoxStyle: 'display:flex;flex-direction:column;gap:5px;border-radius:11px;padding:13px 16px;background:#1a1509;border:1px solid ' + (d.detr && !d.detr.constancia ? '#6b4a12' : '#3a2f10'),
+        expandido: !!s.exp[d.id], arrow: s.exp[d.id] ? '▾' : '▸',
+        arrowStyle: 'background:transparent;border:none;color:' + (s.exp[d.id] ? '#5b7cfa' : '#6e6e78') + ';font-size:15px;cursor:pointer;padding:0;text-align:left',
+        toggleExp: () => this.setState({ exp: { ...s.exp, [d.id]: !s.exp[d.id] } }),
+        switchStyle: 'width:46px;height:26px;border-radius:13px;border:1px solid ' + (d.sire ? '#3b62f0' : '#33333d') + ';background:' + (d.sire ? '#3b62f0' : '#1c1c22') + ';cursor:pointer;padding:0;display:flex;align-items:center;justify-content:' + (d.sire ? 'flex-end' : 'flex-start'),
+        knobStyle: 'display:block;width:20px;height:20px;border-radius:50%;background:#fff;margin:0 3px',
+        toggleSire: () => {
+          if (d.sire) this.setState({ motivoUI: { ...s.motivoUI, [d.id]: true } });
+          else this.setState({ docs: s.docs.map(x => x.id === d.id ? { ...x, sire:true, motivo:'' } : x), motivoUI: { ...s.motivoUI, [d.id]: false }, toast: 'Documento ' + d.numero + ' reincorporado a SIRE — enviar_a_sire=true.' });
+        },
+        motivoAbierto, motivo: d.motivo, motivoError: !!s.motivoErr[d.id],
+        motivoGuardado: !d.sire && !motivoAbierto && !!d.motivo,
+        motivoInputStyle: 'flex:1;background:#0f0f12;border:1px solid ' + (s.motivoErr[d.id] ? '#5c2626' : '#2a2a31') + ';color:#e8e8ec;padding:11px 14px;border-radius:9px;font-size:14px',
+        setMotivo: e => this.setState({ docs: s.docs.map(x => x.id === d.id ? { ...x, motivo: e.target.value } : x), motivoErr: { ...s.motivoErr, [d.id]: false } }),
+        guardarMotivo: () => {
+          const cur = (s.docs.find(x => x.id === d.id).motivo || '').trim();
+          if (!cur) { this.setState({ motivoErr: { ...s.motivoErr, [d.id]: true } }); return; }
+          this.setState({ docs: s.docs.map(x => x.id === d.id ? { ...x, sire:false } : x), motivoUI: { ...s.motivoUI, [d.id]: false }, toast: 'UPDATE cabecera_libro_compras SET enviar_a_sire=false, motivo_no_envio_sire=… para ' + d.numero });
+        },
+        cancelarMotivo: () => this.setState({ motivoUI: { ...s.motivoUI, [d.id]: false }, motivoErr: { ...s.motivoErr, [d.id]: false }, docs: s.docs.map(x => x.id === d.id ? { ...x, motivo:'' } : x) }),
+        baldes: [
+          { label:'DG — Gravado', base:this.money(d.dg.b), igv:this.money(d.dg.i) },
+          { label:'DGNG — Grav. y No Grav.', base:this.money(d.dgng.b), igv:this.money(d.dgng.i) },
+          { label:'DNG — No Gravado', base:this.money(d.dng.b), igv:this.money(d.dng.i) },
+          { label:'IGV total del documento', base:'—', igv:this.money(this.igvTotal(d)) }
+        ],
+        badges, tieneBadges: badges.length > 0,
+        tieneDetraccion: !!d.detr, alertaConstancia: sinConst,
+        detraccion: d.detr ? [
+          { label:'Tipo de bien/servicio', valor:d.detr.tipo, style:'font-size:13.5px' },
+          { label:'% aplicado', valor:d.detr.pct, style:'font-family:JetBrains Mono,monospace;font-size:13.5px' },
+          { label:'Monto', valor:this.money(d.detr.monto), style:'font-family:JetBrains Mono,monospace;font-size:13.5px' },
+          { label:'N° Constancia', valor:d.detr.constancia || 'SIN REGISTRAR', style:'font-family:JetBrains Mono,monospace;font-size:13.5px;color:' + (d.detr.constancia ? '#e8e8ec' : '#f0a0a0') },
+          { label:'Fecha de depósito', valor:d.detr.fecha ? this.fecha(d.detr.fecha) : '—', style:'font-family:JetBrains Mono,monospace;font-size:13.5px' }
+        ] : [],
+        clasificacion: d.clasif, tipoCambio: esOrigen ? d.tc : 'n/a (Moneda País)', noGravada: this.money(d.ng)
+      };
+    });
+
+    const pdfColLabels = ['Emisión','Vcto','Tipo · Nº','Proveedor','Doc. Identidad','Base DG','IGV DG','Base DGNG','IGV DGNG','Base DNG','No Grav.','ISC','ICBPER','Otros','IMB','Ret. IGV','Detr. Tipo/%','Detr. Monto','Nº Constancia','Total','SIRE'];
+    const wid = '78px 70px 116px minmax(190px,1fr) 118px 82px 74px 82px 74px 78px 74px 62px 66px 62px 58px 70px 130px 82px 106px 92px 52px';
+    const cellBase = 'padding:7px 6px;font-size:10.5px;font-family:JetBrains Mono,monospace;border-bottom:1px solid #ddddd7;';
+    const pdfCols = pdfColLabels.map((l,i) => ({ label:l, style:'padding:8px 6px;font-size:9.5px;letter-spacing:.06em;text-transform:uppercase;font-weight:700;border-bottom:1.5px solid #16161a;' + (i>=5 && i!==16 && i!==18 && i!==20 ? 'text-align:right;' : i===20 ? 'text-align:center;' : '') }));
+    const num = v => v ? Math.abs(v).toLocaleString('es-PE',{minimumFractionDigits:2,maximumFractionDigits:2}) : '—';
+    const pdfRows = docs.map((d,ri) => ({
+      rowStyle: 'display:grid;grid-template-columns:' + wid + ';background:' + (ri%2 ? '#f0f0ec' : 'transparent'),
+      cells: [
+        this.fecha(d.emision), this.fecha(d.vcto), d.tipo + ' ' + d.numero, d.proveedor, d.ident,
+        num(d.dg.b), num(d.dg.i), num(d.dgng.b), num(d.dgng.i), num(d.dng.b), num(d.ng),
+        num(d.isc), num(d.icbper), num(d.otros), num(d.imb), num(d.ret),
+        d.detr ? d.detr.tipo.split(' — ')[0] + ' / ' + d.detr.pct : '—',
+        d.detr ? num(d.detr.monto) : '—',
+        d.detr ? (d.detr.constancia || '⚠ SIN CONSTANCIA') : '—',
+        (d.signo === -1 ? '− ' : '') + num(d.total), d.sire ? 'SÍ' : 'NO'
+      ].map((v,i) => ({ v, style: cellBase + (i>=5 && i!==16 && i!==18 && i!==20 ? 'text-align:right;' : i===20 ? 'text-align:center;font-weight:700;' : '') + (i===18 && d.detr && !d.detr.constancia ? 'color:#a11;font-weight:700;' : '') + (i===3 ? 'font-family:Barlow,sans-serif;font-size:11px;' : '') }))
+    }));
+
+    const exportBtns = ['PDF','Word','Excel','Generar TXT SIRE'].map(l => ({
+      label: l,
+      style: 'cursor:pointer;padding:12px 20px;border-radius:11px;font-size:14.5px;font-weight:600;border:' +
+        (l.startsWith('Generar') ? 'none;background:#3b62f0;color:#fff;box-shadow:0 0 22px rgba(59,98,240,.35)' : '1px solid #2a2a31;background:#17171b;color:#c9c9d2'),
+      click: () => this.setState({ modal: l === 'Generar TXT SIRE' ? 'TXT SIRE' : l })
+    }));
+
+    const fmt = s.modal;
+    const modalFilas = fmt ? [
+      { k:'tipo_reporte', v:'LIBRO_COMPRAS' },
+      { k:'libro_legal_id', v:'codigo_sire = 080400' },
+      { k:'formato', v: fmt === 'TXT SIRE' ? 'SIRE_TXT' : fmt.toUpperCase() },
+      { k:'periodo_id', v: s.periodo },
+      { k:'total_registros', v: String(docs.length) },
+      { k:'filtros_aplicados', v: '{"moneda":"' + (esOrigen ? s.monedaOrigen : 'PAIS') + '","sucursal":' + (s.sucursal === 'Todas' ? 'null' : '"' + s.sucursal + '"') + '}' },
+      { k:'nombre_archivo', v: this.nombreArchivo(fmt) },
+      { k:'hash_archivo', v:'SHA-256 ' + s.hash + '…' },
+      { k:'registrado_por', v:'e.ramirez' }
+    ] : [];
+
+    return {
+      screenTitle: titles[p][0], screenSub: titles[p][1],
+      showBack: p > 0, goBack: () => this.setState({ paso: p === 3 ? 2 : p - 1, toast:'' }),
+      steps: ['Paso 0 · Centro de Reportes','Paso 1 · Filtros','Paso 2 · Vista previa','Paso 2c · Exportado'].map((label,i) => ({
+        label, style: this.tab(p === i),
+        go: () => { if (i >= 2 && !PERIODOS[s.periodo]) { this.setState({ aviso:'Periodo contable es obligatorio.' }); return; } this.setState({ paso: i, toast:'' }); }
+      })),
+      isP0: p === 0, isP1: p === 1, isP2: p === 2, isP2c: p === 3,
+
+      libros: [
+        { nombre:'Registro de Compras Nacionales', codigo_sire:'080400', ultimo:'Agosto 2026', impl:true },
+        { nombre:'Registro de Ventas e Ingresos', codigo_sire:'140100', ultimo:'Próximamente', impl:false },
+        { nombre:'Compras No Domiciliados', codigo_sire:'080200', ultimo:'Próximamente', impl:false },
+        { nombre:'Honorarios Profesionales', codigo_sire:'—', ultimo:'Próximamente', impl:false }
+      ].map(lb => ({
+        ...lb,
+        badge: lb.impl ? 'Disponible' : 'Próximamente',
+        badgeStyle: 'font-family:JetBrains Mono,monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;padding:5px 10px;border-radius:6px;white-space:nowrap;' +
+          (lb.impl ? 'background:#0f2019;border:1px solid #1f4436;color:#71c9a3' : 'background:#1c1c22;border:1px solid #2a2a31;color:#7a7a84'),
+        ultimoStyle: 'font-family:JetBrains Mono,monospace;font-size:15px;color:' + (lb.impl ? '#e8e8ec' : '#6e6e78'),
+        btnLabel: lb.impl ? 'Abrir' : 'Próximamente',
+        btnStyle: 'padding:12px;border-radius:11px;font-size:14.5px;font-weight:600;' +
+          (lb.impl ? 'background:#3b62f0;border:none;color:#fff;cursor:pointer;box-shadow:0 0 20px rgba(59,98,240,.3)' : 'background:#17171b;border:1px solid #24242c;color:#5a5a63;cursor:not-allowed'),
+        open: () => { if (lb.impl) this.setState({ paso: 1 }); }
+      })),
+
+      f: { empresa:s.empresa, periodo:s.periodo, sucursal:s.sucursal, desde:s.desde, hasta:s.hasta },
+      usaSucursal: s.usaSucursal,
+      minDate: (PERIODOS[s.periodo] || [])[0] || '', maxDate: (PERIODOS[s.periodo] || [])[1] || '',
+      periodoStyle: 'background:#0f0f12;border:1px solid ' + (PERIODOS[s.periodo] ? '#2a2a31' : '#6b2b2b') + ';color:#e8e8ec;padding:12px 14px;border-radius:10px;font-size:15px',
+      setEmpresa: e => this.setState({ empresa: e.target.value }),
+      setSucursal: e => this.setState({ sucursal: e.target.value }),
+      setPeriodo: this.setPeriodo,
+      setDesde: e => this.setFecha('desde', e.target.value),
+      setHasta: e => this.setFecha('hasta', e.target.value),
+      formatos: Object.keys(s.formatos).map(k => ({
+        label: k,
+        style: 'cursor:pointer;padding:10px 16px;border-radius:9px;font-size:13.5px;font-weight:500;border:1px solid ' +
+          (s.formatos[k] ? '#3b62f0;background:#16204a;color:#a8b8ff' : '#2a2a31;background:#0f0f12;color:#8a8a94'),
+        toggle: () => this.setState({ formatos: { ...s.formatos, [k]: !s.formatos[k] } })
+      })),
+      rangoAvisoVisible: !!s.aviso, rangoAviso: s.aviso,
+      generar: () => {
+        if (!PERIODOS[s.periodo]) { this.setState({ aviso:'Periodo contable es obligatorio — se bloquea la generación.' }); return; }
+        this.setState({ paso: 2, aviso:'', toast:'Vista previa generada — no se creó registro en reporte_generado.' });
+      },
+      limpiar: () => this.setState({ periodo:'Agosto 2026', sucursal:'Todas', desde:'2026-08-01', hasta:'2026-08-31', formatos:{ PDF:false, Word:false, Excel:false, 'TXT SIRE':true }, aviso:'' }),
+
+      esOrigen, bloqueado, tablaVisible: !bloqueado,
+      monedaOrigen: s.monedaOrigen,
+      tabPaisStyle: this.smallTab(!esOrigen), tabOrigenStyle: this.smallTab(esOrigen),
+      selMonedaStyle: 'background:#0f0f12;border:1px solid ' + (monedaElegida ? '#2a2a31' : '#6b2b2b') + ';color:#e8e8ec;padding:10px 14px;border-radius:10px;font-size:14px',
+      setMonedaPais: () => this.setState({ moneda:'PAIS' }),
+      setMonedaOrigen: () => this.setState({ moneda:'ORIGEN' }),
+      setMonedaSel: e => this.setState({ monedaOrigen: e.target.value, toast: MON[e.target.value] ? 'Filtro sustituido — solo documentos con moneda de origen ' + e.target.value + ', montos monto_*_origen sin conversión.' : '' }),
+      rangoTexto: this.fecha(s.desde) + ' – ' + this.fecha(s.hasta),
+      colIgv: 'IGV (' + (esOrigen ? (MON[s.monedaOrigen] || '') : 'S/') + ')',
+      colTotal: 'Total (' + (esOrigen ? (MON[s.monedaOrigen] || '') : 'S/') + ')',
+      filas,
+      totalLibro: this.money(totalLibro), totalSire: this.money(totalSire),
+      countLibro: docs.length, countSire: sireDocs.length,
+      exportBtns,
+
+      pdfCols, pdfRows, pdfHeadStyle: 'display:grid;grid-template-columns:' + wid,
+      criterios: this.criteriosTexto(),
+      nowStamp: '14/08/2026 09:42:11', hashCorto: s.hash + '…',
+
+      modalAbierto: !!fmt, modalTitulo: fmt ? (fmt === 'TXT SIRE' ? 'Generar TXT SIRE (Anexo 11 · 37 campos)' : 'Exportar a ' + fmt) : '',
+      modalFilas, cerrarModal: () => this.setState({ modal: null }),
+      confirmarExport: () => {
+        const stamp = '14/08/2026 16:3' + (s.historial.length + 2);
+        const nombre = this.nombreArchivo(fmt);
+        const excl = docs.filter(d => !d.sire).length;
+        this.setState({
+          modal: null,
+          historial: [{ stamp, formato: fmt === 'TXT SIRE' ? 'SIRE_TXT' : fmt.toUpperCase(), periodo: s.periodo, nombre, registros: String(sireDocs.length) }, ...s.historial],
+          exito: {
+            nombre,
+            filas: [
+              { k:'Formato', v: fmt },
+              { k:'Documentos incluidos', v: sireDocs.length + ' de ' + docs.length + (excl ? ' (' + excl + ' excluido' + (excl>1?'s':'') + ')' : '') },
+              { k:'Generado por', v: 'e.ramirez — ' + stamp },
+              { k:'Hash (SHA-256)', v: s.hash.slice(0,6) + '… (truncado)' }
+            ]
+          }
+        });
+      },
+      exitoAbierto: !!s.exito, exito: s.exito || { nombre:'', filas:[] },
+      cerrarExito: () => this.setState({ exito: null }),
+      descargar: () => this.setState({ exito: null, toast: 'Descarga iniciada: ' + (s.exito ? s.exito.nombre : '') }),
+      historial: s.historial, historialVacio: s.historial.length === 0,
+      toast: s.toast
+    };
+  }
+}
+
+</script>
+</body>
+</html>
